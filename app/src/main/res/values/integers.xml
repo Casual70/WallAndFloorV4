@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="stroke_dimension">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>7</item>
+        <item>10</item>
+        <item>15</item>
+    </integer-array>
+    <string-array name = "filling_Style">
+        <item>Solo Contorno</item>
+        <item>Contorno e Interno</item>
+        <item>Solo Interno</item>
+    </string-array>
+</resources>

@@ -1,0 +1,9 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Material">
+        <!-- Customize your theme here. -->
+        <item name="android:dialogTheme">@android:style/Theme.Material.Dialog.NoActionBar</item>
+    </style>
+
+</resources>

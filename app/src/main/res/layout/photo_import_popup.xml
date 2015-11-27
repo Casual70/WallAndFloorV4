@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:layout_gravity="bottom">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="prova1"
+        android:id="@+id/prova1"
+        android:layout_alignParentTop="true"
+        android:gravity="center_horizontal"/>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar_contrast"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/prova1"
+        android:layout_alignParentStart="true" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="prova2"
+        android:id="@+id/prova2"
+        android:layout_below="@+id/seekBar"
+        android:layout_alignParentStart="true"
+        android:gravity="center_horizontal"/>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar2"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/prova2"
+        android:layout_alignParentStart="true" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="prova3"
+        android:id="@+id/prova3"
+        android:layout_below="@+id/seekBar2"
+        android:layout_alignParentStart="true"
+        android:gravity="center_horizontal"/>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar3"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/prova3"
+        android:layout_alignParentStart="true" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/frameLayout"
+        android:layout_below="@+id/seekBar3"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Button"
+            android:id="@+id/button2"
+            android:layout_weight="1"
+            android:layout_gravity="right|center_vertical" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Button"
+            android:id="@+id/button"
+            android:layout_weight="1"
+            android:layout_gravity="left|center_vertical" />
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,17 @@
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity"
+    android:id="@+id/drawerLayout_color">
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/contentFrame_color"/>
+    <include
+        layout="@layout/color_choisel_drawerlay"/>
+    <include
+        layout="@layout/action_choise_drawerlay"/>
+
+</android.support.v4.widget.DrawerLayout>
