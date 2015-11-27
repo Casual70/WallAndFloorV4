@@ -52,6 +52,7 @@ public class EditorActivity extends Activity {
     private ViewForDrawIn vfd;
     private DrawerLayout drawerLayout_color;
     private App app;
+    private EditorFragment fragment;
 
     private Bitmap myBitmap;
     private Paint myPaint;
@@ -85,31 +86,30 @@ public class EditorActivity extends Activity {
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inMutable = true;
         myBitmap = decodeInSample(wafImage);
-        vfd = new ViewForDrawIn(app.getContext(),myPaint,myBitmap);
+        //vfd = new ViewForDrawIn(app.getContext(),myPaint,myBitmap);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Log.e(LOG_EditorActivity, "onStart");
-        EditorFragment fragment = new EditorFragment();
-        fragment.setVfd(vfd);
-        fragment.setmBitmapAndPaint(myBitmap,myPaint);
+        fragment = new EditorFragment();
+        //fragment.setVfd(vfd);
+        fragment.setmBitmapAndPaint(myBitmap, myPaint);
         FragmentManager fm = getFragmentManager();
         fm.beginTransaction().replace(R.id.contentFrame_color,fragment).commit();
-        //vfd = fragment.getVfd();
         confirmColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int color = cpv.getColor();
-                Paint vfdPaint = vfd.getmPaint();
+                Paint vfdPaint = fragment.getVfd().getmPaint();
                 vfdPaint.setColor(color);
                 if (vfdPaint.getShader() != null) {
                     vfdPaint.setShader(null);
                 }
-                vfd.setmPaint(vfdPaint);
+                fragment.getVfd().setmPaint(vfdPaint);
                 drawerLayout_color.closeDrawers();
-                cpv.setOriginalColor(vfd.getmPaint().getColor());
+                cpv.setOriginalColor(fragment.getVfd().getmPaint().getColor());
             }
         });
         toggleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -118,8 +118,8 @@ public class EditorActivity extends Activity {
                 for (int i = 0; i < group.getChildCount(); i++) {
                     ToggleButton toggleButton = (ToggleButton) group.getChildAt(i);
                     toggleButton.setChecked(toggleButton.getId() == checkedId);
-                    vfd.setFreeHand(freeHandButtton.isChecked());
-                    vfd.setOneLine(oneLineButton.isChecked());
+                    fragment.getVfd().setFreeHand(freeHandButtton.isChecked());
+                    fragment.getVfd().setOneLine(oneLineButton.isChecked());
                 }
             }
         });
@@ -162,7 +162,7 @@ public class EditorActivity extends Activity {
         grayScaleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                vfd.grayscale();
+                fragment.getVfd().grayscale();
             }
         });
     }
@@ -203,7 +203,7 @@ public class EditorActivity extends Activity {
     }
     private void dialogSetBitmap(){
         Dialog dialog = new Dialog(this);
-        Bitmap bitmap = vfd.getmBitmap();
+        Bitmap bitmap = fragment.getVfd().getmBitmap();
         View view = getLayoutInflater().inflate(R.layout.photo_import_popup,null);
         SeekBar contrast = (SeekBar)view.findViewById(R.id.seekBar_contrast);
         dialog.setContentView(view);
@@ -238,7 +238,7 @@ public class EditorActivity extends Activity {
     private boolean saveCurrentPhoto(WafImage wafImage){
         String editedSuffix = "_edit.jpeg";
         boolean isSaved = false;
-        Bitmap edit = vfd.getmBitmap();
+        Bitmap edit = fragment.getVfd().getmBitmap();
         FileOutputStream out = null;
         try{
             out = new FileOutputStream(wafImage.getFilePath().getAbsolutePath()+editedSuffix);

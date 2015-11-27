@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,13 @@ public class EditorFragment extends android.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return vfd;
+        Log.e("fragment","OncreateView");
+        View view = inflater.inflate(R.layout.prova2,null);
+        vfd = (ViewForDrawIn)view.findViewById(R.id.ViewForDrawIn);
+        vfd.setmBitmap(mBitmap);
+        vfd.setmPaint(mPaint);
+        text = (TextView)view.findViewById(R.id.TextViewProva);
+        return view;
     }
 
     public void setVfd(ViewForDrawIn vfd) {

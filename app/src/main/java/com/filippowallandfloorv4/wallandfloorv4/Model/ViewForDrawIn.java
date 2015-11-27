@@ -1,7 +1,9 @@
 package com.filippowallandfloorv4.wallandfloorv4.Model;
 
+import android.app.VoiceInteractor;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorMatrix;
@@ -9,7 +11,9 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.hardware.display.DisplayManager;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -54,22 +58,27 @@ public class ViewForDrawIn extends View {
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context,attrs);
-        this.context = context;
-        Log.e(VFD_LOG, "Context context, AttributeSet attrs");
+        if (isInEditMode()){
+            this.context = context;
+            init();
+            Log.e(VFD_LOG, "Context context, AttributeSet attrs");
+        }
     }
 
 
     //todo try this http://developer.android.com/training/custom-views/create-view.html
-    public ViewForDrawIn(Context context, Paint mPaint, Bitmap mBitmap) {
+    /*public ViewForDrawIn(Context context, Paint mPaint, Bitmap mBitmap) {
         super(context);
         this.context = context;
         init(mPaint,mBitmap);
-    }
+    }*/
 
-    public void init(Paint mPaint,Bitmap mBitmap){
-        this.mPaint = mPaint;
-        this.mBitmap = mBitmap;
-        mPath = new Path();
+    public void init(){
+        this.mPaint = new Paint();
+        DisplayMetrics metrics = new DisplayMetrics();//
+        this.mBitmap = Bitmap.createBitmap(1,1, Bitmap.Config.RGB_565);
+        this.mPath = new Path();
+        mCanvas = new Canvas(mBitmap);
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         circlePaint = new Paint();
         circlePath = new Path();
@@ -84,7 +93,7 @@ public class ViewForDrawIn extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mCanvas = new Canvas(mBitmap);
+
     }
     public ColorMatrixColorFilter grayscale (){
         ColorMatrix cm = new ColorMatrix();
