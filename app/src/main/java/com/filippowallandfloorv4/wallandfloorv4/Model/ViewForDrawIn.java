@@ -17,6 +17,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+
+import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,13 +33,11 @@ public class ViewForDrawIn extends View {
     private static final String VFD_LOG = "ViewForDrawIn_Debug";
     private static final String AutoFinder_debug = "AutoFinder_Debug";
 
-    public int width;               //
-    public int height;              //
     private Bitmap mBitmap;         //
     private Canvas mCanvas;         //
     private Path mPath;             // serve a definire il Percorso Path appunto tracciato, è quello che mi serve
     private Paint mBitmapPaint;     //
-    Context context;                //
+    public Context context;         //
     private Paint circlePaint;      //
     private Path circlePath;        //
     private ArrayList<Point> listPcentr = null;
@@ -58,27 +59,14 @@ public class ViewForDrawIn extends View {
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context,attrs);
-        if (isInEditMode()){
-            this.context = context;
-            init();
-            Log.e(VFD_LOG, "Context context, AttributeSet attrs");
-        }
-    }
-
-
-    //todo try this http://developer.android.com/training/custom-views/create-view.html
-    /*public ViewForDrawIn(Context context, Paint mPaint, Bitmap mBitmap) {
-        super(context);
+        if (isInEditMode()){}
         this.context = context;
-        init(mPaint,mBitmap);
-    }*/
-
+        init();
+        Log.e(VFD_LOG, "Context context, AttributeSet attrs");
+    }
     public void init(){
-        this.mPaint = new Paint();
-        DisplayMetrics metrics = new DisplayMetrics();//
-        this.mBitmap = Bitmap.createBitmap(1,1, Bitmap.Config.RGB_565);
-        this.mPath = new Path();
-        mCanvas = new Canvas(mBitmap);
+        mPath = new Path();
+        mPaint = new Paint();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         circlePaint = new Paint();
         circlePath = new Path();
@@ -88,12 +76,18 @@ public class ViewForDrawIn extends View {
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(1f);
         stroke = mPaint.getStrokeWidth();
+        Log.e(VFD_LOG,"Vdf inizialized");
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
+        if (mBitmap == null){
+            Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+            mCanvas = new Canvas(bitmap);
+        }else{
+            mCanvas = new Canvas(mBitmap);
+        }
     }
     public ColorMatrixColorFilter grayscale (){
         ColorMatrix cm = new ColorMatrix();
@@ -106,6 +100,7 @@ public class ViewForDrawIn extends View {
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
         canvas.drawPath(circlePath, circlePaint);
+
         Log.e("onDraw", "draw");
     }
     private void touch_start(float x,float y){
@@ -347,6 +342,8 @@ public class ViewForDrawIn extends View {
 
     public void setmBitmap(Bitmap mBitmap) {
         this.mBitmap = mBitmap;
+        onSizeChanged(mBitmap.getWidth(),mBitmap.getHeight(),mBitmap.getWidth(),mBitmap.getHeight());
+        Log.e(VFD_LOG,"on size changed recall");
     }
 
     public void setFreeHand(boolean freeHand) {
@@ -359,6 +356,10 @@ public class ViewForDrawIn extends View {
 
     public void setOneLine(boolean oneLine) {
         this.oneLine = oneLine;
+    }
+
+    public Canvas getmCanvas() {
+        return mCanvas;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.filippowallandfloorv4.wallandfloorv4.Fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -54,5 +55,13 @@ public class EditorFragment extends android.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    public Bitmap getmBitmap() {
+        return mBitmap;
+    }
+
+    public Paint getmPaint() {
+        return mPaint;
     }
 }
