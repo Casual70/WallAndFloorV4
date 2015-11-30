@@ -3,37 +3,68 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="50dp">
 
     <ImageButton
+        android:layout_weight="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton" />
+        android:layout_height="25dp"
+        android:layout_gravity="top"
+        android:foregroundGravity="top"
+        android:id="@+id/openImageButton"
+        android:src="@drawable/open_actionbar"/>
 
     <ImageButton
+        android:layout_weight="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton2" />
+        android:layout_height="fill_parent"
+        android:id="@+id/strokeWidthImageButton"
+        android:src="@drawable/line_icon"/>
 
     <ImageButton
+        android:layout_weight="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton3" />
+        android:layout_height="fill_parent"
+        android:id="@+id/strokeStyleImageButton"
+        android:src="@drawable/line_icon_style"/>
+
+    <ImageButton
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:id="@+id/grayScaleImageButton"
+        android:src="@drawable/grayscale_icon"/>
 
     <ToggleButton
+        android:layout_weight="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:text="New ToggleButton"
-        android:id="@+id/toggleButton" />
+        android:textOn=""
+        android:textOff=""
+        android:background="@drawable/checktoggle_freehand"
+        android:id="@+id/freeHandImageButton"/>
 
     <ToggleButton
+        android:layout_weight="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:text="New ToggleButton"
-        android:id="@+id/toggleButton2" />
+        android:textOff=""
+        android:textOn=""
+        android:background="@drawable/checktoggle_oneline"
+        android:id="@+id/oneLineImageButton" />
 
     <ImageButton
+        android:layout_weight="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton4" />
+        android:layout_height="fill_parent"
+        android:id="@+id/textureImageButton"
+        android:src="@drawable/texture_brick"/>
+    <ImageButton
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:id="@+id/saveimageButton"
+        android:src="@drawable/floppy_icon"/>
 </LinearLayout>

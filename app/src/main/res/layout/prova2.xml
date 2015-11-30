@@ -6,30 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/TextViewProva"
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
+    <include layout="@layout/bottom_bar_action_editor"
         android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:text="prova"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" >
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/strokeImage_button"/>
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-    </LinearLayout>
+        android:layout_width="fill_parent"
+        android:layout_height="80dp" />
 
     <com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn
         android:id="@+id/ViewForDrawIn"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_above="@+id/TextViewProva"
-        android:layout_alignParentStart="true" />
+        android:layout_gravity="center_horizontal|bottom" />
 
 </FrameLayout>
