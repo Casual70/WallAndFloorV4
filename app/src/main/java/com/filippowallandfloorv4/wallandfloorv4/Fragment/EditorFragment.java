@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
@@ -20,7 +21,7 @@ import com.filippowallandfloorv4.wallandfloorv4.R;
 public class EditorFragment extends android.app.Fragment {
 
     public ViewForDrawIn vfd;
-    public TextView text;
+    public LinearLayout bottomActionBar;
     public Bitmap mBitmap;
     public Paint mPaint;
 
@@ -35,7 +36,7 @@ public class EditorFragment extends android.app.Fragment {
         vfd = (ViewForDrawIn)view.findViewById(R.id.ViewForDrawIn);
         vfd.setmBitmap(mBitmap);
         vfd.setmPaint(mPaint);
-        text = (TextView)view.findViewById(R.id.TextViewProva);
+        bottomActionBar = (LinearLayout)view.findViewById(R.id.action_bar_layout);
         return view;
     }
 
