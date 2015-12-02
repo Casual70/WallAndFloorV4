@@ -101,7 +101,7 @@ public class ViewForDrawIn extends View {
         canvas.drawPath(mPath, mPaint);
         canvas.drawPath(circlePath, circlePaint);
 
-        Log.e("onDraw", "draw");
+        Log.e(VFD_LOG, "draw");
     }
     private void touch_start(float x,float y){
         mPath.reset();
