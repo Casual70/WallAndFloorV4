@@ -6,48 +6,61 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:layout_weight="1">
 
         <ImageButton
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="25dp"
             android:layout_gravity="top"
             android:foregroundGravity="top"
             android:id="@+id/openImageButton"
             android:src="@drawable/open_actionbar"/>
-
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1">
         <ImageButton
-            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:id="@+id/strokeWidthImageButton"
             android:src="@drawable/line_icon"/>
-
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1">
         <ImageButton
-            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:id="@+id/strokeStyleImageButton"
             android:src="@drawable/line_icon_style"/>
-
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1">
         <ImageButton
-            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:id="@+id/grayScaleImageButton"
-            android:src="@drawable/grayscale_icon"/>
+            android:src="@drawable/grayscale_icon"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/openImageButton" />
+    </LinearLayout>
 
-        <RadioGroup
+    <RadioGroup
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:orientation="horizontal"
-            android:id="@+id/toggleGroup_bottomActionBar">
-
-        </RadioGroup>
-
+            android:id="@+id/toggleGroup_bottomActionBar"
+            android:layout_weight="1">
         <ToggleButton
             android:layout_weight="1"
             android:layout_width="wrap_content"
@@ -56,7 +69,9 @@
             android:textOn=""
             android:textOff=""
             android:background="@drawable/checktoggle_freehand"
-            android:id="@+id/freeHandImageButton" />
+            android:id="@+id/freeHandImageButton"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/oneLineImageButton" />
 
         <ToggleButton
             android:layout_weight="1"
@@ -66,20 +81,34 @@
             android:textOff=""
             android:textOn=""
             android:background="@drawable/checktoggle_oneline"
-            android:id="@+id/oneLineImageButton" />
-
+            android:id="@+id/oneLineImageButton"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/textureImageButton" />
+    </RadioGroup>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="1">
         <ImageButton
-            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:id="@+id/textureImageButton"
-            android:src="@drawable/texture_brick" />
-
+            android:src="@drawable/texture_brick"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/saveimageButton" />
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
         <ImageButton
-            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:id="@+id/saveimageButton"
-            android:src="@drawable/floppy_icon" />
+            android:src="@drawable/floppy_icon"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
     </LinearLayout>
 </LinearLayout>
