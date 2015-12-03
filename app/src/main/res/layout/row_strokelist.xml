@@ -10,8 +10,9 @@
         android:id="@+id/stroke_width_TextView"
         android:text="Altezza riga: 12"/>
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/stroke_width_ImageView"
         android:src="@android:drawable/button_onoff_indicator_off"/>
+
 </LinearLayout>

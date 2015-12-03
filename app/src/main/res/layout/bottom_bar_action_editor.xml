@@ -19,28 +19,50 @@
             android:id="@+id/openImageButton"
             android:src="@drawable/open_actionbar"/>
     </LinearLayout>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_weight="1">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView_strokewidth_icon"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignEnd="@+id/strokeWidthImageButton">
+        </ListView>
+
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:id="@+id/strokeWidthImageButton"
-            android:src="@drawable/line_icon"/>
-    </LinearLayout>
-    <LinearLayout
+            android:src="@drawable/line_icon"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
+    </RelativeLayout>
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_weight="1">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView_strokeStyle_icon"
+            android:layout_alignParentStart="true"
+            android:layout_alignEnd="@+id/strokeStyleImageButton"
+            android:layout_above="@+id/strokeStyleImageButton">
+        </ListView>
         <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="60dp"
             android:id="@+id/strokeStyleImageButton"
-            android:src="@drawable/line_icon_style"/>
-    </LinearLayout>
+            android:src="@drawable/line_icon_style"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,7 +82,7 @@
             android:layout_height="fill_parent"
             android:orientation="horizontal"
             android:id="@+id/toggleGroup_bottomActionBar"
-            android:layout_weight="1">
+            android:layout_weight="2">
         <ToggleButton
             android:layout_weight="1"
             android:layout_width="wrap_content"

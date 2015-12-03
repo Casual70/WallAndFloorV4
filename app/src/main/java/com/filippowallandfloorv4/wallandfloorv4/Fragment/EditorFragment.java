@@ -9,9 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.ToggleButton;
 
+import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapter;
+import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
 import com.filippowallandfloorv4.wallandfloorv4.R;
 
@@ -26,6 +29,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     public LinearLayout bottomActionBar;
     public ImageButton openIB, strokeWidthIB, strokeStyleIB, grayScaleIB,textureIB,saveIB;
     public ToggleButton freeHandToggleB, oneLineToggleB;
+    public ListView strokeWidthList,strokeStyleList;
     public RadioGroup toggleGroup;
     public Bitmap mBitmap;
     public Paint mPaint;
@@ -41,12 +45,16 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         vfd = (ViewForDrawIn)view.findViewById(R.id.ViewForDrawIn);
         vfd.setmBitmap(mBitmap);
         vfd.setmPaint(mPaint);
+        strokeStyleIB = (ImageButton)view.findViewById(R.id.strokeStyleImageButton);
+        strokeWidthIB = (ImageButton)view.findViewById(R.id.strokeWidthImageButton);
         bottomActionBar = (LinearLayout)view.findViewById(R.id.action_bar_layout);
         toggleGroup = (RadioGroup)view.findViewById(R.id.toggleGroup_bottomActionBar);
         freeHandToggleB = (ToggleButton)view.findViewById(R.id.freeHandImageButton);
         oneLineToggleB = (ToggleButton)view.findViewById(R.id.oneLineImageButton);
         openIB = (ImageButton)view.findViewById(R.id.openImageButton);
         grayScaleIB = (ImageButton)view.findViewById(R.id.grayScaleImageButton);
+        strokeWidthList = (ListView)view.findViewById(R.id.listView_strokewidth_icon);
+        strokeStyleList = (ListView)view.findViewById(R.id.listView_strokeStyle_icon);
         return view;
     }
 
@@ -60,6 +68,23 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         super.onStart();
         freeHandToggleB.setOnClickListener(this);
         oneLineToggleB.setOnClickListener(this);
+        strokeWidthIB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                strokeWidthList.setAdapter(new StrokeWidthListAdapter(getActivity(), vfd.getmPaint()));
+                strokeWidthList.setVisibility(View.VISIBLE);
+                freeHandToggleB.setChecked(true);
+            }
+        });
+        strokeStyleIB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                strokeStyleList.setAdapter(new StrokeFillTypeListAdapter(getActivity(),vfd.getmPaint()));
+                strokeStyleList.setVisibility(View.VISIBLE);
+                freeHandToggleB.setChecked(true);
+            }
+        });
+
 
         toggleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -84,6 +109,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
                 openActionBarBottom();
             }
         });
+
     }
 
     public void openActionBarBottom(){
