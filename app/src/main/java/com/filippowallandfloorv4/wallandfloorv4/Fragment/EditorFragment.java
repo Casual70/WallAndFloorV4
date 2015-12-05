@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.ToggleButton;
@@ -79,8 +80,13 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         strokeStyleIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                strokeStyleList.setAdapter(new StrokeFillTypeListAdapter(getActivity(),vfd.getmPaint()));
-                strokeStyleList.setVisibility(View.VISIBLE);
+                ListPopupWindow listPopupWindow = new ListPopupWindow(getActivity());
+                listPopupWindow.setAdapter(new StrokeFillTypeListAdapter(getActivity(),vfd.getmPaint()));
+                listPopupWindow.setAnchorView(strokeStyleIB);
+                listPopupWindow.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+                listPopupWindow.show();
+                //strokeStyleList.setAdapter(new StrokeFillTypeListAdapter(getActivity(),vfd.getmPaint()));
+                //strokeStyleList.setVisibility(View.VISIBLE);
                 freeHandToggleB.setChecked(true);
             }
         });
