@@ -1,136 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:alpha="25">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1">
+        android:id="@+id/buttonContainer"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true">
 
         <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:layout_gravity="top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:foregroundGravity="top"
             android:id="@+id/openImageButton"
-            android:src="@drawable/open_actionbar"/>
-    </LinearLayout>
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1">
-
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView_strokewidth_icon"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignEnd="@+id/strokeWidthImageButton">
-        </ListView>
+            android:src="@drawable/open_actionbar"
+            android:layout_gravity="bottom"
+            android:layout_weight="0.2" />
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
             android:id="@+id/strokeWidthImageButton"
             android:src="@drawable/line_icon"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
-    </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1">
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView_strokeStyle_icon"
-            android:layout_alignParentStart="true"
-            android:layout_alignEnd="@+id/strokeStyleImageButton"
-            android:layout_above="@+id/strokeStyleImageButton">
-        </ListView>
+            android:layout_gravity="bottom"
+            android:layout_weight="1" />
+
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
             android:id="@+id/strokeStyleImageButton"
             android:src="@drawable/line_icon_style"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
-    </RelativeLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1">
+            android:layout_gravity="bottom"
+            android:layout_weight="1" />
+
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
             android:id="@+id/grayScaleImageButton"
             android:src="@drawable/grayscale_icon"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/openImageButton" />
-    </LinearLayout>
+            android:layout_gravity="bottom"
+            android:layout_weight="1" />
 
-    <RadioGroup
+        <RadioGroup
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:orientation="horizontal"
             android:id="@+id/toggleGroup_bottomActionBar"
-            android:layout_weight="2">
-        <ToggleButton
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:text="New ToggleButton"
-            android:textOn=""
-            android:textOff=""
-            android:background="@drawable/checktoggle_freehand"
-            android:id="@+id/freeHandImageButton"
-            android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/oneLineImageButton" />
+            android:layout_weight="0.5">
 
-        <ToggleButton
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:text="New ToggleButton"
-            android:textOff=""
-            android:textOn=""
-            android:background="@drawable/checktoggle_oneline"
-            android:id="@+id/oneLineImageButton"
-            android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/textureImageButton" />
-    </RadioGroup>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1">
+            <ToggleButton
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:text="New ToggleButton"
+                android:textOn=""
+                android:textOff=""
+                android:background="@drawable/checktoggle_freehand"
+                android:id="@+id/freeHandImageButton"
+                android:layout_gravity="bottom"
+                android:layout_weight="1" />
+
+            <ToggleButton
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:text="New ToggleButton"
+                android:textOff=""
+                android:textOn=""
+                android:background="@drawable/checktoggle_oneline"
+                android:id="@+id/oneLineImageButton"
+                android:layout_gravity="bottom"
+                android:layout_weight="1" />
+        </RadioGroup>
+
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
             android:id="@+id/textureImageButton"
             android:src="@drawable/texture_brick"
-            android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/saveimageButton" />
-    </LinearLayout>
-    <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:padding="4dp"
+            android:cropToPadding="true"
+            android:layout_gravity="bottom"
+            android:layout_weight="1" />
+
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
             android:id="@+id/saveimageButton"
             android:src="@drawable/floppy_icon"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_gravity="bottom"
+            android:layout_weight="1" />
+
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

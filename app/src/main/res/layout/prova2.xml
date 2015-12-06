@@ -11,7 +11,7 @@
         layout="@layout/bottom_bar_action_editor"
         android:layout_gravity="bottom"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true" />
 

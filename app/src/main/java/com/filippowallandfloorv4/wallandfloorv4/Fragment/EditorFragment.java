@@ -12,12 +12,15 @@ import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
 
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
 import com.filippowallandfloorv4.wallandfloorv4.R;
+
+import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -27,13 +30,14 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     private final String LOG_EDITFRAG = "EditorFragment";
 
     public ViewForDrawIn vfd;
-    public LinearLayout bottomActionBar;
+    public RelativeLayout bottomActionBar;
     public ImageButton openIB, strokeWidthIB, strokeStyleIB, grayScaleIB,textureIB,saveIB;
     public ToggleButton freeHandToggleB, oneLineToggleB;
-    public ListView strokeWidthList,strokeStyleList;
+    public ListPopupWindow listPopupStyle, listPopupLine;
     public RadioGroup toggleGroup;
     public Bitmap mBitmap;
     public Paint mPaint;
+    public View[]listButton;
 
     public EditorFragment() {
     }
@@ -46,16 +50,17 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         vfd = (ViewForDrawIn)view.findViewById(R.id.ViewForDrawIn);
         vfd.setmBitmap(mBitmap);
         vfd.setmPaint(mPaint);
+        textureIB = (ImageButton)view.findViewById(R.id.textureImageButton);
+        saveIB = (ImageButton)view.findViewById(R.id.saveimageButton);
         strokeStyleIB = (ImageButton)view.findViewById(R.id.strokeStyleImageButton);
         strokeWidthIB = (ImageButton)view.findViewById(R.id.strokeWidthImageButton);
-        bottomActionBar = (LinearLayout)view.findViewById(R.id.action_bar_layout);
+        bottomActionBar = (RelativeLayout)view.findViewById(R.id.action_bar_layout);
         toggleGroup = (RadioGroup)view.findViewById(R.id.toggleGroup_bottomActionBar);
         freeHandToggleB = (ToggleButton)view.findViewById(R.id.freeHandImageButton);
         oneLineToggleB = (ToggleButton)view.findViewById(R.id.oneLineImageButton);
         openIB = (ImageButton)view.findViewById(R.id.openImageButton);
         grayScaleIB = (ImageButton)view.findViewById(R.id.grayScaleImageButton);
-        strokeWidthList = (ListView)view.findViewById(R.id.listView_strokewidth_icon);
-        strokeStyleList = (ListView)view.findViewById(R.id.listView_strokeStyle_icon);
+        listButton = new View[]{strokeStyleIB,strokeWidthIB,toggleGroup,grayScaleIB,textureIB,saveIB};
         return view;
     }
 
@@ -67,24 +72,46 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     @Override
     public void onStart() {
         super.onStart();
+        // impostare l'action come chiusa
         freeHandToggleB.setOnClickListener(this);
         oneLineToggleB.setOnClickListener(this);
         strokeWidthIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                strokeWidthList.setAdapter(new StrokeWidthListAdapter(getActivity(), vfd.getmPaint()));
-                strokeWidthList.setVisibility(View.VISIBLE);
+                if (listPopupLine == null){
+                    listPopupLine = new ListPopupWindow(getActivity());
+                    listPopupLine.setAdapter(new StrokeWidthListAdapter(getActivity(),vfd.getmPaint()));
+                    listPopupLine.setAnchorView(strokeWidthIB);
+                    listPopupLine.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+                    listPopupLine.show();
+                }else{
+                    if (listPopupLine.isShowing()){
+                        listPopupLine.dismiss();
+                    }else{
+                        listPopupLine.show();
+                    }
+                }
+                //strokeWidthList.setAdapter(new StrokeWidthListAdapter(getActivity(), vfd.getmPaint()));
+                //strokeWidthList.setVisibility(View.VISIBLE);
                 freeHandToggleB.setChecked(true);
             }
         });
         strokeStyleIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ListPopupWindow listPopupWindow = new ListPopupWindow(getActivity());
-                listPopupWindow.setAdapter(new StrokeFillTypeListAdapter(getActivity(),vfd.getmPaint()));
-                listPopupWindow.setAnchorView(strokeStyleIB);
-                listPopupWindow.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
-                listPopupWindow.show();
+                if (listPopupStyle == null){
+                    listPopupStyle = new ListPopupWindow(getActivity());
+                    listPopupStyle.setAdapter(new StrokeFillTypeListAdapter(getActivity(), vfd.getmPaint()));
+                    listPopupStyle.setAnchorView(strokeStyleIB);
+                    listPopupStyle.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+                    listPopupStyle.show();
+                }else{
+                    if (listPopupStyle.isShowing()){
+                        listPopupStyle.dismiss();
+                    }else{
+                        listPopupStyle.show();
+                    }
+                }
                 //strokeStyleList.setAdapter(new StrokeFillTypeListAdapter(getActivity(),vfd.getmPaint()));
                 //strokeStyleList.setVisibility(View.VISIBLE);
                 freeHandToggleB.setChecked(true);
@@ -120,13 +147,20 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
 
     public void openActionBarBottom(){
 
-        if (bottomActionBar.getHeight()<=49){ // chiuso/aperto
-            bottomActionBar.getLayoutParams().height = 90;
+        if (bottomActionBar.getHeight() <= getResources().getDisplayMetrics().heightPixels/10-1){ // chiuso/aperto
+            bottomActionBar.getLayoutParams().height = getResources().getDisplayMetrics().heightPixels/10;
             bottomActionBar.requestLayout();
+            for (View v : listButton){
+                v.setVisibility(View.VISIBLE);
+            }
+
             Log.e(LOG_EDITFRAG,"chiuso/aperto");
         }else{                                // aperto/chiuso
-            bottomActionBar.getLayoutParams().height = 25;
+            bottomActionBar.getLayoutParams().height = getResources().getDisplayMetrics().heightPixels/30;
             bottomActionBar.requestLayout();
+            for (View v : listButton){
+                v.setVisibility(View.GONE);
+            }
             Log.e(LOG_EDITFRAG,"aperto/chiuso");
         }
     }
