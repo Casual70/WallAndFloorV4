@@ -40,6 +40,9 @@ import com.rarepebble.colorpicker.ColorPickerView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class EditorActivity extends Activity {
 
@@ -235,8 +238,9 @@ public class EditorActivity extends Activity {
         Bitmap ultimate = Bitmap.createScaledBitmap(imageBit, size.x, size.y, false);
         return ultimate;
     }
-    private boolean saveCurrentPhoto(WafImage wafImage){
-        String editedSuffix = "_edit.jpeg";
+    public boolean saveCurrentPhoto(WafImage wafImage){
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ROOT).format(new Date());
+        String editedSuffix = timeStamp+"_edit.jpeg";
         boolean isSaved = false;
         Bitmap edit = fragment.getVfd().getmBitmap();
         FileOutputStream out = null;
@@ -273,5 +277,9 @@ public class EditorActivity extends Activity {
 
     public ToggleButton getFreeHandButtton() {
         return freeHandButtton;
+    }
+
+    public WafImage getWafImage() {
+        return wafImage;
     }
 }

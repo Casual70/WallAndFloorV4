@@ -1,20 +1,24 @@
 package com.filippowallandfloorv4.wallandfloorv4.Fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
@@ -61,6 +65,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         openIB = (ImageButton)view.findViewById(R.id.openImageButton);
         grayScaleIB = (ImageButton)view.findViewById(R.id.grayScaleImageButton);
         listButton = new View[]{strokeStyleIB,strokeWidthIB,toggleGroup,grayScaleIB,textureIB,saveIB};
+
         return view;
     }
 
@@ -72,7 +77,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     @Override
     public void onStart() {
         super.onStart();
-        // impostare l'action come chiusa
+        openActionBarBottom();
         freeHandToggleB.setOnClickListener(this);
         oneLineToggleB.setOnClickListener(this);
         strokeWidthIB.setOnClickListener(new View.OnClickListener() {
@@ -83,16 +88,23 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
                     listPopupLine.setAdapter(new StrokeWidthListAdapter(getActivity(),vfd.getmPaint()));
                     listPopupLine.setAnchorView(strokeWidthIB);
                     listPopupLine.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+                    listPopupLine.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Integer i = (Integer) parent.getItemAtPosition(position);
+                            vfd.getmPaint().setStrokeWidth(i.floatValue());
+                            listPopupLine.dismiss();
+                        }
+                    });
                     listPopupLine.show();
                 }else{
                     if (listPopupLine.isShowing()){
                         listPopupLine.dismiss();
                     }else{
                         listPopupLine.show();
+                        listPopupLine.setAdapter(new StrokeWidthListAdapter(getActivity(), vfd.getmPaint()));
                     }
                 }
-                //strokeWidthList.setAdapter(new StrokeWidthListAdapter(getActivity(), vfd.getmPaint()));
-                //strokeWidthList.setVisibility(View.VISIBLE);
                 freeHandToggleB.setChecked(true);
             }
         });
@@ -104,21 +116,35 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
                     listPopupStyle.setAdapter(new StrokeFillTypeListAdapter(getActivity(), vfd.getmPaint()));
                     listPopupStyle.setAnchorView(strokeStyleIB);
                     listPopupStyle.setPromptPosition(ListPopupWindow.POSITION_PROMPT_ABOVE);
+                    listPopupStyle.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Paint.Style style = (Paint.Style) parent.getItemAtPosition(position);
+                            vfd.getmPaint().setStyle(style);
+                            listPopupStyle.dismiss();
+                        }
+                    });
                     listPopupStyle.show();
                 }else{
                     if (listPopupStyle.isShowing()){
                         listPopupStyle.dismiss();
                     }else{
                         listPopupStyle.show();
+                        listPopupStyle.setAdapter(new StrokeFillTypeListAdapter(getActivity(), vfd.getmPaint()));
                     }
                 }
-                //strokeStyleList.setAdapter(new StrokeFillTypeListAdapter(getActivity(),vfd.getmPaint()));
-                //strokeStyleList.setVisibility(View.VISIBLE);
                 freeHandToggleB.setChecked(true);
             }
         });
-
-
+        saveIB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditorActivity activity = (EditorActivity) getActivity();
+                if (activity.saveCurrentPhoto(activity.getWafImage())){
+                    Toast.makeText(getActivity(), R.string.save_success, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         toggleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -133,7 +159,8 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         grayScaleIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                vfd.grayscale(); // da finire di sistemare nella View for Draw In è necessario ridipigere il Canvas
+                ColorMatrixColorFilter colorMatrixColorFilter = vfd.grayscale();
+                vfd.getmBitmapPaint().setColorFilter(colorMatrixColorFilter);
             }
         });
         openIB.setOnClickListener(new View.OnClickListener() {

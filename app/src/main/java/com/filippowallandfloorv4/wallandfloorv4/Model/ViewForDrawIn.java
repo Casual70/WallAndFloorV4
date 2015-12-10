@@ -361,5 +361,9 @@ public class ViewForDrawIn extends View {
     public Canvas getmCanvas() {
         return mCanvas;
     }
+
+    public Paint getmBitmapPaint() {
+        return mBitmapPaint;
+    }
 }
 
