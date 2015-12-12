@@ -9,68 +9,18 @@
     <Button
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:id="@+id/button_stroke"
+        android:id="@+id/button_undoPath"
         android:text="Stroke float"
-        android:layout_below="@+id/toggleGroup"
         android:layout_alignParentEnd="true" />
-    <RadioGroup
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/toggleGroup"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true">
-        <ToggleButton
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_freeHand"
-            android:textOn="FreeHand"
-            android:textOff="NoFreeHand"
-            android:checked="true"
-            android:onClick="onToggle"/>
-        <ToggleButton
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_oneLine"
-            android:textOn="OneLine"
-            android:textOff="NoOneLine"
-            android:onClick="onToggle"
-            />
-        </RadioGroup>
 
-
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/listView_strokewidth"
-        android:layout_alignTop="@+id/button_stroke"
-        android:layout_toStartOf="@+id/button_stroke"
-        android:layout_alignParentBottom="true"
-        android:visibility="visible"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Filling Type"
-        android:id="@+id/button_strokeType"
-        android:layout_below="@+id/button_stroke"
-        android:layout_alignEnd="@+id/button_stroke"
-        android:layout_alignStart="@+id/button_stroke" />
-
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/listView_strokeStyle"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/button_strokeType"
-        android:layout_alignTop="@+id/button_strokeType"
-        android:visibility="gone"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="GrayScale"
-        android:id="@+id/grayScale_button"
-        android:layout_below="@+id/button_strokeType"
-        android:layout_toEndOf="@+id/listView_strokewidth" />
+        android:id="@+id/button_redoPath"
+        android:layout_below="@+id/button_undoPath"
+        android:layout_alignEnd="@+id/button_undoPath"
+        android:layout_alignStart="@+id/button_undoPath" />
 
 </RelativeLayout>

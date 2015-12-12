@@ -1,9 +1,7 @@
 package com.filippowallandfloorv4.wallandfloorv4.Model;
 
-import android.app.VoiceInteractor;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorMatrix;
@@ -11,24 +9,22 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.hardware.display.DisplayManager;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
-
-import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ViewForDrawIn extends View {
 
     public Paint mPaint;
+    public Paint currentPaint;
 
     private static final String VFD_LOG = "ViewForDrawIn_Debug";
     private static final String AutoFinder_debug = "AutoFinder_Debug";
@@ -38,11 +34,13 @@ public class ViewForDrawIn extends View {
     private Path mPath;             // serve a definire il Percorso Path appunto tracciato, è quello che mi serve
     private Paint mBitmapPaint;     //
     public Context context;         //
-    private Paint circlePaint;      //
-    private Path circlePath;        //
     private ArrayList<Point> listPcentr = null;
     private ArrayList<Point> listPup = null;
     private ArrayList<Point> listPdw = null;
+    private ArrayList<Path> myPathUndo = new ArrayList<Path>();
+    private ArrayList<Path> myPathRedo = new ArrayList<Path>();
+    private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
+
 
     private boolean freeHand;
     private float mX,mY;
@@ -58,7 +56,7 @@ public class ViewForDrawIn extends View {
     float stroke ;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
-        super(context,attrs);
+        super(context, attrs);
         if (isInEditMode()){}
         this.context = context;
         init();
@@ -68,15 +66,8 @@ public class ViewForDrawIn extends View {
         mPath = new Path();
         mPaint = new Paint();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-        circlePaint = new Paint();
-        circlePath = new Path();
-        circlePaint.setAntiAlias(true);
-        circlePaint.setColor(Color.BLUE);
-        circlePaint.setStyle(Paint.Style.STROKE);
-        circlePaint.setStrokeJoin(Paint.Join.MITER);
-        circlePaint.setStrokeWidth(1f);
         stroke = mPaint.getStrokeWidth();
-        Log.e(VFD_LOG,"Vdf inizialized");
+        Log.e(VFD_LOG, "Vdf inizialized");
     }
 
     @Override
@@ -94,13 +85,16 @@ public class ViewForDrawIn extends View {
         cm.setSaturation(0);
         return new ColorMatrixColorFilter(cm);
     }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        for (Path p : myPathUndo){
+            Paint paint = pathColorMap.get(p);
+            canvas.drawPath(p,paint);
+        }
         canvas.drawPath(mPath, mPaint);
-        canvas.drawPath(circlePath, circlePaint);
-
         Log.e(VFD_LOG, "draw");
     }
     private void touch_start(float x,float y){
@@ -120,9 +114,6 @@ public class ViewForDrawIn extends View {
             mPath.quadTo(mX,mY,(x+mX)/2,(y+mY)/2);
             mX = x;
             mY = y;
-
-            circlePath.reset();
-            circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
             if (listPcentr != null){
                 Point p = new Point((int)x,(int)y);
                 colorLog(p.x,p.y);
@@ -133,13 +124,32 @@ public class ViewForDrawIn extends View {
     }
     private void touch_up(float x, float y){
         mPath.lineTo(mX, mY);
-        circlePath.reset();
-        mCanvas.drawPath(mPath, mPaint);
-        mPath.reset();
+        //mCanvas.drawPath(mPath, mPaint);
         if (listPcentr !=null){
             lp = new Point((int)x,(int)y);
         }
+        if (freeHand){ // funziona per il freehand implementarlo anche per il oneline facendo si che tutta la maschera sia un singolo path
+            pathColorMap.put(mPath, new Paint(mPaint));
+            myPathUndo.add(mPath);
+        }
+
+        mPath = new Path();
     }
+    public void onUndoPath(){
+        if (myPathUndo.size()>0){
+            myPathRedo.add(myPathUndo.get(myPathUndo.size()-1)); // da verificare
+            myPathUndo.remove(myPathUndo.size()-1);
+            invalidate();
+        }
+    }
+    public void onRedoPath(){
+        if (myPathRedo.size()>0){
+            myPathUndo.add(myPathRedo.get(myPathRedo.size()-1));
+            myPathRedo.remove(myPathRedo.size()-1);
+            invalidate();
+        }
+    }
+
     private void floodFillOneLine(Bitmap image,ArrayList<Point>listPathPoint){
         mPath.reset();
         mPath.moveTo(listPathPoint.get(0).x, listPathPoint.get(0).y);
@@ -168,6 +178,7 @@ public class ViewForDrawIn extends View {
         }
         mCanvas.drawPath(mPath, mPaint);
     }
+
     private void extendLineUp(Bitmap image){
         listPup = new ArrayList<>();
         listPup.add(new Point(fp.x, fp.y));
@@ -186,6 +197,7 @@ public class ViewForDrawIn extends View {
             }
         }
     }
+
     private void extendLineDown(Bitmap image){
         listPdw = new ArrayList<>();
         listPdw.add(new Point(lp.x, lp.y));
@@ -201,9 +213,8 @@ public class ViewForDrawIn extends View {
         }
     }
 
-
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) throws IllegalArgumentException{
         super.onTouchEvent(event);
         float y;
         y = event.getY();
@@ -211,62 +222,66 @@ public class ViewForDrawIn extends View {
         x = event.getX();
         Log.e("on Touch choise", "freeHand :" + freeHand);
         Log.e("on Touch choise", "oneLine :" + oneLine);
-        if (freeHand){
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    touch_start(x, y);
-                    invalidate();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    touch_move(x, y);
-                    invalidate();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    touch_up(x,y);
-                    colorLog(x, y); // sarà da togliere alla fine del debug
-                    invalidate();
-                    break;
-            }
-        }
-        if (oneLine){
-            Bitmap image = null;
-            int alpha = mPaint.getAlpha();
-            mPaint.setAlpha(0);
-            switch (event.getAction()){
-                case MotionEvent.ACTION_DOWN:
-                    touch_start(x, y);
-                    invalidate();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    touch_move(x, y);
-                    invalidate();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    touch_up(x,y);
-                    colorLog(x, y); // sarà da togliere alla fine del debug
-                    this.setDrawingCacheEnabled(true);
-                    image = Bitmap.createBitmap(this.getDrawingCache());
-                    sampleColor = mPaint.getColor();
-                    invalidate();
-                    break;
-            }
-            mPaint.setAlpha(alpha);
-            if (listPcentr !=null && image !=null){
-                sampleMinMaxRGB = tolleranceMaxMinColor(listPcentr,image);
-                extendLineUp(image);
-                extendLineDown(image);
-                if (listPup.size()!=0){
-                    Log.e(VFD_LOG, "second array size " + listPup.size());
-                    listPcentr.addAll(listPup);
-                    if (listPdw.size()!=0){
-                        listPcentr.addAll(listPdw);
-                    }
-                    floodFillOneLine(image, listPcentr);
+        try {
+            if (freeHand){
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        touch_start(x, y);
+                        invalidate();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        touch_move(x, y);
+                        invalidate();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        touch_up(x, y);
+                        //colorLog(x, y); // sarà da togliere alla fine del debug
+                        invalidate();
+                        break;
                 }
-                listPup = null;
-                listPdw = null;
-                listPcentr =null;
             }
+            if (oneLine){
+                Bitmap image = null;
+                int alpha = mPaint.getAlpha();
+                mPaint.setAlpha(0);
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        touch_start(x, y);
+                        invalidate();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        touch_move(x, y);
+                        invalidate();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        touch_up(x,y);
+                        colorLog(x, y); // sarà da togliere alla fine del debug
+                        this.setDrawingCacheEnabled(true);
+                        image = Bitmap.createBitmap(this.getDrawingCache());
+                        sampleColor = mPaint.getColor();
+                        invalidate();
+                        break;
+                }
+                mPaint.setAlpha(alpha);
+                if (listPcentr !=null && image !=null){
+                    sampleMinMaxRGB = tolleranceMaxMinColor(listPcentr,image);
+                    extendLineUp(image);
+                    extendLineDown(image);
+                    if (listPup.size()!=0){
+                        Log.e(VFD_LOG, "second array size " + listPup.size());
+                        listPcentr.addAll(listPup);
+                        if (listPdw.size()!=0){
+                            listPcentr.addAll(listPdw);
+                        }
+                        floodFillOneLine(image, listPcentr);
+                    }
+                    listPup = null;
+                    listPdw = null;
+                    listPcentr =null;
+                }
+            }
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
         }
         return true;
     }
@@ -298,6 +313,7 @@ public class ViewForDrawIn extends View {
         //provare ad usare la media dei colori ottenuti oppure impostare i min e max
         return new int[] {redMax,redMin,greeMax,greeMin,blueMax,blueMin};
     }
+
     private boolean findIntMaxMin(Point pixel, int[] maxMinToll,Bitmap image){
         boolean find = false;
         int tollerace = 10;
@@ -314,7 +330,6 @@ public class ViewForDrawIn extends View {
         }
         return find;
     }
-
 
     public void colorLog(float x, float y){
         this.setDrawingCacheEnabled(true);

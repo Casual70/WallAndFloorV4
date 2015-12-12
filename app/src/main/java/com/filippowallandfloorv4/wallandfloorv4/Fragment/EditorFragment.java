@@ -172,6 +172,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
 
     }
 
+
     public void openActionBarBottom(){
 
         if (bottomActionBar.getHeight() <= getResources().getDisplayMetrics().heightPixels/10-1){ // chiuso/aperto

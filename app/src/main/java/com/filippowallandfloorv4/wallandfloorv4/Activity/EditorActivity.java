@@ -6,8 +6,6 @@ import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.v4.widget.DrawerLayout;
@@ -17,11 +15,8 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
@@ -52,7 +47,6 @@ public class EditorActivity extends Activity {
     public static final String LOG_EditorActivity = "EditorActivity_Debug";
 
     private WafImage wafImage;
-    private ViewForDrawIn vfd;
     private DrawerLayout drawerLayout_color;
     private App app;
     private EditorFragment fragment;
@@ -60,11 +54,8 @@ public class EditorActivity extends Activity {
     private Bitmap myBitmap;
     private Paint myPaint;
     private Button confirmColor;
-    private Button strokeButton,strokeTypeButton,grayScaleButton;
-    private ToggleButton freeHandButtton, oneLineButton;
-    private RadioGroup toggleGroup;
+    private Button undoPathButton, redoPathButton;
     private ColorPickerView cpv;
-    private ListView strokeWidthList,strokeStyleList;
 
 
     @Override
@@ -76,20 +67,13 @@ public class EditorActivity extends Activity {
         setContentView(R.layout.drawerlay);
         drawerLayout_color = (DrawerLayout)findViewById(R.id.drawerLayout_color);
         confirmColor = (Button)findViewById(R.id.button_confim);
-        freeHandButtton = (ToggleButton)findViewById(R.id.button_freeHand);
-        strokeButton = (Button)findViewById(R.id.button_stroke);
-        strokeTypeButton = (Button)findViewById(R.id.button_strokeType);
-        oneLineButton = (ToggleButton)findViewById(R.id.button_oneLine);
-        grayScaleButton = (Button)findViewById(R.id.grayScale_button);
+        undoPathButton = (Button)findViewById(R.id.button_undoPath);
+        redoPathButton = (Button)findViewById(R.id.button_redoPath);
         cpv = (ColorPickerView)findViewById(R.id.colorPicker);
-        strokeWidthList = (ListView)findViewById(R.id.listView_strokewidth);
-        strokeStyleList = (ListView)findViewById(R.id.listView_strokeStyle);
-        toggleGroup = (RadioGroup)findViewById(R.id.toggleGroup);
         myPaint = initPaint(myPaint);
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inMutable = true;
         myBitmap = decodeInSample(wafImage);
-        //vfd = new ViewForDrawIn(app.getContext(),myPaint,myBitmap);
     }
 
     @Override
@@ -115,62 +99,20 @@ public class EditorActivity extends Activity {
                 cpv.setOriginalColor(fragment.getVfd().getmPaint().getColor());
             }
         });
-        toggleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                for (int i = 0; i < group.getChildCount(); i++) {
-                    ToggleButton toggleButton = (ToggleButton) group.getChildAt(i);
-                    toggleButton.setChecked(toggleButton.getId() == checkedId);
-                    fragment.getVfd().setFreeHand(freeHandButtton.isChecked());
-                    fragment.getVfd().setOneLine(oneLineButton.isChecked());
-                }
-            }
-        });
 
-        strokeButton.setOnClickListener(new View.OnClickListener() {
+        undoPathButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                strokeWidthList.setAdapter(new StrokeWidthListAdapter(app.getContext(), myPaint));
-                strokeWidthList.setVisibility(View.VISIBLE);
-                freeHandButtton.setChecked(true);
+                fragment.getVfd().onUndoPath();
 
             }
         });
-        strokeTypeButton.setOnClickListener(new View.OnClickListener() {
+        redoPathButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                strokeStyleList.setAdapter(new StrokeFillTypeListAdapter(app.getContext(),myPaint));
-                strokeStyleList.setVisibility(View.VISIBLE);
-                freeHandButtton.setChecked(true);
+                fragment.getVfd().onRedoPath();
             }
         });
-        strokeWidthList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Integer i = (Integer) parent.getItemAtPosition(position);
-                myPaint.setStrokeWidth(i.floatValue());
-                strokeWidthList.setVisibility(View.GONE);
-                drawerLayout_color.closeDrawers();
-            }
-        });
-        strokeStyleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Paint.Style style = (Paint.Style) parent.getItemAtPosition(position);
-                myPaint.setStyle(style);
-                strokeStyleList.setVisibility(View.GONE);
-                drawerLayout_color.closeDrawers();
-            }
-        });
-        grayScaleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragment.getVfd().grayscale();
-            }
-        });
-    }
-    public void onToggle(View v){
-        ((RadioGroup)v.getParent()).check(v.getId());
     }
 
     @Override
@@ -273,10 +215,6 @@ public class EditorActivity extends Activity {
             isSaved = false;
         }
         return isSaved;
-    }
-
-    public ToggleButton getFreeHandButtton() {
-        return freeHandButtton;
     }
 
     public WafImage getWafImage() {
