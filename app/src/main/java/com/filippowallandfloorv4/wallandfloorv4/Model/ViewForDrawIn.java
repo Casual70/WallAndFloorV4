@@ -50,6 +50,7 @@ public class ViewForDrawIn extends View {
     private Point fp;
     private Point lp;
 
+    private int[] pixels;
     private int sampleColor;
     private int[] sampleRBG;
     private int[] sampleMinMaxRGB;
@@ -76,8 +77,12 @@ public class ViewForDrawIn extends View {
         if (mBitmap == null){
             Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
             mCanvas = new Canvas(bitmap);
+            pixels = new int[bitmap.getHeight()*bitmap.getWidth()];
+            bitmap.getPixels(pixels,0,bitmap.getWidth(),0,0,w,h);
         }else{
             mCanvas = new Canvas(mBitmap);
+            pixels = new int[mBitmap.getHeight()*mBitmap.getWidth()];
+            mBitmap.getPixels(pixels,0,mBitmap.getWidth(),0,0,w,h);
         }
     }
     public ColorMatrixColorFilter grayscale (){
@@ -92,17 +97,18 @@ public class ViewForDrawIn extends View {
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         for (Path p : myPathUndo){
             Paint paint = pathColorMap.get(p);
-            canvas.drawPath(p,paint);
+            canvas.drawPath(p, paint);
+            Log.e("ondraw Log", ""+myPathUndo.size());
         }
         canvas.drawPath(mPath, mPaint);
         Log.e(VFD_LOG, "draw");
     }
-    private void touch_start(float x,float y){
+    private void touch_start(float x, float y){
         mPath.reset();
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
-        if (listPcentr ==null){
+        if (listPcentr == null){
             listPcentr = new ArrayList<Point>();
             fp = new Point((int)x,(int)y);
         }
@@ -128,17 +134,22 @@ public class ViewForDrawIn extends View {
         if (listPcentr !=null){
             lp = new Point((int)x,(int)y);
         }
-        if (freeHand){ // funziona per il freehand implementarlo anche per il oneline facendo si che tutta la maschera sia un singolo path
+        if (freeHand) {
             pathColorMap.put(mPath, new Paint(mPaint));
             myPathUndo.add(mPath);
+            //mCanvas.drawPath(mPath,mPaint); questo passaggio è necessario per disegnare sul canvas che poi verrà salvato anche se poi non farà parte dell Do Undo
+            mPath = new Path();
         }
 
-        mPath = new Path();
+
+    }
+    public void onConfirmModify(){
+
     }
     public void onUndoPath(){
-        if (myPathUndo.size()>0){
-            myPathRedo.add(myPathUndo.get(myPathUndo.size()-1)); // da verificare
-            myPathUndo.remove(myPathUndo.size()-1);
+        if (myPathUndo.size() > 0) {
+            myPathRedo.add(myPathUndo.get(myPathUndo.size() - 1)); // da verificare
+            myPathUndo.remove(myPathUndo.size() - 1);
             invalidate();
         }
     }
@@ -176,8 +187,12 @@ public class ViewForDrawIn extends View {
                 }
             }
         }
-        mCanvas.drawPath(mPath, mPaint);
+        pathColorMap.put(mPath, new Paint(mPaint));
+        myPathUndo.add(mPath);
+        mPath = new Path();
+        //mCanvas.drawPath(mPath, mPaint);
     }
+
 
     private void extendLineUp(Bitmap image){
         listPup = new ArrayList<>();
@@ -206,7 +221,7 @@ public class ViewForDrawIn extends View {
         while(!find){
             if (!findIntMaxMin(mP,sampleMinMaxRGB,image)||mP.y>image.getHeight()){
                 find = true;
-            }else{
+            } else{
                 listPdw.add(new Point(mP.x, mP.y));
                 mP.set(mP.x, mP.y + 1);
             }
@@ -259,7 +274,7 @@ public class ViewForDrawIn extends View {
                         this.setDrawingCacheEnabled(true);
                         image = Bitmap.createBitmap(this.getDrawingCache());
                         sampleColor = mPaint.getColor();
-                        invalidate();
+                        //invalidate();
                         break;
                 }
                 mPaint.setAlpha(alpha);
@@ -274,6 +289,7 @@ public class ViewForDrawIn extends View {
                             listPcentr.addAll(listPdw);
                         }
                         floodFillOneLine(image, listPcentr);
+                        invalidate();
                     }
                     listPup = null;
                     listPdw = null;
@@ -341,6 +357,46 @@ public class ViewForDrawIn extends View {
         G = Color.green(pxl);
         B = Color.blue(pxl);
         Log.e(VFD_LOG," Red: "+R+" Green: "+G+" Blue: "+B);
+    }
+    public void findBord(int x, int y){ // farlo dentro un AsyncTask // creare un'altro bitmap identico all'originale ma elaborato con questo metodo ed usarlo per trovare i bordi
+                                        // usare un floodfill più leggero
+        int h = mBitmap.getHeight();
+        int w = mBitmap.getWidth();
+        Log.e(VFD_LOG,"h: "+h + " "+ "w: "+w);
+        for (int indH = 1; indH < h-2; indH++){
+            for (int indW = 1; indW < w-2; indW++){
+                int startPix = mBitmap.getPixel(indW,indH);
+                int Rstart,Gstart,Bstart;
+                Rstart = Color.red(startPix);
+                Gstart = Color.green(startPix);
+                Bstart = Color.blue(startPix);
+                int leftPix = mBitmap.getPixel(indW+1,indH);
+                int Rleft,Gleft,Bleft;
+                Rleft = Color.red(leftPix);
+                Gleft = Color.green(leftPix);
+                Bleft = Color.blue(leftPix);
+                int downPix = mBitmap.getPixel(indW,indH+1);
+                int Rdown,Gdown,Bdown;
+                Rdown = Color.red(downPix);
+                Gdown = Color.green(downPix);
+                Bdown = Color.blue(downPix);
+
+                double distLeft = Math.sqrt((Rstart-Rleft)*(Rstart-Rleft)+(Gstart-Gleft)*(Gstart-Gleft)+(Bstart-Bleft)*(Bstart-Bleft));
+                double distDown = Math.sqrt((Rstart-Rdown)*(Rstart-Rdown)+(Gstart-Gdown)*(Gstart-Gdown)+(Bstart-Bdown)*(Bstart-Bdown));
+                Log.e(VFD_LOG,"distLeft: "+distLeft + " "+ "distDown: "+distDown);
+
+                if (distLeft>25||distDown>25){ // il parametro potrà essere settato dall'utente
+                    mBitmap.setPixel(indW,indH,mPaint.getColor());
+                    //mBitmap.setPixel(indW+1,indH+1,mPaint.getColor());
+                    //mBitmap.setPixel(indW-1,indH-1,mPaint.getColor());
+                    //mBitmap.setPixel(indW+1,indH-1,mPaint.getColor());
+                    //mBitmap.setPixel(indW-1,indH+1,mPaint.getColor());
+                }else{
+                    mBitmap.setPixel(indW,indH,Color.rgb(255,255,255));
+                }
+            }
+        }
+        invalidate();
     }
 
     public void setmPaint(Paint mPaint) {

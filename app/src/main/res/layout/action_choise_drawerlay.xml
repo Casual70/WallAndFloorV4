@@ -23,4 +23,12 @@
         android:layout_alignEnd="@+id/button_undoPath"
         android:layout_alignStart="@+id/button_undoPath" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Only Border"
+        android:id="@+id/button_onlyBord"
+        android:layout_below="@+id/button_redoPath"
+        android:layout_alignStart="@+id/button_redoPath" />
+
 </RelativeLayout>

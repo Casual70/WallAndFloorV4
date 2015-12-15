@@ -55,6 +55,7 @@ public class EditorActivity extends Activity {
     private Paint myPaint;
     private Button confirmColor;
     private Button undoPathButton, redoPathButton;
+    private Button onlyBorderButton;
     private ColorPickerView cpv;
 
 
@@ -69,6 +70,7 @@ public class EditorActivity extends Activity {
         confirmColor = (Button)findViewById(R.id.button_confim);
         undoPathButton = (Button)findViewById(R.id.button_undoPath);
         redoPathButton = (Button)findViewById(R.id.button_redoPath);
+        onlyBorderButton = (Button)findViewById(R.id.button_onlyBord);
         cpv = (ColorPickerView)findViewById(R.id.colorPicker);
         myPaint = initPaint(myPaint);
         BitmapFactory.Options opt = new BitmapFactory.Options();
@@ -111,6 +113,12 @@ public class EditorActivity extends Activity {
             @Override
             public void onClick(View v) {
                 fragment.getVfd().onRedoPath();
+            }
+        });
+        onlyBorderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragment.getVfd().findBord(0,0);
             }
         });
     }
