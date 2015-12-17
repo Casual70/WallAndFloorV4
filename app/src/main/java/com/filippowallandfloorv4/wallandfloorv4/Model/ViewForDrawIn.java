@@ -8,7 +8,6 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,6 +17,7 @@ import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -34,9 +34,6 @@ public class ViewForDrawIn extends View {
     private Path mPath;             // serve a definire il Percorso Path appunto tracciato, è quello che mi serve
     private Paint mBitmapPaint;     //
     public Context context;         //
-    private ArrayList<Point> listPcentr = null;
-    private ArrayList<Point> listPup = null;
-    private ArrayList<Point> listPdw = null;
     private ArrayList<Path> myPathUndo = new ArrayList<Path>();
     private ArrayList<Path> myPathRedo = new ArrayList<Path>();
     private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
@@ -48,8 +45,7 @@ public class ViewForDrawIn extends View {
     private static final float TOUCH_TOLLERANCE = 0; // ricordarsi di cambiarlo old = 4
     private boolean strokePath;
     private boolean floodFill;
-    private Point fp;
-    private Point lp;
+    private List<Pixel> listPcentr;
 
     private int[] pixels;
     private int sampleColor;
@@ -110,22 +106,19 @@ public class ViewForDrawIn extends View {
         mX = x;
         mY = y;
         if (listPcentr == null){
-            listPcentr = new ArrayList<Point>();
-            fp = new Point((int)x,(int)y);
+            listPcentr = new ArrayList<Pixel>();
+            listPcentr.add(new Pixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
         }
     }
     private void touch_move(float x,float y){
         float dx = Math.abs(x-mX);
         float dy = Math.abs(y-mY);
         if (dx >= TOUCH_TOLLERANCE || dy >=TOUCH_TOLLERANCE){
-            mPath.quadTo(mX,mY,(x+mX)/2,(y+mY)/2);
+            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;
             if (listPcentr != null){
-                Point p = new Point((int)x,(int)y);
-                colorLog(p.x,p.y);
-                Log.e(VFD_LOG, "" + p);
-                listPcentr.add(p);
+                listPcentr.add(new Pixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
             }
         }
     }
@@ -133,7 +126,7 @@ public class ViewForDrawIn extends View {
         mPath.lineTo(mX, mY);
         //mCanvas.drawPath(mPath, mPaint);
         if (listPcentr !=null){
-            lp = new Point((int)x,(int)y);
+            listPcentr.add(new Pixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
         }
         if (freeHand) {
             pathColorMap.put(mPath, new Paint(mPaint));
@@ -156,6 +149,7 @@ public class ViewForDrawIn extends View {
             invalidate();
         }
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) throws IllegalArgumentException{
@@ -210,11 +204,13 @@ public class ViewForDrawIn extends View {
         Bitmap imgBtm = Bitmap.createBitmap(this.getDrawingCache());
         this.setDrawingCacheEnabled(false);
         int pxl = imgBtm.getPixel((int) x, (int) y);
-        int R,G,B;
+        int A,R,G,B;
+        A = Color.alpha(pxl);
         R = Color.red(pxl);
         G = Color.green(pxl);
         B = Color.blue(pxl);
-        Log.e(VFD_LOG," Red: "+R+" Green: "+G+" Blue: "+B);
+        int argb = Color.argb(A,R,G,B);
+        Log.e(VFD_LOG,"Alpha: "+A+ " Red: "+R+" Green: "+G+" Blue: "+B);
     }
     public void findBord(int x, int y){ // usare un floodfill più leggero
         CannyEdgeDetector detector = new CannyEdgeDetector();
@@ -225,6 +221,10 @@ public class ViewForDrawIn extends View {
         backBitmap = detector.getEdgesImage();
         mBitmap = backBitmap;
         invalidate();
+    }
+
+    public void floodFill(Bitmap bitmap, Pixel nestP){
+
     }
 
     public void setmPaint(Paint mPaint) {
