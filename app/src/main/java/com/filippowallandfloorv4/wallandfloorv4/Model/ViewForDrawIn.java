@@ -14,10 +14,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -40,13 +40,14 @@ public class ViewForDrawIn extends View {
     private ArrayList<Path> myPathUndo = new ArrayList<Path>();
     private ArrayList<Path> myPathRedo = new ArrayList<Path>();
     private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
+    private Bitmap backBitmap;
 
 
     private boolean freeHand;
     private float mX,mY;
     private static final float TOUCH_TOLLERANCE = 0; // ricordarsi di cambiarlo old = 4
     private boolean strokePath;
-    private boolean oneLine;
+    private boolean floodFill;
     private Point fp;
     private Point lp;
 
@@ -140,11 +141,6 @@ public class ViewForDrawIn extends View {
             //mCanvas.drawPath(mPath,mPaint); questo passaggio è necessario per disegnare sul canvas che poi verrà salvato anche se poi non farà parte dell Do Undo
             mPath = new Path();
         }
-
-
-    }
-    public void onConfirmModify(){
-
     }
     public void onUndoPath(){
         if (myPathUndo.size() > 0) {
@@ -161,73 +157,6 @@ public class ViewForDrawIn extends View {
         }
     }
 
-    private void floodFillOneLine(Bitmap image,ArrayList<Point>listPathPoint){
-        mPath.reset();
-        mPath.moveTo(listPathPoint.get(0).x, listPathPoint.get(0).y);
-        Log.e(VFD_LOG, "lunghezza lista punti: " + listPathPoint.size());
-        for (Point p : listPathPoint){ // funzione riempimento horizzont
-            Point original = new Point(p.x,p.y);
-            boolean findXDx = false;
-            boolean findXSx = false;
-            while (!findXDx){
-                if (!findIntMaxMin(p,sampleMinMaxRGB,image) || p.x<1){
-                    findXDx = true;
-                    Log.e(VFD_LOG, "punto: "+ p);
-                }else{
-                    mPath.lineTo(p.x,p.y);
-                    p.x--;
-                }
-            }
-            while (!findXSx){
-                if (!findIntMaxMin(original,sampleMinMaxRGB,image) || original.x >= image.getWidth()-1){
-                    findXSx = true;
-                }else{
-                    mPath.lineTo(original.x,original.y);
-                    original.x++;
-                }
-            }
-        }
-        pathColorMap.put(mPath, new Paint(mPaint));
-        myPathUndo.add(mPath);
-        mPath = new Path();
-        //mCanvas.drawPath(mPath, mPaint);
-    }
-
-
-    private void extendLineUp(Bitmap image){
-        listPup = new ArrayList<>();
-        listPup.add(new Point(fp.x, fp.y));
-        Point mP = new Point(fp.x,fp.y-1);
-        Log.e(VFD_LOG, fp + " " + mP);
-        boolean find = false;
-        while(!find){
-            if (!findIntMaxMin(mP,sampleMinMaxRGB,image) || mP.y<1){
-                Log.e(VFD_LOG, "trovata differenza " + mP);
-                colorLog(mP.x, mP.y);
-                find = true;
-            }else{
-                listPup.add(new Point(mP.x,mP.y));
-                mP.set(mP.x, mP.y - 1);
-                Log.e(VFD_LOG, "aggiunto punto "+mP);
-            }
-        }
-    }
-
-    private void extendLineDown(Bitmap image){
-        listPdw = new ArrayList<>();
-        listPdw.add(new Point(lp.x, lp.y));
-        Point mP = new Point(lp.x,lp.y+1);
-        boolean find = false;
-        while(!find){
-            if (!findIntMaxMin(mP,sampleMinMaxRGB,image)||mP.y>image.getHeight()){
-                find = true;
-            } else{
-                listPdw.add(new Point(mP.x, mP.y));
-                mP.set(mP.x, mP.y + 1);
-            }
-        }
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) throws IllegalArgumentException{
         super.onTouchEvent(event);
@@ -236,7 +165,7 @@ public class ViewForDrawIn extends View {
         float x;
         x = event.getX();
         Log.e("on Touch choise", "freeHand :" + freeHand);
-        Log.e("on Touch choise", "oneLine :" + oneLine);
+        Log.e("on Touch choise", "floodFill :" + floodFill);
         try {
             if (freeHand){
                 switch (event.getAction()) {
@@ -255,96 +184,25 @@ public class ViewForDrawIn extends View {
                         break;
                 }
             }
-            if (oneLine){
+            if (floodFill){
                 Bitmap image = null;
                 int alpha = mPaint.getAlpha();
                 mPaint.setAlpha(0);
                 switch (event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        touch_start(x, y);
-                        invalidate();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        touch_move(x, y);
-                        invalidate();
-                        break;
                     case MotionEvent.ACTION_UP:
                         touch_up(x,y);
                         colorLog(x, y); // sarà da togliere alla fine del debug
                         this.setDrawingCacheEnabled(true);
                         image = Bitmap.createBitmap(this.getDrawingCache());
                         sampleColor = mPaint.getColor();
-                        //invalidate();
                         break;
                 }
                 mPaint.setAlpha(alpha);
-                if (listPcentr !=null && image !=null){
-                    sampleMinMaxRGB = tolleranceMaxMinColor(listPcentr,image);
-                    extendLineUp(image);
-                    extendLineDown(image);
-                    if (listPup.size()!=0){
-                        Log.e(VFD_LOG, "second array size " + listPup.size());
-                        listPcentr.addAll(listPup);
-                        if (listPdw.size()!=0){
-                            listPcentr.addAll(listPdw);
-                        }
-                        floodFillOneLine(image, listPcentr);
-                        invalidate();
-                    }
-                    listPup = null;
-                    listPdw = null;
-                    listPcentr =null;
-                }
             }
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
         return true;
-    }
-
-    private int[] tolleranceMaxMinColor(ArrayList<Point> points, Bitmap image){
-        List<Integer> redList = new ArrayList<>();
-        List<Integer> greeList = new ArrayList<>();
-        List<Integer>blueList = new ArrayList<>();
-
-        for (Point p : points){
-            int [] analisRGB ={Color.red(image.getPixel(p.x,p.y)),
-                               Color.green(image.getPixel(p.x, p.y)),
-                               Color.blue(image.getPixel(p.x,p.y))};
-            redList.add(analisRGB[0]);
-            greeList.add(analisRGB[1]);
-            blueList.add(analisRGB[2]);
-        }
-        int redMax = Collections.max(redList);
-        int redMin = Collections.min(redList);
-        int greeMax = Collections.max(greeList);
-        int greeMin = Collections.min(greeList);
-        int blueMax = Collections.max(blueList);
-        int blueMin = Collections.min(blueList);
-
-        Log.e("AVERANGECOLOR","Red max: "+redMax+" Red min: "+redMin);
-        Log.e("AVERANGECOLOR","Green max: "+greeMax+" Green min: "+greeMin);
-        Log.e("AVERANGECOLOR","Blue max: "+blueMax+" Blue min: "+blueMin);
-
-        //provare ad usare la media dei colori ottenuti oppure impostare i min e max
-        return new int[] {redMax,redMin,greeMax,greeMin,blueMax,blueMin};
-    }
-
-    private boolean findIntMaxMin(Point pixel, int[] maxMinToll,Bitmap image){
-        boolean find = false;
-        int tollerace = 10;
-        if (pixel.x>=1 && pixel.x<=image.getWidth()-1 && pixel.y>=1 && pixel.y<=image.getHeight()-1){
-            int [] analisRGB ={Color.red(image.getPixel(pixel.x,pixel.y)),
-                               Color.green(image.getPixel(pixel.x, pixel.y)),
-                               Color.blue(image.getPixel(pixel.x,pixel.y))};
-
-            if (    analisRGB[0]<=maxMinToll[0]+tollerace && analisRGB[0] >= maxMinToll[1]-tollerace&&
-                    analisRGB[1]<=maxMinToll[2]+tollerace && analisRGB[1] >= maxMinToll[3]-tollerace&&
-                    analisRGB[2]<=maxMinToll[4]+tollerace && analisRGB[2] >= maxMinToll[5]-tollerace) {
-                find = true;
-            }
-        }
-        return find;
     }
 
     public void colorLog(float x, float y){
@@ -358,44 +216,14 @@ public class ViewForDrawIn extends View {
         B = Color.blue(pxl);
         Log.e(VFD_LOG," Red: "+R+" Green: "+G+" Blue: "+B);
     }
-    public void findBord(int x, int y){ // farlo dentro un AsyncTask // creare un'altro bitmap identico all'originale ma elaborato con questo metodo ed usarlo per trovare i bordi
-                                        // usare un floodfill più leggero
-        int h = mBitmap.getHeight();
-        int w = mBitmap.getWidth();
-        Log.e(VFD_LOG,"h: "+h + " "+ "w: "+w);
-        for (int indH = 1; indH < h-2; indH++){
-            for (int indW = 1; indW < w-2; indW++){
-                int startPix = mBitmap.getPixel(indW,indH);
-                int Rstart,Gstart,Bstart;
-                Rstart = Color.red(startPix);
-                Gstart = Color.green(startPix);
-                Bstart = Color.blue(startPix);
-                int leftPix = mBitmap.getPixel(indW+1,indH);
-                int Rleft,Gleft,Bleft;
-                Rleft = Color.red(leftPix);
-                Gleft = Color.green(leftPix);
-                Bleft = Color.blue(leftPix);
-                int downPix = mBitmap.getPixel(indW,indH+1);
-                int Rdown,Gdown,Bdown;
-                Rdown = Color.red(downPix);
-                Gdown = Color.green(downPix);
-                Bdown = Color.blue(downPix);
-
-                double distLeft = Math.sqrt((Rstart-Rleft)*(Rstart-Rleft)+(Gstart-Gleft)*(Gstart-Gleft)+(Bstart-Bleft)*(Bstart-Bleft));
-                double distDown = Math.sqrt((Rstart-Rdown)*(Rstart-Rdown)+(Gstart-Gdown)*(Gstart-Gdown)+(Bstart-Bdown)*(Bstart-Bdown));
-                Log.e(VFD_LOG,"distLeft: "+distLeft + " "+ "distDown: "+distDown);
-
-                if (distLeft>25||distDown>25){ // il parametro potrà essere settato dall'utente
-                    mBitmap.setPixel(indW,indH,mPaint.getColor());
-                    //mBitmap.setPixel(indW+1,indH+1,mPaint.getColor());
-                    //mBitmap.setPixel(indW-1,indH-1,mPaint.getColor());
-                    //mBitmap.setPixel(indW+1,indH-1,mPaint.getColor());
-                    //mBitmap.setPixel(indW-1,indH+1,mPaint.getColor());
-                }else{
-                    mBitmap.setPixel(indW,indH,Color.rgb(255,255,255));
-                }
-            }
-        }
+    public void findBord(int x, int y){ // usare un floodfill più leggero
+        CannyEdgeDetector detector = new CannyEdgeDetector();
+        detector.setLowThreshold(0.1f);
+        detector.setHighThreshold(2.0f);
+        detector.setSourceImage(mBitmap);
+        detector.process();
+        backBitmap = detector.getEdgesImage();
+        mBitmap = backBitmap;
         invalidate();
     }
 
@@ -425,8 +253,8 @@ public class ViewForDrawIn extends View {
         this.strokePath = strokePath;
     }
 
-    public void setOneLine(boolean oneLine) {
-        this.oneLine = oneLine;
+    public void setFloodFill(boolean floodFill) {
+        this.floodFill = floodFill;
     }
 
     public Canvas getmCanvas() {

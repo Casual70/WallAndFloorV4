@@ -10,9 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
-import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -23,8 +21,6 @@ import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapte
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
 import com.filippowallandfloorv4.wallandfloorv4.R;
-
-import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -152,7 +148,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
                     ToggleButton toggleButton = (ToggleButton) group.getChildAt(i);
                     toggleButton.setChecked(toggleButton.getId() == checkedId);
                     vfd.setFreeHand(freeHandToggleB.isChecked());
-                    vfd.setOneLine(oneLineToggleB.isChecked());
+                    vfd.setFloodFill(oneLineToggleB.isChecked());
                 }
             }
         });
