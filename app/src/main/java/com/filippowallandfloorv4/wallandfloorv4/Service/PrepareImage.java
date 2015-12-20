@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 
+import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
+
 /**
  * Created by Filippo on 16/12/2015.
  */
@@ -15,63 +17,38 @@ public class PrepareImage extends AsyncTask<Bitmap,Void,Bitmap> {
     private final static String PrepareImage_Log = "PrepareImage_log";
 
     private Bitmap originalBitmap;
-    private Paint mPaint;
     private Bitmap backBitmap;
+    private ViewForDrawIn view;
 
-    public PrepareImage(Bitmap originalBitmap, Paint mPaint, View v) {
+
+    public PrepareImage(Bitmap originalBitmap, ViewForDrawIn view) {
         this.originalBitmap = originalBitmap;
-        this.mPaint = mPaint;
-        this.backBitmap = Bitmap.createBitmap(originalBitmap);
+        this.view = view;
+
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        // dialog
     }
 
     @Override
     protected Bitmap doInBackground(Bitmap... params) {
-        int h = originalBitmap.getHeight();
-        int w = originalBitmap.getWidth();
-        Log.e(PrepareImage_Log, "h: " + h + " " + "w: " + w);
-        for (int indH = 1; indH < h-2; indH++){
-            for (int indW = 1; indW < w-2; indW++){
-                int startPix = originalBitmap.getPixel(indW,indH);
-                int Rstart,Gstart,Bstart;
-                Rstart = Color.red(startPix);
-                Gstart = Color.green(startPix);
-                Bstart = Color.blue(startPix);
-                int leftPix = originalBitmap.getPixel(indW+1,indH);
-                int Rleft,Gleft,Bleft;
-                Rleft = Color.red(leftPix);
-                Gleft = Color.green(leftPix);
-                Bleft = Color.blue(leftPix);
-                int downPix = originalBitmap.getPixel(indW,indH+1);
-                int Rdown,Gdown,Bdown;
-                Rdown = Color.red(downPix);
-                Gdown = Color.green(downPix);
-                Bdown = Color.blue(downPix);
-
-                double distLeft = Math.sqrt((Rstart-Rleft)*(Rstart-Rleft)+(Gstart-Gleft)*(Gstart-Gleft)+(Bstart-Bleft)*(Bstart-Bleft));
-                double distDown = Math.sqrt((Rstart-Rdown)*(Rstart-Rdown)+(Gstart-Gdown)*(Gstart-Gdown)+(Bstart-Bdown)*(Bstart-Bdown));
-                Log.e(PrepareImage_Log,"distLeft: "+distLeft + " "+ "distDown: "+distDown);
-
-                if (distLeft>20||distDown>20){ // il parametro potrà essere settato dall'utente
-                    backBitmap.setPixel(indW,indH,mPaint.getColor());
-                }else{
-                    backBitmap.setPixel(indW,indH,Color.rgb(255,255,255));
-                }
-            }
-        }
-        return backBitmap;
+        CannyEdgeDetector detector = new CannyEdgeDetector();
+        detector.setLowThreshold(1.0f);
+        detector.setHighThreshold(5.0f);
+        detector.setSourceImage(originalBitmap);
+        detector.process();
+        return detector.getEdgesImage();
     }
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
+        view.setBackBitmap(bitmap);
+        //view.setmBitmap(bitmap);
+        view.invalidate();
         super.onPostExecute(bitmap);
-    }
-
-    public Bitmap getBackBitmap() {
-        return backBitmap;
+        //dialog close
     }
 }

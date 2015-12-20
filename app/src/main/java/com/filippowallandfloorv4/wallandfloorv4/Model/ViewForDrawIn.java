@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
+import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -211,23 +212,16 @@ public class ViewForDrawIn extends View {
         int argb = Color.argb(A,R,G,B);
         Log.e(VFD_LOG, "Alpha: " + A + " Red: " + R + " Green: " + G + " Blue: " + B);
     }
-    public void findBord(){ // usare un floodfill più leggero
-        CannyEdgeDetector detector = new CannyEdgeDetector();
-        detector.setLowThreshold(1.0f);
-        detector.setHighThreshold(5.0f);
-        detector.setSourceImage(mBitmap);
-        detector.process();
-        backBitmap = detector.getEdgesImage();
-        //mBitmap = backBitmap;
-        invalidate();
+    public void findBord(){
+        PrepareImage prepareImage = new PrepareImage(mBitmap,this);
+        prepareImage.execute();
     }
 
     public void floodFill(Bitmap bitmap, Pixel nestP){
-        boolean findx;
         int x1 = nestP.x;
         while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) {
             fillY(bitmap,new Pixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
-            x1++;
+             x1++;
         }
         int x2 = nestP.x;
         while (x2 > 1 && bitmap.getPixel(x2,nestP.y)== Color.BLACK){
@@ -294,6 +288,10 @@ public class ViewForDrawIn extends View {
 
     public Paint getmBitmapPaint() {
         return mBitmapPaint;
+    }
+
+    public void setBackBitmap(Bitmap backBitmap) {
+        this.backBitmap = backBitmap;
     }
 }
 
