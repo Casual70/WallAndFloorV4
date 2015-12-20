@@ -17,8 +17,10 @@ import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 
 public class ViewForDrawIn extends View {
@@ -179,19 +181,16 @@ public class ViewForDrawIn extends View {
                 }
             }
             if (floodFill){
-                Bitmap image = null;
+                /**Bitmap image = null;
                 int alpha = mPaint.getAlpha();
-                mPaint.setAlpha(0);
+                mPaint.setAlpha(0);*/
                 switch (event.getAction()){
                     case MotionEvent.ACTION_UP:
                         touch_up(x,y);
-                        colorLog(x, y); // sarà da togliere alla fine del debug
-                        this.setDrawingCacheEnabled(true);
-                        image = Bitmap.createBitmap(this.getDrawingCache());
-                        sampleColor = mPaint.getColor();
+                        colorLog(x, y);
+                        floodFill(backBitmap,new Pixel((int)x,(int)y,backBitmap.getPixel((int)x,(int)y)));
                         break;
                 }
-                mPaint.setAlpha(alpha);
             }
         }catch (IllegalArgumentException e){
             e.printStackTrace();
@@ -210,21 +209,53 @@ public class ViewForDrawIn extends View {
         G = Color.green(pxl);
         B = Color.blue(pxl);
         int argb = Color.argb(A,R,G,B);
-        Log.e(VFD_LOG,"Alpha: "+A+ " Red: "+R+" Green: "+G+" Blue: "+B);
+        Log.e(VFD_LOG, "Alpha: " + A + " Red: " + R + " Green: " + G + " Blue: " + B);
     }
-    public void findBord(int x, int y){ // usare un floodfill più leggero
+    public void findBord(){ // usare un floodfill più leggero
         CannyEdgeDetector detector = new CannyEdgeDetector();
-        detector.setLowThreshold(0.1f);
-        detector.setHighThreshold(2.0f);
+        detector.setLowThreshold(1.0f);
+        detector.setHighThreshold(5.0f);
         detector.setSourceImage(mBitmap);
         detector.process();
         backBitmap = detector.getEdgesImage();
-        mBitmap = backBitmap;
+        //mBitmap = backBitmap;
         invalidate();
     }
 
     public void floodFill(Bitmap bitmap, Pixel nestP){
-
+        boolean findx;
+        int x1 = nestP.x;
+        while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) {
+            fillY(bitmap,new Pixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
+            x1++;
+        }
+        int x2 = nestP.x;
+        while (x2 > 1 && bitmap.getPixel(x2,nestP.y)== Color.BLACK){
+            fillY(bitmap,new Pixel(x2,nestP.y,bitmap.getPixel(x2,nestP.y)));
+            x2--;
+        }
+        invalidate();
+    }
+    private boolean fillY(Bitmap bitmap, Pixel nestP){
+        int y1 = nestP.y;
+        LinkedList<Pixel> pixelsY1 = new LinkedList<>();
+        while (y1 < bitmap.getHeight() - 1 && bitmap.getPixel(nestP.x, y1) == Color.BLACK) {
+            Pixel p = new Pixel(nestP.x, y1, bitmap.getPixel(nestP.x, y1));
+            pixelsY1.add(p);
+            y1++;
+        }
+        int y2 = nestP.y;
+        LinkedList<Pixel> pixelsY2 = new LinkedList<>();
+        while (y2 > 1 && bitmap.getPixel(nestP.x, y2) == Color.BLACK) {
+            Pixel p = new Pixel(nestP.x, y2, bitmap.getPixel(nestP.x, y2));
+            pixelsY2.add(p);
+            y2--;
+        }
+        Path path = new Path();
+        path.moveTo(pixelsY2.getLast().x, pixelsY2.getLast().y);
+        path.lineTo(pixelsY1.getLast().x, pixelsY1.getLast().y);
+        mCanvas.drawPath(path, mPaint);
+        return true;
     }
 
     public void setmPaint(Paint mPaint) {

@@ -118,7 +118,7 @@ public class EditorActivity extends Activity {
         onlyBorderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragment.getVfd().findBord(0,0);
+                fragment.getVfd().findBord();
             }
         });
     }
