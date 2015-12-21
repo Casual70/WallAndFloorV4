@@ -1,6 +1,7 @@
 package com.filippowallandfloorv4.wallandfloorv4.Service;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
@@ -46,7 +47,7 @@ public class PrepareImage extends AsyncTask<Bitmap,Void,Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         view.setBackBitmap(bitmap);
-        view.setmBitmap(bitmap);
+        //view.setmBitmap(bitmap);
         view.invalidate();
         super.onPostExecute(bitmap);
         //dialog close

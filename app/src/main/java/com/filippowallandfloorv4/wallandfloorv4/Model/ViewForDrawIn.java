@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Timer;
 
 
 public class ViewForDrawIn extends View {
@@ -34,6 +35,8 @@ public class ViewForDrawIn extends View {
 
     private Bitmap mBitmap;         //
     private Canvas mCanvas;         //
+    private Canvas backCanvas;
+    private Paint backPaint;
     private Path mPath;             // serve a definire il Percorso Path appunto tracciato, è quello che mi serve
     private Paint mBitmapPaint;     //
     public Context context;         //
@@ -41,6 +44,8 @@ public class ViewForDrawIn extends View {
     private ArrayList<Path> myPathRedo = new ArrayList<Path>();
     private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
     private Bitmap backBitmap;
+    private LinkedList<Pixel>postElaboration;
+    private LinkedList<Pixel>postFill;
 
 
     private boolean freeHand;
@@ -195,6 +200,12 @@ public class ViewForDrawIn extends View {
                     }
                 }
             }
+            if (!floodFill && !freeHand){
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_UP:
+                        colorLog(x,y);
+                }
+            }
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
@@ -220,20 +231,49 @@ public class ViewForDrawIn extends View {
     }
 
     public void floodFill(Bitmap bitmap, Pixel nestP){
+        postElaboration = new LinkedList<>();
+        postFill = new LinkedList<>();
+        long start = System.currentTimeMillis();
         int x1 = nestP.x;
         while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) {
             fillY(bitmap,new Pixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
             x1++;
         }
         int x2 = nestP.x-1;
-        while (x2 > 1 && bitmap.getPixel(x2,nestP.y)== Color.BLACK){
+        while (x2 > 1 && bitmap.getPixel(x2,nestP.y) == Color.BLACK){
             fillY(bitmap,new Pixel(x2,nestP.y,bitmap.getPixel(x2,nestP.y)));
             x2--;
         }
+        for (Pixel post:postElaboration){
+            bitmap.setPixel(post.x,post.y,Color.RED);
+        }
+        postFill(bitmap);
+        Log.e(VFD_LOG,"postFill size: "+postFill.size());
+        long finish = (System.currentTimeMillis()-start);
+        Log.e(VFD_LOG,"tempo impiegato: "+finish);
+        mBitmap = bitmap;
         invalidate();
     }
-    private boolean fillY(Bitmap bitmap, Pixel nestP){ // todo deve ritornare una linkedList con le coordinate delgi ultimi pixel rilevati
-                                                       // che andrà a sostituirsi ogni volte che gira il fillY()
+    private void postFill(Bitmap bitmap){
+        for (Pixel post:postElaboration){
+            if (bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){
+                postFill.add(new Pixel(post.x-1,post.y,Color.BLACK));
+            }
+            if (bitmap.getPixel(post.x+1,post.y) == Color.BLACK && bitmap.getPixel(post.x-2,post.y) == Color.RED){
+                postFill.add(new Pixel(post.x+1,post.y,Color.BLACK));
+            }
+        }
+        for (Pixel postfillPix: postFill){
+            bitmap.setPixel(postfillPix.x,postfillPix.y,Color.GREEN);
+            /**if (bitmap.getPixel(postfillPix.x-1,postfillPix.y)==Color.BLACK){
+                floodFill(bitmap,new Pixel(postfillPix.x-1,postfillPix.y,Color.BLACK));
+            }*/
+            if (bitmap.getPixel(postfillPix.x+1,postfillPix.y)==Color.BLACK){
+                floodFill(bitmap,new Pixel(postfillPix.x+1,postfillPix.y,Color.BLACK));
+            }
+        }
+    }
+    private boolean fillY(Bitmap bitmap, Pixel nestP){
         int y1 = nestP.y;
         LinkedList<Pixel> pixelsY1 = new LinkedList<>();
         while (y1 < bitmap.getHeight() - 1 && bitmap.getPixel(nestP.x, y1) == Color.BLACK) {
@@ -254,6 +294,9 @@ public class ViewForDrawIn extends View {
         path.moveTo(pixelsY2.getLast().x, pixelsY2.getLast().y);
         path.lineTo(pixelsY1.getLast().x, pixelsY1.getLast().y);
         mCanvas.drawPath(path, mPaint);
+        postElaboration.addAll(pixelsY1);
+        postElaboration.addAll(pixelsY2);
+        Log.e(VFD_LOG,"postElaboration size: "+postElaboration.size());
         return true;
     }
 
@@ -297,6 +340,22 @@ public class ViewForDrawIn extends View {
 
     public void setBackBitmap(Bitmap backBitmap) {
         this.backBitmap = backBitmap;
+    }
+
+    public Canvas getBackCanvas() {
+        return backCanvas;
+    }
+
+    public void setBackCanvas(Canvas backCanvas) {
+        this.backCanvas = backCanvas;
+    }
+
+    public Paint getBackPaint() {
+        return backPaint;
+    }
+
+    public void setBackPaint(Paint backPaint) {
+        this.backPaint = backPaint;
     }
 }
 
