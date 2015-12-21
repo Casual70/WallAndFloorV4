@@ -182,15 +182,17 @@ public class ViewForDrawIn extends View {
                 }
             }
             if (floodFill){
-                /**Bitmap image = null;
-                int alpha = mPaint.getAlpha();
-                mPaint.setAlpha(0);*/
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_UP:
-                        touch_up(x,y);
-                        colorLog(x, y);
-                        floodFill(backBitmap,new Pixel((int)x,(int)y,backBitmap.getPixel((int)x,(int)y)));
-                        break;
+                if (backBitmap != null){
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_UP:
+                            touch_up(x, y);
+                            colorLog(x, y);
+                            float stroke = mPaint.getStrokeWidth();
+                            mPaint.setStrokeWidth(1.0f);
+                            floodFill(backBitmap, new Pixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
+                            mPaint.setStrokeWidth(stroke);
+                            break;
+                    }
                 }
             }
         }catch (IllegalArgumentException e){
@@ -221,20 +223,22 @@ public class ViewForDrawIn extends View {
         int x1 = nestP.x;
         while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) {
             fillY(bitmap,new Pixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
-             x1++;
+            x1++;
         }
-        int x2 = nestP.x;
+        int x2 = nestP.x-1;
         while (x2 > 1 && bitmap.getPixel(x2,nestP.y)== Color.BLACK){
             fillY(bitmap,new Pixel(x2,nestP.y,bitmap.getPixel(x2,nestP.y)));
             x2--;
         }
         invalidate();
     }
-    private boolean fillY(Bitmap bitmap, Pixel nestP){
+    private boolean fillY(Bitmap bitmap, Pixel nestP){ // todo deve ritornare una linkedList con le coordinate delgi ultimi pixel rilevati
+                                                       // che andrà a sostituirsi ogni volte che gira il fillY()
         int y1 = nestP.y;
         LinkedList<Pixel> pixelsY1 = new LinkedList<>();
         while (y1 < bitmap.getHeight() - 1 && bitmap.getPixel(nestP.x, y1) == Color.BLACK) {
             Pixel p = new Pixel(nestP.x, y1, bitmap.getPixel(nestP.x, y1));
+            p.setVisited(true);
             pixelsY1.add(p);
             y1++;
         }
@@ -242,6 +246,7 @@ public class ViewForDrawIn extends View {
         LinkedList<Pixel> pixelsY2 = new LinkedList<>();
         while (y2 > 1 && bitmap.getPixel(nestP.x, y2) == Color.BLACK) {
             Pixel p = new Pixel(nestP.x, y2, bitmap.getPixel(nestP.x, y2));
+            p.setVisited(true);
             pixelsY2.add(p);
             y2--;
         }
