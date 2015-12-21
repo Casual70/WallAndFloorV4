@@ -251,7 +251,7 @@ public class ViewForDrawIn extends View {
         Log.e(VFD_LOG,"postFill size: "+postFill.size());
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
-        mBitmap = bitmap;
+        //mBitmap = bitmap;
         invalidate();
     }
     private void postFill(Bitmap bitmap){
@@ -265,14 +265,20 @@ public class ViewForDrawIn extends View {
         }
         for (Pixel postfillPix: postFill){
             bitmap.setPixel(postfillPix.x,postfillPix.y,Color.GREEN);
+
             /**if (bitmap.getPixel(postfillPix.x-1,postfillPix.y)==Color.BLACK){
                 floodFill(bitmap,new Pixel(postfillPix.x-1,postfillPix.y,Color.BLACK));
             }*/
-            if (bitmap.getPixel(postfillPix.x+1,postfillPix.y)==Color.BLACK){
+            /**if (bitmap.getPixel(postfillPix.x+1,postfillPix.y)==Color.BLACK){
                 floodFill(bitmap,new Pixel(postfillPix.x+1,postfillPix.y,Color.BLACK));
-            }
+            }*/
         }
     }
+    /**todo dove riorganizzare meglio i metodi in modo da renderli più flessibili e riutilizzabili
+     * todo e farli ciclare fino a quando la postfill LinkedList non nasca vuota (ogni volta chè viene caricato un pixel nella lista si deve svolgere il metodo perpendicolare)*/
+
+
+
     private boolean fillY(Bitmap bitmap, Pixel nestP){
         int y1 = nestP.y;
         LinkedList<Pixel> pixelsY1 = new LinkedList<>();
@@ -299,6 +305,7 @@ public class ViewForDrawIn extends View {
         Log.e(VFD_LOG,"postElaboration size: "+postElaboration.size());
         return true;
     }
+
 
     public void setmPaint(Paint mPaint) {
         this.mPaint = mPaint;
