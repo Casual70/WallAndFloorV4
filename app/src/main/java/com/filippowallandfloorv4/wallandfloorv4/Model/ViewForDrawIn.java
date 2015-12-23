@@ -264,7 +264,8 @@ public class ViewForDrawIn extends View {
             if (bitmap.getPixel(post.x+1,post.y) == Color.BLACK && bitmap.getPixel(post.x-2,post.y) == Color.RED){
                 postFill.add(new Pixel(post.x+1,post.y,Color.BLACK));
             }
-        }
+        }// this is ok
+
         LinkedList<LinkedList>listOfAllBorder = new LinkedList<>();
         LinkedList<Pixel>singleBorderLinePlus = new LinkedList<>();
         LinkedList<Pixel>singleBorderLineMinus = new LinkedList<>();
@@ -272,6 +273,7 @@ public class ViewForDrawIn extends View {
         Pixel previusY = null;
         while (iterator.hasNext()){
             Pixel p = iterator.next();
+            Log.e(VFD_LOG, "Y: "+p.y);
             if (previusY == null){
                 previusY = p;
                 singleBorderLinePlus.add(p);
