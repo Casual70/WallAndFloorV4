@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Timer;
 
 
@@ -251,7 +253,7 @@ public class ViewForDrawIn extends View {
         Log.e(VFD_LOG,"postFill size: "+postFill.size());
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
-        //mBitmap = bitmap;
+        mBitmap = bitmap;
         invalidate();
     }
     private void postFill(Bitmap bitmap){
@@ -263,16 +265,51 @@ public class ViewForDrawIn extends View {
                 postFill.add(new Pixel(post.x+1,post.y,Color.BLACK));
             }
         }
-        for (Pixel postfillPix: postFill){
-            bitmap.setPixel(postfillPix.x,postfillPix.y,Color.GREEN);
+        LinkedList<LinkedList>listOfAllBorder = new LinkedList<>();
+        LinkedList<Pixel>singleBorderLinePlus = new LinkedList<>();
+        LinkedList<Pixel>singleBorderLineMinus = new LinkedList<>();
+        ListIterator<Pixel> iterator = postFill.listIterator();
+        Pixel previusY = null;
+        while (iterator.hasNext()){
+            Pixel p = iterator.next();
+            if (previusY == null){
+                previusY = p;
+                singleBorderLinePlus.add(p);
+            }
+            else if (previusY.y+1 == p.y){
+                singleBorderLinePlus.add(p);
+                Log.e(VFD_LOG, "aggiunto_Plus");
+            }
+            else if (previusY.y-1 == p.y){
+                singleBorderLineMinus.add(p);
+                Log.e(VFD_LOG, "aggiunto_Minus");
+            }
+            else{
+                if (!singleBorderLinePlus.isEmpty()){
+                    LinkedList<Pixel>plus = new LinkedList<>(singleBorderLinePlus);
+                    listOfAllBorder.add(plus);
+                    singleBorderLinePlus.clear();
+                }
+                if (!singleBorderLineMinus.isEmpty()){
+                    LinkedList<Pixel>minus = new LinkedList<>(singleBorderLineMinus);
+                    listOfAllBorder.add(minus);
+                    singleBorderLineMinus.clear();
+                }
+                // aggiugi le liste alla listOfAllBorder come nuovo elemento
+                // pulisci le liste
 
-            /**if (bitmap.getPixel(postfillPix.x-1,postfillPix.y)==Color.BLACK){
-                floodFill(bitmap,new Pixel(postfillPix.x-1,postfillPix.y,Color.BLACK));
-            }*/
-            /**if (bitmap.getPixel(postfillPix.x+1,postfillPix.y)==Color.BLACK){
-                floodFill(bitmap,new Pixel(postfillPix.x+1,postfillPix.y,Color.BLACK));
-            }*/
+            }
+            Log.e(VFD_LOG,"previus; "+previusY.y + " pixel: "+p.y);
+            previusY = p;
         }
+        int[]color = {Color.BLUE,Color.CYAN,Color.GREEN,Color.WHITE};
+        Log.e(VFD_LOG, "border n: " + listOfAllBorder.size());
+        for (LinkedList p : listOfAllBorder){
+            for (Pixel pix : (LinkedList<Pixel>)p){
+                bitmap.setPixel(pix.x,pix.y,Color.WHITE);
+            }
+        }
+
     }
     /**todo dove riorganizzare meglio i metodi in modo da renderli più flessibili e riutilizzabili
      * todo e farli ciclare fino a quando la postfill LinkedList non nasca vuota (ogni volta chè viene caricato un pixel nella lista si deve svolgere il metodo perpendicolare)*/
@@ -363,6 +400,14 @@ public class ViewForDrawIn extends View {
 
     public void setBackPaint(Paint backPaint) {
         this.backPaint = backPaint;
+    }
+
+    public void finallyDraw() {
+        for (Path p : myPathUndo) {
+            Paint paint = pathColorMap.get(p);
+            mCanvas.drawPath(p, paint);
+        }
+        mCanvas.drawPath(mPath,mPaint);
     }
 }
 

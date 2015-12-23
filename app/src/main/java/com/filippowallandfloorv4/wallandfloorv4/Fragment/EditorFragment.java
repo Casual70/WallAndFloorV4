@@ -135,6 +135,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         saveIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                vfd.finallyDraw();
                 EditorActivity activity = (EditorActivity) getActivity();
                 if (activity.saveCurrentPhoto(activity.getWafImage())){
                     Toast.makeText(getActivity(), R.string.save_success, Toast.LENGTH_SHORT).show();
