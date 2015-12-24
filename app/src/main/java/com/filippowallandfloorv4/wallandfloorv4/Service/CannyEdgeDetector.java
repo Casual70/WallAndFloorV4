@@ -1,6 +1,7 @@
 package com.filippowallandfloorv4.wallandfloorv4.Service;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.Arrays;
 
@@ -271,7 +272,8 @@ public class CannyEdgeDetector {
         int kwidth;
         for (kwidth = 0; kwidth < kernelWidth; kwidth++) {
             float g1 = gaussian(kwidth, kernelRadius);
-            if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 2) break;
+            //if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 2) break;// originale
+            if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 1) break;
             float g2 = gaussian(kwidth - 0.5f, kernelRadius);
             float g3 = gaussian(kwidth + 0.5f, kernelRadius);
             kernel[kwidth] = (g1 + g2 + g3) / 3f / (2f * (float) Math.PI * kernelRadius * kernelRadius);
@@ -445,7 +447,7 @@ public class CannyEdgeDetector {
         int x0 = x1 == 0 ? x1 : x1 - 1;
         int x2 = x1 == width - 1 ? x1 : x1 + 1;
         int y0 = y1 == 0 ? y1 : y1 - 1;
-        int y2 = y1 == height -1 ? y1 : y1 + 1;
+        int y2 = y1 == height - 1 ? y1 : y1 + 1;
 
         data[i1] = magnitude[i1];
         for (int x = x0; x <= x2; x++) {
@@ -542,6 +544,7 @@ public class CannyEdgeDetector {
         }
         //edgesImage.getWritableTile(0, 0).setDataElements(0, 0, width, height, pixels);
         edgesImage.setPixels(pixels,0,edgesImage.getWidth(),0,0,edgesImage.getWidth(),edgesImage.getHeight());
+        Log.e("barck BitmapEdge", "bitmap edged W: " + edgesImage.getWidth() + "bitmap edged H: " + edgesImage.getHeight());
     }
 
 }

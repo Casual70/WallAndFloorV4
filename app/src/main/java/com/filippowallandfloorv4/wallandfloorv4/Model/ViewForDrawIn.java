@@ -30,10 +30,8 @@ import java.util.Timer;
 public class ViewForDrawIn extends View {
 
     private static final String VFD_LOG = "ViewForDrawIn_Debug";
-    private static final String AutoFinder_debug = "AutoFinder_Debug";
     private static final float TOUCH_TOLLERANCE = 0; // ricordarsi di cambiarlo old = 4
     public Paint mPaint;
-    public Paint currentPaint;
     public Context context;         //
     float stroke ;
     private Bitmap mBitmap;         //
@@ -50,13 +48,9 @@ public class ViewForDrawIn extends View {
     private LinkedList<Pixel>postFill;
     private boolean freeHand;
     private float mX,mY;
-    private boolean strokePath;
     private boolean floodFill;
     private List<Pixel> listPcentr;
     private int[] pixels;
-    private int sampleColor;
-    private int[] sampleRBG;
-    private int[] sampleMinMaxRGB;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -234,12 +228,12 @@ public class ViewForDrawIn extends View {
         postFill = new LinkedList<>();
         long start = System.currentTimeMillis();
         int x1 = nestP.x;
-        while (x1< bitmap.getWidth()-11 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) {
+        while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) { //check get width 11 è sbagliato
             fillY(bitmap,new Pixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
             x1++;
         }
         int x2 = nestP.x-1;
-        while (x2 > 11 && bitmap.getPixel(x2,nestP.y) == Color.BLACK){
+        while (x2 > 1 && bitmap.getPixel(x2,nestP.y) == Color.BLACK){ //check get width 11 è sbagliato
             fillY(bitmap, new Pixel(x2, nestP.y, bitmap.getPixel(x2, nestP.y)));
             x2--;
         }
@@ -257,7 +251,7 @@ public class ViewForDrawIn extends View {
         }
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
-        //mBitmap = bitmap;
+        mBitmap = bitmap;
         invalidate();
     }
     private LinkedList<LinkedList> postFill(Bitmap bitmap){
@@ -366,10 +360,6 @@ public class ViewForDrawIn extends View {
 
     public void setFreeHand(boolean freeHand) {
         this.freeHand = freeHand;
-    }
-
-    public void setStrokePath(boolean strokePath) {
-        this.strokePath = strokePath;
     }
 
     public void setFloodFill(boolean floodFill) {
