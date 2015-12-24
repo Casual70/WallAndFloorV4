@@ -29,39 +29,34 @@ import java.util.Timer;
 
 public class ViewForDrawIn extends View {
 
-    public Paint mPaint;
-    public Paint currentPaint;
-
     private static final String VFD_LOG = "ViewForDrawIn_Debug";
     private static final String AutoFinder_debug = "AutoFinder_Debug";
-
+    private static final float TOUCH_TOLLERANCE = 0; // ricordarsi di cambiarlo old = 4
+    public Paint mPaint;
+    public Paint currentPaint;
+    public Context context;         //
+    float stroke ;
     private Bitmap mBitmap;         //
     private Canvas mCanvas;         //
     private Canvas backCanvas;
     private Paint backPaint;
     private Path mPath;             // serve a definire il Percorso Path appunto tracciato, è quello che mi serve
     private Paint mBitmapPaint;     //
-    public Context context;         //
     private ArrayList<Path> myPathUndo = new ArrayList<Path>();
     private ArrayList<Path> myPathRedo = new ArrayList<Path>();
     private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
     private Bitmap backBitmap;
     private LinkedList<Pixel>postElaboration;
     private LinkedList<Pixel>postFill;
-
-
     private boolean freeHand;
     private float mX,mY;
-    private static final float TOUCH_TOLLERANCE = 0; // ricordarsi di cambiarlo old = 4
     private boolean strokePath;
     private boolean floodFill;
     private List<Pixel> listPcentr;
-
     private int[] pixels;
     private int sampleColor;
     private int[] sampleRBG;
     private int[] sampleMinMaxRGB;
-    float stroke ;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -90,6 +85,7 @@ public class ViewForDrawIn extends View {
             mCanvas = new Canvas(mBitmap);
             pixels = new int[mBitmap.getHeight()*mBitmap.getWidth()];
             mBitmap.getPixels(pixels,0,mBitmap.getWidth(),0,0,w,h);
+            Log.e(VFD_LOG,"bimtap original W: "+ mBitmap.getWidth() + "bitmap original H: "+mBitmap.getHeight());
         }
     }
     public ColorMatrixColorFilter grayscale (){
@@ -196,6 +192,7 @@ public class ViewForDrawIn extends View {
                             colorLog(x, y);
                             float stroke = mPaint.getStrokeWidth();
                             mPaint.setStrokeWidth(1.0f);
+                            mPath.reset();
                             floodFill(backBitmap, new Pixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
                             mPaint.setStrokeWidth(stroke);
                             break;
@@ -237,26 +234,33 @@ public class ViewForDrawIn extends View {
         postFill = new LinkedList<>();
         long start = System.currentTimeMillis();
         int x1 = nestP.x;
-        while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) {
+        while (x1< bitmap.getWidth()-11 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) {
             fillY(bitmap,new Pixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
             x1++;
         }
         int x2 = nestP.x-1;
-        while (x2 > 1 && bitmap.getPixel(x2,nestP.y) == Color.BLACK){
-            fillY(bitmap,new Pixel(x2,nestP.y,bitmap.getPixel(x2,nestP.y)));
+        while (x2 > 11 && bitmap.getPixel(x2,nestP.y) == Color.BLACK){
+            fillY(bitmap, new Pixel(x2, nestP.y, bitmap.getPixel(x2, nestP.y)));
             x2--;
         }
         for (Pixel post:postElaboration){
             bitmap.setPixel(post.x,post.y,Color.RED);
         }
-        postFill(bitmap);
-        Log.e(VFD_LOG,"postFill size: "+postFill.size());
+        LinkedList<LinkedList> listOfBorder = postFill(bitmap);
+        if (!listOfBorder.isEmpty()){
+            for (LinkedList list : listOfBorder){
+                if (list.size() >= 30){
+                Pixel newNest = (Pixel) list.get(list.size()/2);
+                floodFill(bitmap,newNest);
+                }
+            }
+        }
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
-        mBitmap = bitmap;
+        //mBitmap = bitmap;
         invalidate();
     }
-    private void postFill(Bitmap bitmap){
+    private LinkedList<LinkedList> postFill(Bitmap bitmap){
         for (Pixel post:postElaboration){
             if (bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){
                 postFill.add(new Pixel(post.x-1,post.y,Color.BLACK));
@@ -265,53 +269,50 @@ public class ViewForDrawIn extends View {
                 postFill.add(new Pixel(post.x+1,post.y,Color.BLACK));
             }
         }// this is ok
-
         LinkedList<LinkedList>listOfAllBorder = new LinkedList<>();
-        LinkedList<Pixel>singleBorderLinePlus = new LinkedList<>();
-        LinkedList<Pixel>singleBorderLineMinus = new LinkedList<>();
+        LinkedList<Pixel>singleBorderLine = new LinkedList<>();
         ListIterator<Pixel> iterator = postFill.listIterator();
-        Pixel previusY = null;
+        int previusY = 0;
         while (iterator.hasNext()){
             Pixel p = iterator.next();
             Log.e(VFD_LOG, "Y: "+p.y);
-            if (previusY == null){
-                previusY = p;
-                singleBorderLinePlus.add(p);
-            }
-            else if (previusY.y+1 == p.y){
-                singleBorderLinePlus.add(p);
-                Log.e(VFD_LOG, "aggiunto_Plus");
-            }
-            else if (previusY.y-1 == p.y){
-                singleBorderLineMinus.add(p);
-                Log.e(VFD_LOG, "aggiunto_Minus");
-            }
-            else{
-                if (!singleBorderLinePlus.isEmpty()){
-                    LinkedList<Pixel>plus = new LinkedList<>(singleBorderLinePlus);
-                    listOfAllBorder.add(plus);
-                    singleBorderLinePlus.clear();
+            if (previusY == 0 || (previusY+1 != p.y && previusY-1 != p.y)){
+                Log.e(VFD_LOG, "previus is null or different");
+                if (!singleBorderLine.isEmpty()){
+                    LinkedList<Pixel> temp = new LinkedList<>();
+                    temp.addAll(singleBorderLine);
+                    listOfAllBorder.add(temp);
+                    Log.e(VFD_LOG, "creta nuova lista size: "+temp.size());
                 }
-                if (!singleBorderLineMinus.isEmpty()){
-                    LinkedList<Pixel>minus = new LinkedList<>(singleBorderLineMinus);
-                    listOfAllBorder.add(minus);
-                    singleBorderLineMinus.clear();
+                singleBorderLine.clear();
+                singleBorderLine.add(p);
+                previusY = p.y;
+            }else {
+                Log.e(VFD_LOG," Y in sequenza");
+                if (previusY+1 == p.y || previusY-1 == p.y){
+                    singleBorderLine.add(p);
                 }
-                // aggiugi le liste alla listOfAllBorder come nuovo elemento
-                // pulisci le liste
-
             }
-            Log.e(VFD_LOG,"previus; "+previusY.y + " pixel: "+p.y);
-            previusY = p;
+            Log.e(VFD_LOG,"previus; "+previusY + " pixel: "+p.y);
+            previusY = p.y;
         }
-        int[]color = {Color.BLUE,Color.CYAN,Color.GREEN,Color.WHITE};
+        if (!singleBorderLine.isEmpty()){
+            LinkedList<Pixel> temp = new LinkedList<>();
+            temp.addAll(singleBorderLine);
+            listOfAllBorder.add(temp);
+            Log.e(VFD_LOG, "creta nuova lista finale size: "+temp.size());
+        }
+
         Log.e(VFD_LOG, "border n: " + listOfAllBorder.size());
-        for (LinkedList p : listOfAllBorder){
+        int[] color = {Color.RED,Color.GREEN,Color.BLUE,Color.WHITE};
+        /**for (LinkedList p : listOfAllBorder){
+            Random random = new Random();
+            int x = random.nextInt(3);
             for (Pixel pix : (LinkedList<Pixel>)p){
                 bitmap.setPixel(pix.x,pix.y,Color.WHITE);
             }
-        }
-
+        }*/
+        return listOfAllBorder;
     }
     /**todo dove riorganizzare meglio i metodi in modo da renderli più flessibili e riutilizzabili
      * todo e farli ciclare fino a quando la postfill LinkedList non nasca vuota (ogni volta chè viene caricato un pixel nella lista si deve svolgere il metodo perpendicolare)*/
@@ -345,13 +346,12 @@ public class ViewForDrawIn extends View {
         return true;
     }
 
+    public Paint getmPaint() {
+        return mPaint;
+    }
 
     public void setmPaint(Paint mPaint) {
         this.mPaint = mPaint;
-    }
-
-    public Paint getmPaint() {
-        return mPaint;
     }
 
     public Bitmap getmBitmap() {
