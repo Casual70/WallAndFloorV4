@@ -2,27 +2,24 @@
 <RelativeLayout
     xmlns:android ="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include
         android:id="@+id/action_bar_layout"
         layout="@layout/bottom_bar_action_editor"
-        android:layout_gravity="bottom"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/action_bar_layout">
+        android:layout_gravity="bottom" />
+
         <com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn
             android:id="@+id/ViewForDrawIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"/>
-    </LinearLayout>
+            android:layout_above="@id/action_bar_layout" />
+
 
 </RelativeLayout>

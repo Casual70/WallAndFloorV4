@@ -179,7 +179,7 @@ public class EditorActivity extends Activity {
     }
     private Bitmap decodeInSample(WafImage wafImage){
         BitmapFactory.Options opt = new BitmapFactory.Options();
-        opt.inSampleSize = 3;
+        opt.inSampleSize = 6;
         opt.inMutable = true;
         Bitmap imageBit = BitmapFactory.decodeFile(wafImage.getFilePath().getAbsolutePath(), opt);
         Display display = getWindowManager().getDefaultDisplay();

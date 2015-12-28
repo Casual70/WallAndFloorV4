@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListPopupWindow;
@@ -50,6 +51,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         vfd = (ViewForDrawIn)view.findViewById(R.id.ViewForDrawIn);
         vfd.setmBitmap(mBitmap);
         vfd.setmPaint(mPaint);
+
         textureIB = (ImageButton)view.findViewById(R.id.textureImageButton);
         saveIB = (ImageButton)view.findViewById(R.id.saveimageButton);
         strokeStyleIB = (ImageButton)view.findViewById(R.id.strokeStyleImageButton);
@@ -190,12 +192,12 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         }
     }
 
-    public void setVfd(ViewForDrawIn vfd) {
-        this.vfd = vfd;
-    }
-
     public ViewForDrawIn getVfd() {
         return vfd;
+    }
+
+    public void setVfd(ViewForDrawIn vfd) {
+        this.vfd = vfd;
     }
 
     public void setmBitmapAndPaint(Bitmap mBitmap,Paint mPaint){

@@ -8,10 +8,14 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
+import android.hardware.display.DisplayManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
@@ -69,19 +73,30 @@ public class ViewForDrawIn extends View {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
         if (mBitmap == null){
             Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
             mCanvas = new Canvas(bitmap);
-            pixels = new int[bitmap.getHeight()*bitmap.getWidth()];
-            bitmap.getPixels(pixels,0,bitmap.getWidth(),0,0,w,h);
+            //pixels = new int[bitmap.getHeight()*bitmap.getWidth()];
+            //bitmap.getPixels(pixels,0,bitmap.getWidth(),0,0,w,h);
+            Log.e(VFD_LOG, "Bitmap Null");
         }else{
             mCanvas = new Canvas(mBitmap);
-            pixels = new int[mBitmap.getHeight()*mBitmap.getWidth()];
-            mBitmap.getPixels(pixels,0,mBitmap.getWidth(),0,0,w,h);
+            //pixels = new int[mBitmap.getHeight()*mBitmap.getWidth()];
+            //mBitmap.getPixels(pixels,0,mBitmap.getWidth(),0,0,w,h);
             Log.e(VFD_LOG,"bimtap original W: "+ mBitmap.getWidth() + "bitmap original H: "+mBitmap.getHeight());
+            Log.e(VFD_LOG,"Canvass original W: "+ mCanvas.getWidth() + "Canvass original H: "+mCanvas.getHeight());
         }
+        super.onSizeChanged(w, h, oldw, oldh);
     }
+
+    //todo centrare sta cazzo di immagine
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.e(VFD_LOG,"on Measure");
+    }
+
     public ColorMatrixColorFilter grayscale (){
         ColorMatrix cm = new ColorMatrix();
         cm.setSaturation(0);
@@ -95,7 +110,7 @@ public class ViewForDrawIn extends View {
         for (Path p : myPathUndo){
             Paint paint = pathColorMap.get(p);
             canvas.drawPath(p, paint);
-            Log.e("ondraw Log", ""+myPathUndo.size());
+            Log.e("ondraw Log", ""+ myPathUndo.size());
         }
         canvas.drawPath(mPath, mPaint);
         Log.e(VFD_LOG, "draw");

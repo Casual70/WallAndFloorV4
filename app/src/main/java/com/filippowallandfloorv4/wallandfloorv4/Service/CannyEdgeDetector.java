@@ -274,16 +274,25 @@ public class CannyEdgeDetector {
             float g1 = gaussian(kwidth, kernelRadius);
             //if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 2) break;// originale
             if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 1) break;
-            float g2 = gaussian(kwidth - 0.5f, kernelRadius);
+            float g2 = gaussian(kwidth - 0.5f, kernelRadius); // original
             float g3 = gaussian(kwidth + 0.5f, kernelRadius);
             kernel[kwidth] = (g1 + g2 + g3) / 3f / (2f * (float) Math.PI * kernelRadius * kernelRadius);
             diffKernel[kwidth] = g3 - g2;
         }
 
-        int initX = kwidth - 1;
+        /**int initX = kwidth - 1;   // original
+        int maxX = width - (kwidth - 1);
+        int initY = width * (kwidth - 1);
+        int maxY = width * (height - (kwidth - 1));*/
+
+        int initX = kwidth - 1;   // original
         int maxX = width - (kwidth - 1);
         int initY = width * (kwidth - 1);
         int maxY = width * (height - (kwidth - 1));
+
+        Log.e("Canny Edge", "initX: "+initX + " Max x: "+ maxX);
+        Log.e("Canny Edge", "Image X "+sourceImage.getWidth());
+
 
         //perform convolution in x and y directions
         for (int x = initX; x < maxX; x++) {
@@ -333,10 +342,11 @@ public class CannyEdgeDetector {
 
         }
 
-        initX = kwidth;
+        /**initX = kwidth;                                                  original
         maxX = width - kwidth;
         initY = width * kwidth;
-        maxY = width * (height - kwidth);
+        maxY = width * (height - kwidth);*/
+
         for (int x = initX; x < maxX; x++) {
             for (int y = initY; y < maxY; y += width) {
                 int index = x + y;
@@ -544,7 +554,7 @@ public class CannyEdgeDetector {
         }
         //edgesImage.getWritableTile(0, 0).setDataElements(0, 0, width, height, pixels);
         edgesImage.setPixels(pixels,0,edgesImage.getWidth(),0,0,edgesImage.getWidth(),edgesImage.getHeight());
-        Log.e("barck BitmapEdge", "bitmap edged W: " + edgesImage.getWidth() + "bitmap edged H: " + edgesImage.getHeight());
+        Log.e("back BitmapEdge", "bitmap edged W: " + edgesImage.getWidth() + "bitmap edged H: " + edgesImage.getHeight());
     }
 
 }

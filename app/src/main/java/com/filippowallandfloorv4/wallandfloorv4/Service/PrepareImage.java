@@ -3,6 +3,7 @@ package com.filippowallandfloorv4.wallandfloorv4.Service;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -38,10 +39,11 @@ public class PrepareImage extends AsyncTask<Bitmap,Void,Bitmap> {
     protected Bitmap doInBackground(Bitmap... params) {
         CannyEdgeDetector detector = new CannyEdgeDetector();
         detector.setLowThreshold(1.0f);
-        detector.setHighThreshold(1.5f);
+        detector.setHighThreshold(1.2f);
         detector.setSourceImage(originalBitmap);
         detector.process();
-        return detector.getEdgesImage();
+        Bitmap edgeImage = detector.getEdgesImage();
+        return edgeImage;
     }
 
     @Override
