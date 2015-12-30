@@ -39,7 +39,7 @@ public class PrepareImage extends AsyncTask<Bitmap,Void,Bitmap> {
     protected Bitmap doInBackground(Bitmap... params) {
         CannyEdgeDetector detector = new CannyEdgeDetector();
         detector.setLowThreshold(1.0f);
-        detector.setHighThreshold(1.2f);
+        detector.setHighThreshold(2.5f);
         detector.setSourceImage(originalBitmap);
         detector.process();
         Bitmap edgeImage = detector.getEdgesImage();

@@ -273,7 +273,7 @@ public class CannyEdgeDetector {
         for (kwidth = 0; kwidth < kernelWidth; kwidth++) {
             float g1 = gaussian(kwidth, kernelRadius);
             //if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 2) break;// originale
-            if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 1) break;
+            if (g1 <= GAUSSIAN_CUT_OFF && kwidth >= 2) break;
             float g2 = gaussian(kwidth - 0.5f, kernelRadius); // original
             float g3 = gaussian(kwidth + 0.5f, kernelRadius);
             kernel[kwidth] = (g1 + g2 + g3) / 3f / (2f * (float) Math.PI * kernelRadius * kernelRadius);
@@ -292,6 +292,7 @@ public class CannyEdgeDetector {
 
         Log.e("Canny Edge", "initX: "+initX + " Max x: "+ maxX);
         Log.e("Canny Edge", "Image X "+sourceImage.getWidth());
+        Log.e("Canny Edge", "kwidth "+kwidth);
 
 
         //perform convolution in x and y directions
@@ -342,10 +343,10 @@ public class CannyEdgeDetector {
 
         }
 
-        /**initX = kwidth;                                                  original
+        initX = kwidth;
         maxX = width - kwidth;
         initY = width * kwidth;
-        maxY = width * (height - kwidth);*/
+        maxY = width * (height - kwidth);
 
         for (int x = initX; x < maxX; x++) {
             for (int y = initY; y < maxY; y += width) {
