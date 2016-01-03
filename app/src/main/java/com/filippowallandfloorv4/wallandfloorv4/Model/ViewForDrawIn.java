@@ -1,5 +1,6 @@
 package com.filippowallandfloorv4.wallandfloorv4.Model;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,10 +14,13 @@ import android.hardware.display.DisplayManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 
+import com.filippowallandfloorv4.wallandfloorv4.R;
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
 
@@ -55,6 +59,7 @@ public class ViewForDrawIn extends View {
     private boolean floodFill;
     private List<Pixel> listPcentr;
     private int[] pixels;
+    private WafImage wafImage;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -94,7 +99,7 @@ public class ViewForDrawIn extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        Log.e(VFD_LOG,"on Measure");
+        Log.e(VFD_LOG, "on Measure");
     }
 
     public ColorMatrixColorFilter grayscale (){
@@ -236,7 +241,10 @@ public class ViewForDrawIn extends View {
     public void findBord(){
         PrepareImage prepareImage = new PrepareImage(mBitmap,this);
         prepareImage.execute();
+
+
     }
+
 
     public void floodFill(Bitmap bitmap, Pixel nestP){
         postElaboration = new LinkedList<>();
@@ -266,7 +274,9 @@ public class ViewForDrawIn extends View {
         }
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
-        mBitmap = bitmap;
+
+        //mBitmap = bitmap;
+
         invalidate();
     }
     private LinkedList<LinkedList> postFill(Bitmap bitmap){
@@ -325,7 +335,6 @@ public class ViewForDrawIn extends View {
     }
     /**todo dove riorganizzare meglio i metodi in modo da renderli più flessibili e riutilizzabili
      * todo e farli ciclare fino a quando la postfill LinkedList non nasca vuota (ogni volta chè viene caricato un pixel nella lista si deve svolgere il metodo perpendicolare)*/
-
 
 
     private boolean fillY(Bitmap bitmap, Pixel nestP){
@@ -407,6 +416,14 @@ public class ViewForDrawIn extends View {
 
     public void setBackPaint(Paint backPaint) {
         this.backPaint = backPaint;
+    }
+
+    public WafImage getWafImage() {
+        return wafImage;
+    }
+
+    public void setWafImage(WafImage wafImage) {
+        this.wafImage = wafImage;
     }
 
     public void finallyDraw() {

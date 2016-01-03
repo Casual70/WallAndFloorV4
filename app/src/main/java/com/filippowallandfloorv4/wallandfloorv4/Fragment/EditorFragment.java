@@ -21,6 +21,7 @@ import com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
+import com.filippowallandfloorv4.wallandfloorv4.Model.WafImage;
 import com.filippowallandfloorv4.wallandfloorv4.R;
 
 /**
@@ -39,6 +40,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     public Bitmap mBitmap;
     public Paint mPaint;
     public View[]listButton;
+    private WafImage wafImage;
 
     public EditorFragment() {
     }
@@ -51,6 +53,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         vfd = (ViewForDrawIn)view.findViewById(R.id.ViewForDrawIn);
         vfd.setmBitmap(mBitmap);
         vfd.setmPaint(mPaint);
+        vfd.setWafImage(wafImage);
 
         textureIB = (ImageButton)view.findViewById(R.id.textureImageButton);
         saveIB = (ImageButton)view.findViewById(R.id.saveimageButton);
@@ -218,5 +221,11 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         return mPaint;
     }
 
+    public WafImage getWafImage() {
+        return wafImage;
+    }
 
+    public void setWafImage(WafImage wafImage) {
+        this.wafImage = wafImage;
+    }
 }

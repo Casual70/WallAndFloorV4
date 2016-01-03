@@ -32,6 +32,9 @@ import com.filippowallandfloorv4.wallandfloorv4.Model.WafImage;
 import com.filippowallandfloorv4.wallandfloorv4.R;
 import com.rarepebble.colorpicker.ColorPickerView;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.OpenCVLoader;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -85,6 +88,7 @@ public class EditorActivity extends Activity {
         fragment = new EditorFragment();
         //fragment.setVfd(vfd);
         fragment.setmBitmapAndPaint(myBitmap, myPaint);
+        fragment.setWafImage(wafImage);
         FragmentManager fm = getFragmentManager();
         fm.beginTransaction().replace(R.id.contentFrame_color,fragment).commit();
         confirmColor.setOnClickListener(new View.OnClickListener() {
@@ -119,8 +123,15 @@ public class EditorActivity extends Activity {
             @Override
             public void onClick(View v) {
                 fragment.getVfd().findBord();
+                drawerLayout_color.closeDrawers();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
+        super.onResume();
     }
 
     @Override
@@ -228,4 +239,20 @@ public class EditorActivity extends Activity {
     public WafImage getWafImage() {
         return wafImage;
     }
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status){
+                case BaseLoaderCallback.SUCCESS:
+                {
+                    Log.e("OPENcV","OpenCV loaded successfully");
+                }break;
+                default:{
+                    super.onManagerConnected(status);
+                }break;
+            }
+        }
+    };
+
 }

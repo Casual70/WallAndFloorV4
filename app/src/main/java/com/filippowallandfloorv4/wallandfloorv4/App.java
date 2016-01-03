@@ -7,6 +7,9 @@ import android.util.Log;
 
 import com.filippowallandfloorv4.wallandfloorv4.SqlDb.ImageDb;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.OpenCVLoader;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +79,7 @@ public class App extends Application {
     public static List<String> getListZoneText() {
         return listZoneText;
     }
+
 }
 /** TODO: 17/10/2015 importare l'activity di photoEditor e farla funzionare come prima
  *  todo aggiungere il PickColor e i texture
