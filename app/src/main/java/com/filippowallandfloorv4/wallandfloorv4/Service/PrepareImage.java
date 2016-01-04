@@ -1,5 +1,6 @@
 package com.filippowallandfloorv4.wallandfloorv4.Service;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -8,9 +9,14 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
@@ -92,9 +98,9 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     }
 
     private void dialogSetBitmap(){
-        final Dialog dialog = new Dialog(view.getContext(),android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
         final Bitmap bitmap = originalBitmap;
         View view = LayoutInflater.from(this.view.getContext()).inflate(R.layout.edge_detector_accuracy,null);
+        final PopupWindow pop = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
         SeekBar contrast = (SeekBar)view.findViewById(R.id.seekEdgeDetector);
         threshold_min = contrast.getProgress();
         contrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -118,11 +124,12 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
         saveImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                pop.dismiss();
                 onPostExecute(doInBackground(bitmap));
             }
         });
-        dialog.setContentView(view);
-        dialog.show();
+        pop.showAtLocation(this.view, Gravity.CENTER,0,0);
+
+        //todo implementare drag http://stackoverflow.com/questions/22126041/android-dragging-popup-window
     }
 }

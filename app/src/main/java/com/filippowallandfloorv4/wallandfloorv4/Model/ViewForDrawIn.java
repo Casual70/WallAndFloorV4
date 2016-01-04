@@ -24,6 +24,8 @@ import com.filippowallandfloorv4.wallandfloorv4.R;
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
 
+import org.opencv.imgproc.Imgproc;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -242,9 +244,7 @@ public class ViewForDrawIn extends View {
         PrepareImage prepareImage = new PrepareImage(mBitmap,this);
         prepareImage.execute();
 
-
     }
-
 
     public void floodFill(Bitmap bitmap, Pixel nestP){
         postElaboration = new LinkedList<>();
@@ -263,7 +263,7 @@ public class ViewForDrawIn extends View {
         for (Pixel post:postElaboration){
             bitmap.setPixel(post.x,post.y,Color.RED);
         }
-        LinkedList<LinkedList> listOfBorder = postFill(bitmap);
+        LinkedList<LinkedList> listOfBorder =  new LinkedList<>();//postFill(bitmap);
         if (!listOfBorder.isEmpty()){
             for (LinkedList list : listOfBorder){
                 if (list.size() >= 30){
@@ -279,7 +279,7 @@ public class ViewForDrawIn extends View {
 
         invalidate();
     }
-    private LinkedList<LinkedList> postFill(Bitmap bitmap){
+    private LinkedList<LinkedList> postFill(Bitmap bitmap){ // todo rivedere questo metodo e velocizzarlo
         for (Pixel post:postElaboration){
             if (bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){
                 postFill.add(new Pixel(post.x-1,post.y,Color.BLACK));
@@ -324,13 +324,13 @@ public class ViewForDrawIn extends View {
 
         Log.e(VFD_LOG, "border n: " + listOfAllBorder.size());
         int[] color = {Color.RED,Color.GREEN,Color.BLUE,Color.WHITE};
-        /**for (LinkedList p : listOfAllBorder){
+        for (LinkedList p : listOfAllBorder){
             Random random = new Random();
             int x = random.nextInt(3);
             for (Pixel pix : (LinkedList<Pixel>)p){
-                bitmap.setPixel(pix.x,pix.y,Color.WHITE);
+                bitmap.setPixel(pix.x,pix.y,Color.GREEN);
             }
-        }*/
+        }
         return listOfAllBorder;
     }
     /**todo dove riorganizzare meglio i metodi in modo da renderli più flessibili e riutilizzabili
