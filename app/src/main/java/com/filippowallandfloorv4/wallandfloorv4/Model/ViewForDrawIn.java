@@ -263,10 +263,10 @@ public class ViewForDrawIn extends View {
         for (Pixel post:postElaboration){
             bitmap.setPixel(post.x,post.y,Color.RED);
         }
-        LinkedList<LinkedList> listOfBorder =  new LinkedList<>();//postFill(bitmap);
+        LinkedList<LinkedList> listOfBorder = postFill(bitmap);
         if (!listOfBorder.isEmpty()){
             for (LinkedList list : listOfBorder){
-                if (list.size() >= 30){
+                if (list.size() >= 10){
                 Pixel newNest = (Pixel) list.get(list.size()/2);
                 floodFill(bitmap,newNest);
                 }
@@ -328,7 +328,7 @@ public class ViewForDrawIn extends View {
             Random random = new Random();
             int x = random.nextInt(3);
             for (Pixel pix : (LinkedList<Pixel>)p){
-                bitmap.setPixel(pix.x,pix.y,Color.GREEN);
+                bitmap.setPixel(pix.x,pix.y,Color.BLACK);
             }
         }
         return listOfAllBorder;

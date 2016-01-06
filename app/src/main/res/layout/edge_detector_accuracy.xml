@@ -8,9 +8,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/seekEdgeDetector"
         android:layout_weight="5"
-        android:layout_alignBottom="@+id/SaveDetectorAccuracy"
+        android:layout_below="@+id/dragButton"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/SaveDetectorAccuracy"
         android:layout_toStartOf="@+id/SaveDetectorAccuracy" />
 
     <ImageButton
@@ -18,7 +18,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/SaveDetectorAccuracy"
         android:src="@drawable/floppy_icon"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/dragButton"
         android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:id="@+id/dragButton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/open_actionbar"
+        android:layout_alignEnd="@+id/SaveDetectorAccuracy" />
 
 </RelativeLayout>

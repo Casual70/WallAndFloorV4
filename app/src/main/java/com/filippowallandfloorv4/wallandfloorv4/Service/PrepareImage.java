@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -46,6 +47,9 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     private ViewForDrawIn view;
     private WafImage wafImage;
 
+    private int mCurrentY;
+    private int mCurrentX;
+
     private double threshold_min = 20;
 
 
@@ -76,8 +80,8 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
         Mat imageCanny  = new Mat();
         Mat imageGray = new Mat();
         Imgproc.cvtColor(imageOriginalMat,imageGray,Imgproc.COLOR_BGR2GRAY);
-        Imgproc.blur(imageGray, imageCanny, new Size(3, 3));
-        Imgproc.Canny(imageCanny, imageCanny, threshold_min, threshold_min * 3, 3, true);
+        Imgproc.blur(imageGray, imageCanny, new Size(3,3));
+        Imgproc.Canny(imageCanny, imageCanny, threshold_min, threshold_min * 15, 5, true);
         Utils.matToBitmap(imageCanny, edgeImage);
         return edgeImage;
     }
@@ -99,7 +103,7 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
 
     private void dialogSetBitmap(){
         final Bitmap bitmap = originalBitmap;
-        View view = LayoutInflater.from(this.view.getContext()).inflate(R.layout.edge_detector_accuracy,null);
+        final View view = LayoutInflater.from(this.view.getContext()).inflate(R.layout.edge_detector_accuracy,null);
         final PopupWindow pop = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
         SeekBar contrast = (SeekBar)view.findViewById(R.id.seekEdgeDetector);
         threshold_min = contrast.getProgress();
@@ -128,7 +132,36 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
                 onPostExecute(doInBackground(bitmap));
             }
         });
-        pop.showAtLocation(this.view, Gravity.CENTER,0,0);
+        ImageButton drag = (ImageButton)view.findViewById(R.id.dragButton);
+        View.OnTouchListener otl = new View.OnTouchListener() {
+            private float mDx;
+            private float mDy;
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                if (action == MotionEvent.ACTION_DOWN) {
+                    mDx = mCurrentX - event.getRawX();
+                    mDy = mCurrentY - event.getRawY();
+                } else
+                if (action == MotionEvent.ACTION_MOVE) {
+                    mCurrentX = (int) (event.getRawX() + mDx);
+                    mCurrentY = (int) (event.getRawY() + mDy);
+                    pop.update(mCurrentX, mCurrentY, -1, -1);
+                }
+                return true;
+            }
+        };
+        mCurrentX = 20; // cambiare con il centro dello schermo
+        mCurrentY = 50;
+        drag.setOnTouchListener(otl);
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                pop.showAtLocation(view, Gravity.NO_GRAVITY, mCurrentX, mCurrentY);
+            }
+        });
+
+
 
         //todo implementare drag http://stackoverflow.com/questions/22126041/android-dragging-popup-window
     }
