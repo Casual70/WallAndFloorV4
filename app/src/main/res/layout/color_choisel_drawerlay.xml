@@ -17,5 +17,40 @@
         android:layout_gravity="start"
         android:id="@+id/button_confim"
         android:text="@string/button_confirm"/>
+    <LinearLayout
+        android:layout_width="240dp"
+        android:layout_height="60dp"
+        android:id="@+id/colorViewLay1">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="240dp"
+        android:layout_height="60dp"
+        android:id="@+id/colorViewLay2">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
 
 </LinearLayout>

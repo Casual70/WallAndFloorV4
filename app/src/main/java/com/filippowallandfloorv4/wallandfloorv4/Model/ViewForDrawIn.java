@@ -54,13 +54,13 @@ public class ViewForDrawIn extends View {
     private ArrayList<Path> myPathRedo = new ArrayList<Path>();
     private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
     private Bitmap backBitmap;
+    private LinkedList<Bitmap> undoRedo;
     private LinkedList<Pixel>postElaboration;
     private LinkedList<Pixel>postFill;
     private boolean freeHand;
     private float mX,mY;
     private boolean floodFill;
     private List<Pixel> listPcentr;
-    private int[] pixels;
     private WafImage wafImage;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
@@ -83,20 +83,14 @@ public class ViewForDrawIn extends View {
         if (mBitmap == null){
             Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
             mCanvas = new Canvas(bitmap);
-            //pixels = new int[bitmap.getHeight()*bitmap.getWidth()];
-            //bitmap.getPixels(pixels,0,bitmap.getWidth(),0,0,w,h);
             Log.e(VFD_LOG, "Bitmap Null");
         }else{
             mCanvas = new Canvas(mBitmap);
-            //pixels = new int[mBitmap.getHeight()*mBitmap.getWidth()];
-            //mBitmap.getPixels(pixels,0,mBitmap.getWidth(),0,0,w,h);
             Log.e(VFD_LOG,"bimtap original W: "+ mBitmap.getWidth() + "bitmap original H: "+mBitmap.getHeight());
             Log.e(VFD_LOG,"Canvass original W: "+ mCanvas.getWidth() + "Canvass original H: "+mCanvas.getHeight());
         }
         super.onSizeChanged(w, h, oldw, oldh);
     }
-
-    //todo centrare sta cazzo di immagine
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -237,7 +231,6 @@ public class ViewForDrawIn extends View {
         R = Color.red(pxl);
         G = Color.green(pxl);
         B = Color.blue(pxl);
-        int argb = Color.argb(A,R,G,B);
         Log.e(VFD_LOG, "Alpha: " + A + " Red: " + R + " Green: " + G + " Blue: " + B);
     }
     public void findBord(){
@@ -245,8 +238,15 @@ public class ViewForDrawIn extends View {
         prepareImage.execute();
 
     }
+    private void UndoRedoFull(Bitmap ActBitmap){
+        if (undoRedo == null){
+            undoRedo = new LinkedList<Bitmap>();
+        }
+        undoRedo.add(mBitmap);
+    }
 
     public void floodFill(Bitmap bitmap, Pixel nestP){
+        Path mainPath = new Path();
         postElaboration = new LinkedList<>();
         postFill = new LinkedList<>();
         long start = System.currentTimeMillis();
@@ -263,7 +263,7 @@ public class ViewForDrawIn extends View {
         for (Pixel post:postElaboration){
             bitmap.setPixel(post.x,post.y,Color.RED);
         }
-        LinkedList<LinkedList> listOfBorder = postFill(bitmap);
+        LinkedList<LinkedList> listOfBorder = new LinkedList<>(); //postFill(bitmap);
         if (!listOfBorder.isEmpty()){
             for (LinkedList list : listOfBorder){
                 if (list.size() >= 10){
@@ -357,7 +357,10 @@ public class ViewForDrawIn extends View {
         Path path = new Path();
         path.moveTo(pixelsY2.getLast().x, pixelsY2.getLast().y);
         path.lineTo(pixelsY1.getLast().x, pixelsY1.getLast().y);
-        mCanvas.drawPath(path, mPaint);
+        //mCanvas.drawPath(path, mPaint);
+        pathColorMap.put(path, new Paint(mPaint));
+        myPathUndo.add(path);
+
         postElaboration.addAll(pixelsY1);
         postElaboration.addAll(pixelsY2);
         Log.e(VFD_LOG,"postElaboration size: "+postElaboration.size());

@@ -130,6 +130,7 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
             public void onClick(View v) {
                 pop.dismiss();
                 onPostExecute(doInBackground(bitmap));
+                cancel(true);
             }
         });
         ImageButton drag = (ImageButton)view.findViewById(R.id.dragButton);
@@ -151,8 +152,9 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
                 return true;
             }
         };
-        mCurrentX = 20; // cambiare con il centro dello schermo
-        mCurrentY = 50;
+        mCurrentX = (this.view.getWidth()/2) - (pop.getWidth()/2);
+        mCurrentY = (this.view.getHeight()/2 - (pop.getHeight()/2));
+
         drag.setOnTouchListener(otl);
         view.post(new Runnable() {
             @Override
