@@ -52,6 +52,7 @@ public class ViewForDrawIn extends View {
     private Paint mBitmapPaint;     //
     private ArrayList<Path> myPathUndo = new ArrayList<Path>();
     private ArrayList<Path> myPathRedo = new ArrayList<Path>();
+    private Path floodFillPath;
     private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
     private Bitmap backBitmap;
     private LinkedList<Bitmap> undoRedo;
@@ -72,6 +73,7 @@ public class ViewForDrawIn extends View {
     }
     public void init(){
         mPath = new Path();
+        floodFillPath = new Path();
         mPaint = new Paint();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         stroke = mPaint.getStrokeWidth();
@@ -246,7 +248,6 @@ public class ViewForDrawIn extends View {
     }
 
     public void floodFill(Bitmap bitmap, Pixel nestP){
-        Path mainPath = new Path();
         postElaboration = new LinkedList<>();
         postFill = new LinkedList<>();
         long start = System.currentTimeMillis();
@@ -263,7 +264,7 @@ public class ViewForDrawIn extends View {
         for (Pixel post:postElaboration){
             bitmap.setPixel(post.x,post.y,Color.RED);
         }
-        LinkedList<LinkedList> listOfBorder = new LinkedList<>(); //postFill(bitmap);
+        LinkedList<LinkedList> listOfBorder = postFill(bitmap);
         if (!listOfBorder.isEmpty()){
             for (LinkedList list : listOfBorder){
                 if (list.size() >= 10){
@@ -272,6 +273,10 @@ public class ViewForDrawIn extends View {
                 }
             }
         }
+        pathColorMap.put(floodFillPath, new Paint(mPaint));
+        myPathUndo.add(floodFillPath);
+        floodFillPath = new Path();
+
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
 
@@ -358,8 +363,7 @@ public class ViewForDrawIn extends View {
         path.moveTo(pixelsY2.getLast().x, pixelsY2.getLast().y);
         path.lineTo(pixelsY1.getLast().x, pixelsY1.getLast().y);
         //mCanvas.drawPath(path, mPaint);
-        pathColorMap.put(path, new Paint(mPaint));
-        myPathUndo.add(path);
+        floodFillPath.addPath(path);
 
         postElaboration.addAll(pixelsY1);
         postElaboration.addAll(pixelsY2);
