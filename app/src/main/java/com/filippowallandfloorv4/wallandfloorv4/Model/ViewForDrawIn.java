@@ -207,6 +207,9 @@ public class ViewForDrawIn extends View {
                             mPath.reset();
                             floodFill(backBitmap, new Pixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
                             mPaint.setStrokeWidth(stroke);
+                            pathColorMap.put(floodFillPath, new Paint(mPaint));
+                            myPathUndo.add(floodFillPath);
+                            floodFillPath = new Path();
                             break;
                     }
                 }
@@ -273,9 +276,6 @@ public class ViewForDrawIn extends View {
                 }
             }
         }
-        pathColorMap.put(floodFillPath, new Paint(mPaint));
-        myPathUndo.add(floodFillPath);
-        floodFillPath = new Path();
 
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
