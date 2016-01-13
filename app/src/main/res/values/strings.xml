@@ -14,6 +14,7 @@
     <string name="title_activity_editor">EditorActivity</string>
     <!--drawer Text -->
     <string name="button_confirm">Conferma</string>
+    <string name="button_add_color">Aggiugi</string>
     <string name="radio_auto_finder">AutoFinder</string>
     <!--editor menu -->
     <string name="save_menu">Salva</string>

@@ -206,10 +206,10 @@ public class ViewForDrawIn extends View {
                             mPaint.setStrokeWidth(1.0f);
                             mPath.reset();
                             floodFill(backBitmap, new Pixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
-                            mPaint.setStrokeWidth(stroke);
                             pathColorMap.put(floodFillPath, new Paint(mPaint));
                             myPathUndo.add(floodFillPath);
                             floodFillPath = new Path();
+                            mPaint.setStrokeWidth(stroke);
                             break;
                     }
                 }

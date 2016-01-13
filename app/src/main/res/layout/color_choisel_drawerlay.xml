@@ -11,46 +11,102 @@
         android:layout_width="240dp"
         android:layout_gravity="start"
         android:layout_height="wrap_content"/>
-    <Button
+    <LinearLayout
         android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:id="@+id/button_confim"
-        android:text="@string/button_confirm"/>
-    <LinearLayout
-        android:layout_width="240dp"
-        android:layout_height="60dp"
-        android:id="@+id/colorViewLay1">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:id="@+id/button_confim"
+            android:text="@string/button_confirm"
             android:layout_weight="1"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/button_addColor"
+            android:text="@string/button_add_color"/>
+
     </LinearLayout>
-    <LinearLayout
+
+    <GridLayout
         android:layout_width="240dp"
-        android:layout_height="60dp"
-        android:id="@+id/colorViewLay2">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
-    </LinearLayout>
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton2"
+            android:background="@drawable/colors_pallette"
+            android:layout_margin="5dp" />
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton3"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_margin="5dp"
+            android:background="@drawable/colors_pallette"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton4"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:layout_margin="5dp"
+            android:background="@drawable/colors_pallette"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton5"
+            android:layout_row="0"
+            android:layout_column="3"
+            android:layout_margin="5dp"
+            android:background="@drawable/colors_pallette"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton6"
+            android:layout_row="1"
+            android:layout_column="0"
+            android:layout_margin="5dp"
+            android:background="@drawable/colors_pallette"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton7"
+            android:layout_row="1"
+            android:layout_column="1"
+            android:layout_margin="5dp"
+            android:background="@drawable/colors_pallette"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton8"
+            android:layout_row="1"
+            android:layout_column="2"
+            android:layout_margin="5dp"
+            android:background="@drawable/colors_pallette"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageButton9"
+            android:layout_row="1"
+            android:layout_column="3"
+            android:layout_margin="5dp"
+            android:background="@drawable/colors_pallette"/>
+
+    </GridLayout>
+
 
 
 </LinearLayout>
