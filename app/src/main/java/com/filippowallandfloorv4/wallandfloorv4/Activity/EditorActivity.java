@@ -70,6 +70,8 @@ public class EditorActivity extends Activity {
     private Button onlyBorderButton;
     private ColorPickerView cpv;
 
+    private Bitmap colorCelBit;
+
     private ImageButton color2,color3,color4,color5,color6,color7,color8,color9;
     private View.OnClickListener colorsListener;
     private ArrayList<ImageButton>colorsArray;
@@ -104,6 +106,9 @@ public class EditorActivity extends Activity {
         colorsArray.add(color2);colorsArray.add(color3);colorsArray.add(color4);
         colorsArray.add(color5);colorsArray.add(color6);colorsArray.add(color7);
         colorsArray.add(color8);colorsArray.add(color9);
+
+        colorCelBit = BitmapFactory.decodeResource(getResources(),R.drawable.floppy_icon);
+        Log.e(LOG_EditorActivity,"primary bitmap"+colorCelBit.getHeight());
 
         cpv.showHex(false);
         cpv.showAlpha(true);
@@ -163,12 +168,12 @@ public class EditorActivity extends Activity {
             public void onClick(View v) {
                 ImageButton imageButton = (ImageButton)v;
                 if (imageButton.isSelected()){
-                    Bitmap bitmapColor = Bitmap.createBitmap(70,70, Bitmap.Config.ARGB_8888);
-                    Log.e(LOG_EditorActivity,"on click widht "+(imageButton.getWidth()-10));
+                    Bitmap bitmapColor = Bitmap.createBitmap(colorCelBit.getWidth(),colorCelBit.getHeight(), Bitmap.Config.ARGB_8888);
+                    Log.e(LOG_EditorActivity,"on click widht "+(bitmapColor.getWidth()));
                     Canvas colorcanvas = new Canvas(bitmapColor);
                     Paint paint = new Paint();
                     paint.setColor(cpv.getColor());
-                    colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), 35, paint);
+                    colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), colorCelBit.getHeight()/2-10, paint);
                     imageButton.setImageBitmap(bitmapColor);
                     String tag = (String)imageButton.getTag();
                     colorPref.edit().putInt(tag,paint.getColor()).apply();
@@ -190,11 +195,11 @@ public class EditorActivity extends Activity {
         for (int i = 0; i < colorsArray.size(); i++) {
             ImageButton ima = colorsArray.get(i);
             Log.e(LOG_EditorActivity,"weight,height "+ ima.getWidth()+ " "+ima.getHeight());
-            Bitmap bitmapColor = Bitmap.createBitmap(70, 70, Bitmap.Config.ARGB_8888);
+            Bitmap bitmapColor = Bitmap.createBitmap(colorCelBit.getWidth(),colorCelBit.getHeight(), Bitmap.Config.ARGB_8888);
             Canvas colorcanvas = new Canvas(bitmapColor);
             Paint paint = new Paint();
             paint.setColor(colorPref.getInt(keys[i],Color.TRANSPARENT));
-            colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), 35, paint);
+            colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), colorCelBit.getHeight()/2-10, paint);
             ima.setImageBitmap(bitmapColor);
         }
         DrawerLayout.DrawerListener drawerListener = new DrawerLayout.DrawerListener() {
