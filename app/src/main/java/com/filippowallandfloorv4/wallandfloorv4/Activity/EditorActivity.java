@@ -163,11 +163,12 @@ public class EditorActivity extends Activity {
             public void onClick(View v) {
                 ImageButton imageButton = (ImageButton)v;
                 if (imageButton.isSelected()){
-                    Bitmap bitmapColor = Bitmap.createBitmap(imageButton.getWidth()-10,imageButton.getHeight()-10, Bitmap.Config.ARGB_8888);
+                    Bitmap bitmapColor = Bitmap.createBitmap(70,70, Bitmap.Config.ARGB_8888);
+                    Log.e(LOG_EditorActivity,"on click widht "+(imageButton.getWidth()-10));
                     Canvas colorcanvas = new Canvas(bitmapColor);
                     Paint paint = new Paint();
                     paint.setColor(cpv.getColor());
-                    colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), colorcanvas.getHeight() - 20, paint);
+                    colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), 35, paint);
                     imageButton.setImageBitmap(bitmapColor);
                     String tag = (String)imageButton.getTag();
                     colorPref.edit().putInt(tag,paint.getColor()).apply();
@@ -188,11 +189,12 @@ public class EditorActivity extends Activity {
         }
         for (int i = 0; i < colorsArray.size(); i++) {
             ImageButton ima = colorsArray.get(i);
-            Bitmap bitmapColor = Bitmap.createBitmap(40, 40, Bitmap.Config.ARGB_8888);
+            Log.e(LOG_EditorActivity,"weight,height "+ ima.getWidth()+ " "+ima.getHeight());
+            Bitmap bitmapColor = Bitmap.createBitmap(70, 70, Bitmap.Config.ARGB_8888);
             Canvas colorcanvas = new Canvas(bitmapColor);
             Paint paint = new Paint();
             paint.setColor(colorPref.getInt(keys[i],Color.TRANSPARENT));
-            colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), colorcanvas.getHeight() - 20, paint);
+            colorcanvas.drawCircle(colorcanvas.getClipBounds().centerX(), colorcanvas.getClipBounds().centerY(), 35, paint);
             ima.setImageBitmap(bitmapColor);
         }
         DrawerLayout.DrawerListener drawerListener = new DrawerLayout.DrawerListener() {
