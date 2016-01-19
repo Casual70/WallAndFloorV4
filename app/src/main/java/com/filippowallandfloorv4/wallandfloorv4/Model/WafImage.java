@@ -12,10 +12,14 @@ import java.io.File;
  */
 public class WafImage implements Parcelable {
 
+    public static final int TEXTURECODE_ON = 5;
+    public static final int TEXTURECODE_OFF = 2;
+
     private File filePath;
     private String nomeProject;
     private String nomeZona;
     private int _id;
+    private int textureCode;
 
     public WafImage (File filePath){
         this.filePath = filePath;
@@ -26,7 +30,17 @@ public class WafImage implements Parcelable {
         this.nomeProject = nomeProject;
         this.nomeZona = nomeZona;
         this._id = _id;
+        this.textureCode = TEXTURECODE_OFF;
     }
+
+    public WafImage(File filePath, String nomeProject, String nomeZona, int _id, int textureCode) {
+        this.filePath = filePath;
+        this.nomeProject = nomeProject;
+        this.nomeZona = nomeZona;
+        this._id = _id;
+        this.textureCode = textureCode;
+    }
+
     public WafImage(){
 
     }
@@ -73,6 +87,14 @@ public class WafImage implements Parcelable {
         this.nomeZona = nomeZona;
     }
 
+    public int getTextureCode() {
+        return textureCode;
+    }
+
+    public void setTextureCode(int textureCode) {
+        this.textureCode = textureCode;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -83,12 +105,14 @@ public class WafImage implements Parcelable {
         dest.writeSerializable(this.filePath);
         dest.writeString(this.nomeProject);
         dest.writeString(this.nomeZona);
+        dest.writeInt(this.textureCode);
     }
 
     protected WafImage(Parcel in) {
         this.filePath = (File) in.readSerializable();
         this.nomeProject = in.readString();
         this.nomeZona = in.readString();
+        this.textureCode = in.readInt();
     }
 
     public static final Creator<WafImage> CREATOR = new Creator<WafImage>() {

@@ -1,5 +1,7 @@
 package com.filippowallandfloorv4.wallandfloorv4.Fragment;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListPopupWindow;
 import android.widget.RadioGroup;
@@ -18,8 +21,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity;
+import com.filippowallandfloorv4.wallandfloorv4.Adapter.ColorGridAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
+import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
 import com.filippowallandfloorv4.wallandfloorv4.Model.WafImage;
 import com.filippowallandfloorv4.wallandfloorv4.R;
@@ -106,7 +111,6 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
                         listPopupLine.setAdapter(new StrokeWidthListAdapter(getActivity(), vfd.getmPaint()));
                     }
                 }
-                freeHandToggleB.setChecked(true);
             }
         });
         strokeStyleIB.setOnClickListener(new View.OnClickListener() {
@@ -172,6 +176,13 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
             }
         });
 
+        textureIB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogTexture();
+            }
+        });
+
     }
 
 
@@ -193,6 +204,16 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
             }
             Log.e(LOG_EDITFRAG,"aperto/chiuso");
         }
+    }
+    private void dialogTexture(){
+        Context context = getActivity();
+        Dialog dialog = new Dialog(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_texture,null);
+        GridView gridView = (GridView) view.findViewById(R.id.gridView);
+        ColorGridAdapter adapter = new ColorGridAdapter(context,App.getDrawablesDefault());
+        gridView.setAdapter(adapter);
+        dialog.setContentView(view);
+        dialog.show();
     }
 
     public ViewForDrawIn getVfd() {

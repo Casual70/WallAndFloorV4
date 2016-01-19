@@ -29,6 +29,8 @@ public class ImageDb extends SQLiteOpenHelper {
     public static final String NAME_PROJECT = "project_name";
     public static final String NAME_ZONE = "zone_name";
 
+    public static final String TEXTURE_CODE = "texture_code";
+
     public ImageDb(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -39,7 +41,9 @@ public class ImageDb extends SQLiteOpenHelper {
                 IMAGE_COL_ID + " INTEGER PRIMARY KEY," +
                 IMAGE_FILE_PATH + " TEXT," +
                 NAME_PROJECT + " TEXT," +
-                NAME_ZONE + " TEXT" + ")";
+                NAME_ZONE + " TEXT," +
+                TEXTURE_CODE + " INTEGER"+
+                ")";
         db.execSQL(CREATE_TALE);
     }
 
@@ -51,16 +55,17 @@ public class ImageDb extends SQLiteOpenHelper {
     public void addWafToDb(WafImage image){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(NAME_ZONE,image.getNomeZona()); Log.e("zone",image.getNomeZona());
-        values.put(IMAGE_FILE_PATH,image.getFilePath().getAbsolutePath());
+        values.put(NAME_ZONE, image.getNomeZona()); Log.e("zone", image.getNomeZona());
+        values.put(IMAGE_FILE_PATH, image.getFilePath().getAbsolutePath());
         values.put(NAME_PROJECT,image.getNomeProject());Log.e("project", image.getNomeProject());
+        values.put(TEXTURE_CODE,image.getTextureCode());Log.e("Textture code", "" + image.getTextureCode());
         db.insert(TABLE_WAFIMAGE, null, values);
         db.close();
     }
     public WafImage getWafByDb (int id) {
         WafImage wafImage;
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, IMAGE_FILE_PATH, NAME_PROJECT, NAME_ZONE}, IMAGE_COL_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+        Cursor cursor = db.query(TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, IMAGE_FILE_PATH, NAME_PROJECT, NAME_ZONE, TEXTURE_CODE}, IMAGE_COL_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
         if (cursor != null){
             cursor.moveToFirst();
         }
@@ -69,7 +74,8 @@ public class ImageDb extends SQLiteOpenHelper {
             wafImage = new WafImage(   path,
                                                 cursor.getString(cursor.getColumnIndex(NAME_PROJECT)),
                                                 cursor.getString(cursor.getColumnIndex(NAME_ZONE)),
-                                                cursor.getInt(cursor.getColumnIndex(IMAGE_COL_ID)));
+                                                cursor.getInt(cursor.getColumnIndex(IMAGE_COL_ID)),
+                                                cursor.getInt(cursor.getColumnIndex(TEXTURE_CODE)));
             Log.e(LOG_IMAGEDB,"WAFIMAGE, creta correttamente e restituita");
         }else{
             wafImage = null;
@@ -89,14 +95,15 @@ public class ImageDb extends SQLiteOpenHelper {
                 WafImage wafImage = new WafImage(   path,
                         cursor.getString(cursor.getColumnIndex(NAME_PROJECT)),
                         cursor.getString(cursor.getColumnIndex(NAME_ZONE)),
-                        cursor.getInt(cursor.getColumnIndex(IMAGE_COL_ID)));
+                        cursor.getInt(cursor.getColumnIndex(IMAGE_COL_ID)),
+                        cursor.getInt(cursor.getColumnIndex(TEXTURE_CODE)));
                 listWafImages.add(wafImage);
             }while (cursor.moveToNext());
         }
         cursor.close();
         return listWafImages;
     }
-    public int updateWafImage(WafImage image){
+    public int updateWafImage(WafImage image){ // not work for now
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(IMAGE_FILE_PATH,image.getFilePath().getAbsolutePath());
@@ -104,12 +111,12 @@ public class ImageDb extends SQLiteOpenHelper {
         values.put(NAME_ZONE, image.getNomeZona());
         return  db.update(TABLE_WAFIMAGE,values,IMAGE_COL_ID+" = ?",new String[]{String.valueOf(image.get_id())});
     }
-    public void deleteWafImage(WafImage image){
+    public void deleteWafImage(WafImage image){ // not work for now
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_WAFIMAGE, IMAGE_COL_ID + " = ?", new String[]{String.valueOf(image.get_id())});
         db.close();
     }
-    public List<WafImage> getAllWafImageSortByProject(String projectName){
+    public List<WafImage> getAllWafImageSortByProject(String projectName){ // not work for now
         SQLiteDatabase db = this.getReadableDatabase();
         List<WafImage>wafImageList = new ArrayList<>();
         String allSelectQuery = "SELECT * FROM "+TABLE_WAFIMAGE + " WHERE "+NAME_PROJECT+" =?";
@@ -127,7 +134,7 @@ public class ImageDb extends SQLiteOpenHelper {
         cursor.close();
         return wafImageList;
     }
-    public List<String> getAllByProjectString(){
+    public List<String> getAllByProjectString(){ // not work for now
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT "+NAME_PROJECT+" FROM "+TABLE_WAFIMAGE; //SBAGLIAAAAAAAAAAAAAAAAAAAAATO!!"!!!
         List<String>projectList = new ArrayList<>();
@@ -147,6 +154,10 @@ public class ImageDb extends SQLiteOpenHelper {
     public Cursor getAllWafImageSortByProjectCursor(String projectName){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(false,TABLE_WAFIMAGE,new String[]{IMAGE_COL_ID,NAME_PROJECT,NAME_ZONE,IMAGE_FILE_PATH},NAME_PROJECT+"=?",new String[]{projectName},null,null,null,null);
+    }
+    public Cursor getAllWafImageTexture(){ // da collaudare
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(false,TABLE_WAFIMAGE,new String[]{IMAGE_COL_ID,NAME_PROJECT,NAME_ZONE,IMAGE_FILE_PATH,TEXTURE_CODE},TEXTURE_CODE+"=?",new String[]{String.valueOf(WafImage.TEXTURECODE_ON)},null,null,null,null);
     }
     public Cursor getAllWafImageCursor(){
         SQLiteDatabase db = this.getReadableDatabase();
