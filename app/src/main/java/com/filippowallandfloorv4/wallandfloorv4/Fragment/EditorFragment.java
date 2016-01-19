@@ -227,6 +227,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     public void setmBitmapAndPaint(Bitmap mBitmap,Paint mPaint){
         this.mBitmap = mBitmap;
         this.mPaint = mPaint;
+        //
     }
 
     @Override
