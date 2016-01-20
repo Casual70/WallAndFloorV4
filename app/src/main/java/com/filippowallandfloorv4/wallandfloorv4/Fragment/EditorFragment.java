@@ -2,6 +2,7 @@ package com.filippowallandfloorv4.wallandfloorv4.Fragment;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
@@ -10,18 +11,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity;
-import com.filippowallandfloorv4.wallandfloorv4.Adapter.ColorGridAdapter;
+import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureCustomGridAdapter;
+import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureElementHolder;
+import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureGridAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.App;
@@ -209,10 +213,36 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         Context context = getActivity();
         Dialog dialog = new Dialog(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_texture,null);
-        GridView gridView = (GridView) view.findViewById(R.id.gridView);
-        ColorGridAdapter adapter = new ColorGridAdapter(context,App.getDrawablesDefault());
-        gridView.setAdapter(adapter);
+        final GridView gridView = (GridView) view.findViewById(R.id.gridView);
+        final TextView defautlText = (TextView)view.findViewById(R.id.defaultTexture);
+        final TextView customText = (TextView)view.findViewById(R.id.customTexture);
+        final ImageView addtexture = (ImageView)view.findViewById(R.id.addTexture);
+        final DialogTextureGridAdapter adapterDef = new DialogTextureGridAdapter(context,App.getDrawablesDefault());
+        final DialogTextureCustomGridAdapter adapterCust = new DialogTextureCustomGridAdapter(context,App.getAppIstance().getImageDb().getAllWafImageTexture(),true);
+        gridView.setAdapter(adapterCust);
         dialog.setContentView(view);
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == defautlText.getId()){
+                    gridView.setAdapter(adapterDef);
+                }
+                else if (v.getId() == customText.getId()){
+                    gridView.setAdapter(adapterCust);
+                }
+            }
+        };
+        defautlText.setOnClickListener(click);
+        customText.setOnClickListener(click);
+        addtexture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // da photo
+                Intent cropIntent = new Intent();
+                cropIntent.setType("image/");
+
+            }
+        });
         dialog.show();
     }
 

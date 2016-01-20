@@ -18,14 +18,14 @@ import java.util.ArrayList;
 /**
  * Created by Filippo on 13/01/2016.
  */
-public class ColorGridAdapter extends BaseAdapter {
+public class DialogTextureGridAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<Integer> texture;
     private DialogTextureElementHolder holder;
     private LayoutInflater inflater;
 
-    public ColorGridAdapter(Context context, ArrayList<Integer> texture) {
+    public DialogTextureGridAdapter(Context context, ArrayList<Integer> texture) {
         this.context = context;
         this.texture = texture;
         inflater = LayoutInflater.from(context);

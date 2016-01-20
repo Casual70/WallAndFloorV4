@@ -12,6 +12,8 @@
     <string name="hint_project_name">Casa al Lago, Es Ristrut Rossi</string>
     <string name="hint_zone_name">Salotto,Camera,Bagno,Soffitta</string>
     <string name="title_activity_editor">EditorActivity</string>
+    <string name="defaultTexture">Default</string>
+    <string name="customTexture">Custom</string>
     <!--drawer Text -->
     <string name="button_confirm">Conferma</string>
     <string name="button_add_color">Aggiugi</string>
