@@ -4,8 +4,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity;
+import com.filippowallandfloorv4.wallandfloorv4.Activity.MainActivity;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureCustomGridAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureElementHolder;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureGridAdapter;
@@ -38,7 +42,8 @@ import com.filippowallandfloorv4.wallandfloorv4.R;
  */
 public class EditorFragment extends android.app.Fragment implements View.OnClickListener {
 
-    private final String LOG_EDITFRAG = "EditorFragment";
+    private static final String LOG_EDITFRAG = "EditorFragment";
+    private static final String KEY_WAFIMAGE = "save_waf";
 
     public ViewForDrawIn vfd;
     public RelativeLayout bottomActionBar;
@@ -57,9 +62,12 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.e("fragment", "OncreateView");
+        Log.e(LOG_EDITFRAG, "OncreateView");
         View view = inflater.inflate(R.layout.prova2,null);
         vfd = (ViewForDrawIn)view.findViewById(R.id.ViewForDrawIn);
+        if (savedInstanceState != null){
+
+        }
         vfd.setmBitmap(mBitmap);
         vfd.setmPaint(mPaint);
         vfd.setWafImage(wafImage);
@@ -169,8 +177,9 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         grayScaleIB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ColorMatrixColorFilter colorMatrixColorFilter = vfd.grayscale();
-                vfd.getmBitmapPaint().setColorFilter(colorMatrixColorFilter);
+                //ColorMatrixColorFilter colorMatrixColorFilter = vfd.grayscale();
+                //vfd.getmBitmapPaint().setColorFilter(colorMatrixColorFilter);
+                vfd.findBord();
             }
         });
         openIB.setOnClickListener(new View.OnClickListener() {
@@ -211,7 +220,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     }
     private void dialogTexture(){
         Context context = getActivity();
-        Dialog dialog = new Dialog(context);
+        final Dialog dialog = new Dialog(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_texture,null);
         final GridView gridView = (GridView) view.findViewById(R.id.gridView);
         final TextView defautlText = (TextView)view.findViewById(R.id.defaultTexture);
@@ -238,9 +247,23 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
             @Override
             public void onClick(View v) {
                 // da photo
-                Intent cropIntent = new Intent();
-                cropIntent.setType("image/");
+                // prendere esempio da qui
+                //com.filippowallandfloorv4.wallandfloorv4.Activity.MainActivity#takeNewPhoto
 
+            }
+        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Integer item = (Integer) parent.getItemAtPosition(position);
+                Paint paintTexture = vfd.getmPaint();
+                Bitmap textureBit = BitmapFactory.decodeResource(getResources(),item);
+                BitmapShader bitmapShader = new BitmapShader(textureBit, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+                paintTexture.setShader(bitmapShader);
+                paintTexture.setAlpha(230); // arbitrary parameter for preserve edge
+                paintTexture.setColor(0);
+                vfd.setmPaint(paintTexture);
+                dialog.dismiss();
             }
         });
         dialog.show();
@@ -280,4 +303,20 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     public void setWafImage(WafImage wafImage) {
         this.wafImage = wafImage;
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_WAFIMAGE,wafImage);
+        Log.e(LOG_EDITFRAG,"onSaveInstanceState");
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.e(LOG_EDITFRAG, "onViewStateRestored");
+
+    }
+
+
 }

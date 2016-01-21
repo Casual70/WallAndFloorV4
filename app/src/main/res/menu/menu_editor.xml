@@ -4,18 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity">
     <item
+        android:id="@+id/Undo"
+        android:icon="@drawable/ic_action_goleft"
+        android:title="Undo"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/Redo"
+        android:icon="@drawable/ic_action_goright"
+        android:title="Redo"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        android:orderInCategory="100"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_save"
-        android:title="@string/save_menu"
-        android:orderInCategory="100"
-        app:showAsAction ="ifRoom"/>
-    <item
-        android:id="@+id/action_bit_setting"
-        android:title="@string/setting_bitmap"
-        android:orderInCategory="100"
-        app:showAsAction = "ifRoom"/>
 </menu>

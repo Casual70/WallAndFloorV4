@@ -12,6 +12,8 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -40,10 +42,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class EditorActivity extends Activity {
+public class EditorActivity extends AppCompatActivity {
 
     public static final String EDITOR_ACTION = "com.filippowallandfloorv4.wallandfloorv4.action.EDITOR_ACTION";
     public static final String EXTRA_WAF_IMAGE = "com.filippowallandfloorv4.wallandfloorv4.extra.EXTRA_WAF_IMAGE";
+
+    public static final String KEY_WAFIMAGE = "save_wafImage";
 
     public static final String LOG_EditorActivity = "EditorActivity_Debug";
 
@@ -83,7 +87,13 @@ public class EditorActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e(LOG_EditorActivity, "onCreate");
-        wafImage = getIntent().getParcelableExtra(EXTRA_WAF_IMAGE);
+        if (savedInstanceState != null){
+            wafImage = savedInstanceState.getParcelable(KEY_WAFIMAGE);
+            Log.e(LOG_EditorActivity, "savedIstance not null " + String.valueOf(wafImage != null));
+        }else{
+            wafImage = getIntent().getParcelableExtra(EXTRA_WAF_IMAGE);
+            Log.e(LOG_EditorActivity, "waf by Intent");
+        }
         app = App.getAppIstance();
         setContentView(R.layout.drawerlay);
         drawerLayout_color = (DrawerLayout)findViewById(R.id.drawerLayout_color);
@@ -108,21 +118,26 @@ public class EditorActivity extends Activity {
         colorsArray.add(color8);colorsArray.add(color9);
 
         colorCelBit = BitmapFactory.decodeResource(getResources(),R.drawable.floppy_icon);
-        Log.e(LOG_EditorActivity,"primary bitmap"+colorCelBit.getHeight());
+        Log.e(LOG_EditorActivity, "primary bitmap" + colorCelBit.getHeight());
 
         cpv.showHex(false);
         cpv.showAlpha(true);
-        myPaint = initPaint(myPaint);
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inMutable = true;
 
-        myBitmap = decodeInSample(wafImage);
+
+
+        /**provare a spostare il myBitmap ed il myPaint in onStart*/
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Log.e(LOG_EditorActivity, "onStart");
+
+        myPaint = initPaint(myPaint);
+        myBitmap = decodeInSample(wafImage);
+
         fragment = new EditorFragment();
         fragment.setmBitmapAndPaint(myBitmap, myPaint);
         fragment.setWafImage(wafImage);
@@ -239,6 +254,7 @@ public class EditorActivity extends Activity {
 
     @Override
     protected void onResume() {
+        Log.e(LOG_EditorActivity,"onRestore");
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
         super.onResume();
     }
@@ -259,16 +275,6 @@ public class EditorActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
-        }
-        if (id == R.id.action_save){
-            if (saveCurrentPhoto(wafImage)){
-                Toast.makeText(getApplicationContext(),R.string.save_success,Toast.LENGTH_SHORT).show();
-            }
-            return true;
-        }
-        if (id == R.id.action_bit_setting){
-            dialogSetBitmap();
             return true;
         }
 
@@ -364,4 +370,16 @@ public class EditorActivity extends Activity {
         }
     };
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_WAFIMAGE,wafImage);
+        Log.e(LOG_EditorActivity,"onsave");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.e(LOG_EditorActivity, "onrestore");
+    }
 }

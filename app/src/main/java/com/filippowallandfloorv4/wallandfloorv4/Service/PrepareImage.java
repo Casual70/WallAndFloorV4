@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
@@ -69,11 +70,6 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Bitmap... params) {
-        //CannyEdgeDetector detector = new CannyEdgeDetector();
-        //detector.setLowThreshold(1.0f);
-        //detector.setHighThreshold(2.5f);
-        //detector.setSourceImage(originalBitmap);
-       // detector.process();
         Bitmap edgeImage = Bitmap.createBitmap(originalBitmap.getWidth(),originalBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Mat imageOriginalMat = new Mat();
         Utils.bitmapToMat(originalBitmap,imageOriginalMat);
@@ -152,8 +148,10 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
                 return true;
             }
         };
-        mCurrentX = (this.view.getWidth()/2) - (pop.getWidth()/2);
-        mCurrentY = (this.view.getHeight()/2 - (pop.getHeight()/2));
+        //mCurrentX = (this.view.getWidth()/2 - (pop.getWidth()/2));
+        //mCurrentY = (this.view.getHeight()/2 - (pop.getHeight()/2));
+        mCurrentX = this.view.getWidth()/8;
+        mCurrentY = this.view.getHeight()/2;
 
         drag.setOnTouchListener(otl);
         view.post(new Runnable() {
@@ -162,9 +160,5 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
                 pop.showAtLocation(view, Gravity.NO_GRAVITY, mCurrentX, mCurrentY);
             }
         });
-
-
-
-        //todo implementare drag http://stackoverflow.com/questions/22126041/android-dragging-popup-window
     }
 }

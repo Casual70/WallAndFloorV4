@@ -52,6 +52,9 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
 
+    //save restore
+    private static final String KEY_PROJECT = "sel_Project";
+
     private App app;
     private ImageDb db;
     private WafImage tempWafImage;
@@ -100,10 +103,10 @@ public class MainActivity extends Activity {
         super.onStart();
         Log.e(LOG_MAINACTIVITY_DEBUG, "onStart");
         app = App.getAppIstance();
-        db = app.getImageDb();//questo
+        db = app.getImageDb();
         Log.e(LOG_MAINACTIVITY_DEBUG, String.valueOf(db.getAllWafImages().size()));
         if (cursorProjectAdapter ==null){
-            cursorProjectAdapter = new CursorProjectAdapter(app.getContext(),db.getAllByProjectCursor(),false);/// equesto
+            cursorProjectAdapter = new CursorProjectAdapter(app.getContext(),db.getAllByProjectCursor(),false);
         }
         projectListView.setAdapter(cursorProjectAdapter);
         projectListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -119,13 +122,13 @@ public class MainActivity extends Activity {
         });
     }
 
-    private GridView createPreview(Context context,String projectName){ //usare un viewHolder anche qui Riciclare
-        tempProjectName = projectName;
-        GridView gridView = new GridView(context);
+    private GridView createPreview(Context context, String nameProject){ //usare un viewHolder anche qui Riciclare
+        tempProjectName = nameProject;
+        GridView gridView = new GridView(app.getContext());
         gridView.setNumColumns(2);
-        gridPreviewCursorAdapter = new GridPreviewCursorAdapter(this,db.getAllWafImageSortByProjectCursor(projectName),true); // by Cursor
+        gridPreviewCursorAdapter = new GridPreviewCursorAdapter(this,db.getAllWafImageSortByProjectCursor(nameProject),true); // by Cursor
         gridView.setAdapter(gridPreviewCursorAdapter);
-        gridView.setEmptyView(LayoutInflater.from(context).inflate(R.layout.empty_grid_view, null));
+        gridView.setEmptyView(LayoutInflater.from(app.getContext()).inflate(R.layout.empty_grid_view, null));
         return gridView;
     }
     public void startdEditor(WafImage wafImage){
@@ -324,6 +327,25 @@ public class MainActivity extends Activity {
             }
         });
         dialog.show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_PROJECT,tempProjectName);
+        Log.e(LOG_MAINACTIVITY_DEBUG,"onsave");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState!=null){
+            Log.e(LOG_MAINACTIVITY_DEBUG, "onrestore");
+            ProjectPreviewFragment fragment = new ProjectPreviewFragment();
+            fragment.setProjectPreview(createPreview(app.getContext(), savedInstanceState.getString(KEY_PROJECT)));
+            FragmentManager fm = getFragmentManager();
+            fm.beginTransaction().replace(R.id.contentFrame, fragment).commit();
+        }
     }
 }
 

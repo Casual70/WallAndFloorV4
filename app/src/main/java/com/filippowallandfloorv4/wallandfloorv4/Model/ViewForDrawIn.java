@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 
+import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.R;
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
@@ -67,9 +68,8 @@ public class ViewForDrawIn extends View {
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (isInEditMode()){}
-        this.context = context;
+        this.context = App.getAppIstance().getContext();
         init();
-        Log.e(VFD_LOG, "Context context, AttributeSet attrs");
     }
     public void init(){
         mPath = new Path();
@@ -338,9 +338,6 @@ public class ViewForDrawIn extends View {
         }
         return listOfAllBorder;
     }
-    /**todo dove riorganizzare meglio i metodi in modo da renderli più flessibili e riutilizzabili
-     * todo e farli ciclare fino a quando la postfill LinkedList non nasca vuota (ogni volta chè viene caricato un pixel nella lista si deve svolgere il metodo perpendicolare)*/
-
 
     private boolean fillY(Bitmap bitmap, Pixel nestP){
         int y1 = nestP.y;
@@ -385,8 +382,8 @@ public class ViewForDrawIn extends View {
 
     public void setmBitmap(Bitmap mBitmap) {
         this.mBitmap = mBitmap;
-        onSizeChanged(mBitmap.getWidth(),mBitmap.getHeight(),mBitmap.getWidth(),mBitmap.getHeight());
-        Log.e(VFD_LOG,"on size changed recall");
+        //onSizeChanged(mBitmap.getWidth(),mBitmap.getHeight(),mBitmap.getWidth(),mBitmap.getHeight());
+        //Log.e(VFD_LOG,"on size changed recall");
     }
 
     public void setFreeHand(boolean freeHand) {

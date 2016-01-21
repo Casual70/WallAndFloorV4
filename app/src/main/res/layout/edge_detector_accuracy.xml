@@ -28,7 +28,6 @@
         android:id="@+id/dragButton"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:src="@drawable/open_actionbar"
-        android:layout_alignEnd="@+id/SaveDetectorAccuracy" />
+        android:src="@drawable/open_actionbar" />
 
 </RelativeLayout>
