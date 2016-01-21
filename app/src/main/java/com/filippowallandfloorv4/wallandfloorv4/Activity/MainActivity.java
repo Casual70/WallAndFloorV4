@@ -1,5 +1,6 @@
 package com.filippowallandfloorv4.wallandfloorv4.Activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
@@ -13,6 +14,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -79,8 +81,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.e(LOG_MAINACTIVITY_DEBUG, "onCreate");
         setContentView(R.layout.listview_project_drawerlay);
-        projectListView = (ListView)findViewById(R.id.ListView_Project);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLay_listProject);
+        projectListView = (ListView)findViewById(R.id.ListView_Project);
         linearLayout = (LinearLayout)findViewById(R.id.linearLay_listProject);
     }
 

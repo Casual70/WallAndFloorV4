@@ -261,7 +261,6 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
                 BitmapShader bitmapShader = new BitmapShader(textureBit, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
                 paintTexture.setShader(bitmapShader);
                 paintTexture.setAlpha(230); // arbitrary parameter for preserve edge
-                paintTexture.setColor(0);
                 vfd.setmPaint(paintTexture);
                 dialog.dismiss();
             }
