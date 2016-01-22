@@ -1,8 +1,12 @@
-<fragment
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment"
-    android:name="com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment"
-    tools:layout="@layout/fragment_vfd_editor"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent" >
+    <include
+        layout="@layout/toolbar_layout"
+        android:id="@+id/toolbar_layout2"/>
+    <include
+        layout="@layout/drawerlay"/>
+
+</FrameLayout>

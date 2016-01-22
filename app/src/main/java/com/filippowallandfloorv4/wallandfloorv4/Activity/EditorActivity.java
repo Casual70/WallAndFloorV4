@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class EditorActivity extends Activity {
+public class EditorActivity extends AppCompatActivity {
 
     public static final String EDITOR_ACTION = "com.filippowallandfloorv4.wallandfloorv4.action.EDITOR_ACTION";
     public static final String EXTRA_WAF_IMAGE = "com.filippowallandfloorv4.wallandfloorv4.extra.EXTRA_WAF_IMAGE";
@@ -81,6 +81,8 @@ public class EditorActivity extends Activity {
     private ArrayList<ImageButton>colorsArray;
 
     private GridView gridViewColor;
+    private Toolbar toolbar;
+
 
 
     @Override
@@ -95,7 +97,9 @@ public class EditorActivity extends Activity {
             Log.e(LOG_EditorActivity, "waf by Intent");
         }
         app = App.getAppIstance();
-        setContentView(R.layout.drawerlay);
+        setContentView(R.layout.activity_editor);
+        toolbar = (Toolbar)findViewById(R.id.toolbar_layout2);
+        setSupportActionBar(toolbar);
         drawerLayout_color = (DrawerLayout)findViewById(R.id.drawerLayout_color);
         confirmColor = (Button)findViewById(R.id.button_confim);
         undoPathButton = (Button)findViewById(R.id.button_undoPath);
@@ -276,6 +280,12 @@ public class EditorActivity extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        if (id == R.id.Redo){
+            fragment.getVfd().onRedoPath();
+        }
+        if (id == R.id.Undo){
+            fragment.getVfd().onUndoPath();
         }
 
         return super.onOptionsItemSelected(item);
