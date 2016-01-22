@@ -15,6 +15,8 @@ import android.provider.MediaStore;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -52,7 +54,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     //save restore
     private static final String KEY_PROJECT = "sel_Project";
@@ -69,6 +71,7 @@ public class MainActivity extends Activity {
     private CursorProjectAdapter cursorProjectAdapter;
     private GridPreviewCursorAdapter gridPreviewCursorAdapter;
     private String loadImagePath;
+    private Toolbar toolbar;
 
     private static final String LOG_MAINACTIVITY_DEBUG = "Log_main_activity_debug";
 
@@ -80,7 +83,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e(LOG_MAINACTIVITY_DEBUG, "onCreate");
-        setContentView(R.layout.listview_project_drawerlay);
+        setContentView(R.layout.activity_main);
+        toolbar = (Toolbar)findViewById(R.id.toolbar_layout);
+        setSupportActionBar(toolbar);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLay_listProject);
         projectListView = (ListView)findViewById(R.id.ListView_Project);
         linearLayout = (LinearLayout)findViewById(R.id.linearLay_listProject);
