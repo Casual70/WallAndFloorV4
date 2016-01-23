@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     <include
         layout="@layout/toolbar_layout"
+        tools:showIn = "@layout/toolbar_layout"
         android:id="@+id/toolbar_layout2"/>
     <include
-        layout="@layout/drawerlay"/>
-
+        layout="@layout/drawerlay" />
 </FrameLayout>

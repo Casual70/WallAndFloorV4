@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="colorchoser_width">280dp</dimen>
+    <dimen name="colorchoser_height">170dp</dimen>
+
+    <dimen name="colorpallet_element">40dp</dimen>
+    <dimen name="colorpallet_element_width">60dp</dimen>
+</resources>

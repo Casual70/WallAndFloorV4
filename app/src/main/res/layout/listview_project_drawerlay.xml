@@ -13,5 +13,6 @@
         android:layout_height="fill_parent"
         android:id="@+id/contentFrame"/>
    <include
-       layout="@layout/project_list_drawerlay"/>
+       layout="@layout/project_list_drawerlay"
+       tools:showIn = "@layout/project_list_drawerlay"/>
 </android.support.v4.widget.DrawerLayout>
