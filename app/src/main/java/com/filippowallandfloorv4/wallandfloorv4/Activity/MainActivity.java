@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment.setProjectPreview(createPreview(app.getContext(), nameProject));
                 FragmentManager fm = getFragmentManager();
                 fm.beginTransaction().replace(R.id.contentFrame, fragment).commit();
+                drawerLayout.closeDrawers();
                 Log.e(LOG_MAINACTIVITY_DEBUG, nameProject);
             }
         });
@@ -133,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         tempProjectName = nameProject;
         GridView gridView = new GridView(app.getContext());
         gridView.setNumColumns(2);
+        // todo migliorare la gridview
         gridPreviewCursorAdapter = new GridPreviewCursorAdapter(this,db.getAllWafImageSortByProjectCursor(nameProject),true); // by Cursor
         gridView.setAdapter(gridPreviewCursorAdapter);
         gridView.setEmptyView(LayoutInflater.from(app.getContext()).inflate(R.layout.empty_grid_view, null));

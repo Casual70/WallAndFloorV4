@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:id="@+id/drawerLay_listProject">
     <FrameLayout
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="@dimen/toobar_height"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/contentFrame"/>

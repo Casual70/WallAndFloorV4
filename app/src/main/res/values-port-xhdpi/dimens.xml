@@ -9,6 +9,6 @@
     <dimen name="colorpallet_element">50dp</dimen>
     <dimen name="colorpallet_element_width">37dp</dimen>
 
-    <dimen name="toobar_height">40dp</dimen>
+    <dimen name="toobar_height">50dp</dimen>
 
 </resources>

@@ -7,7 +7,7 @@
     android:id="@+id/linearLay_listProject"
     android:layout_gravity="start">
     <ListView
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="@dimen/toobar_height"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
