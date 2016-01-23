@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WallAndFloorV4</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+
+    <!--dialog text -->
+    <string name="dialog_title">Scegli Progetto</string>
+    <string name="project_name">Nome Progetto</string>
+    <string name="zone_name">Nome Zona</string>
+    <string name="hint_project_name">Casa al Lago, Es Ristrut Rossi</string>
+    <string name="hint_zone_name">Salotto,Camera,Bagno,Soffitta</string>
+    <string name="title_activity_editor">EditorActivity</string>
+    <string name="defaultTexture">Default</string>
+    <string name="customTexture">Custom</string>
+    <!--drawer Text -->
+    <string name="button_confirm">OK</string>
+    <string name="button_add_color">ADD</string>
+    <string name="radio_auto_finder">AutoFinder</string>
+    <!--editor menu -->
+    <string name="save_menu">Salva</string>
+    <string name="save_success">Immagine Salvata</string>
+    <string name="setting_bitmap">Photo Setting</string>
+</resources>

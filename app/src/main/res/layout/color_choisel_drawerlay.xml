@@ -6,6 +6,7 @@
     android:layout_width="@dimen/colorchoser_width"
     android:layout_height="wrap_content"
     android:id="@+id/linearLay_editor_color"
+    android:layout_marginTop="@dimen/toobar_height"
     android:layout_gravity="start">
 
     <com.rarepebble.colorpicker.ColorPickerView

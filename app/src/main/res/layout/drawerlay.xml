@@ -6,7 +6,7 @@
     tools:context="com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity"
     android:id="@+id/drawerLayout_color">
     <FrameLayout
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="@dimen/toobar_height"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/contentFrame_color"/>

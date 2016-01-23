@@ -8,7 +8,7 @@
             <corners
                 android:radius="20dp"/>
             <stroke
-                android:width="6dp"
+                android:width="@dimen/colopallet_element_stoke"
                 android:color="@color/red_error"/>
         </shape>
     </item>
@@ -19,7 +19,7 @@
             <corners
                 android:radius="20dp"/>
             <stroke
-                android:width="6dp"
+                android:width="@dimen/colopallet_element_stoke"
                 android:color="@color/gray600"/>
         </shape>
     </item>
