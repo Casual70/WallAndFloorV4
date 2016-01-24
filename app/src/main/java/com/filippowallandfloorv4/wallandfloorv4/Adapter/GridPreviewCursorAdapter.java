@@ -49,9 +49,9 @@ public class GridPreviewCursorAdapter extends CursorAdapter {
         ImageLayHolder holder = (ImageLayHolder)view.getTag();
         final WafImage wafImage = db.getWafByDb(cursor.getInt(cursor.getColumnIndex(ImageDb.IMAGE_COL_ID)));
         ImageView imageView = holder.getImageView();
-        opt.inSampleSize = 2;
+        opt.inSampleSize = 8;
         Bitmap bitImage = BitmapFactory.decodeFile(cursor.getString(cursor.getColumnIndex(ImageDb.IMAGE_FILE_PATH)),opt);
-        imageView.setImageBitmap(Bitmap.createBitmap(Bitmap.createScaledBitmap(bitImage,300,200,false)));
+        imageView.setImageBitmap(Bitmap.createBitmap(Bitmap.createScaledBitmap(bitImage,300,350,false)));
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

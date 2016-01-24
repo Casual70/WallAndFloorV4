@@ -133,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
     private GridView createPreview(Context context, String nameProject){ //usare un viewHolder anche qui Riciclare
         tempProjectName = nameProject;
         GridView gridView = new GridView(app.getContext());
-        gridView.setNumColumns(2);
+        gridView.setNumColumns(GridView.AUTO_FIT);
+        gridView.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
         // todo migliorare la gridview
         gridPreviewCursorAdapter = new GridPreviewCursorAdapter(this,db.getAllWafImageSortByProjectCursor(nameProject),true); // by Cursor
         gridView.setAdapter(gridPreviewCursorAdapter);
