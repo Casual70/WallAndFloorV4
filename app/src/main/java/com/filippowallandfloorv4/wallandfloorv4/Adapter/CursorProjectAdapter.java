@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.R;
 import com.filippowallandfloorv4.wallandfloorv4.SqlDb.ImageDb;
 
@@ -36,8 +37,11 @@ public class CursorProjectAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ProjectlistCursorItemHolder holder = (ProjectlistCursorItemHolder) view.getTag();
-        holder.getProjectNameLabelOnlist().setText(cursor.getString(cursor.getColumnIndex(ImageDb.NAME_PROJECT)));
-        // manca da implementare il set del numero delle foto
+        String nameProject = cursor.getString(cursor.getColumnIndex(ImageDb.NAME_PROJECT));
+
+        holder.getProjectNameLabelOnlist().setText(nameProject);
+        Cursor size = App.getAppIstance().getImageDb().getAllWafImageSortByProjectCursor(nameProject);
+        holder.getProjectNameImagecountOnlist().setText(String.valueOf(size.getCount()));
     }
 
     @Override

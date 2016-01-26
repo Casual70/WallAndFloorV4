@@ -29,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -283,24 +284,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void dialogTakedPhoto(final WafImage wafImage){
-        final Dialog dialog = new Dialog(this,R.style.AppTheme);
+        final Dialog dialog = new Dialog(this);
         View dialogView = LayoutInflater.from(app.getContext()).inflate(R.layout.dialog_project_zone,null);
-        dialog.setContentView(dialogView, new ViewGroup.LayoutParams(650, 600));
+        dialog.setContentView(dialogView);
         final EditText projectName = (EditText)dialogView.findViewById(R.id.ProjectName_edit);
         final EditText zoneName = (EditText)dialogView.findViewById(R.id.ZoneName_edit);
-        final ListView listView = (ListView)dialogView.findViewById(R.id.listView_dialog);
-        listView.setAdapter(cursorProjectAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                projectName.setText(cursorProjectAdapter.getItem(position));
-            }
-        });
         TextView filePath = (TextView)dialogView.findViewById(R.id.FilePath_edit);
         Button confirm = (Button)dialogView.findViewById(R.id.button_confim);
         Button avoid = (Button)dialogView.findViewById(R.id.button_avoid);
+        ImageButton confirmaImage = (ImageButton) dialogView.findViewById(R.id.imageButton10);
+        ImageButton avoidImage = (ImageButton)dialogView.findViewById(R.id.imageButton11);
         filePath.setText(wafImage.getFilePath().getAbsolutePath());
-        confirm.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener confirListe = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Editable nameProj = projectName.getText();
@@ -325,17 +320,22 @@ public class MainActivity extends AppCompatActivity {
                             gridPreviewCursorAdapter = new GridPreviewCursorAdapter(app.getContext(),db.getAllWafImageSortByProjectCursor(nameProj.toString()),true);
                         }
                         gridPreviewCursorAdapter.swapCursor(db.getAllWafImageSortByProjectCursor(nameProj.toString()));
+                        //todo aprire la preview del progetto appena inserito
                         dialog.dismiss();
                     }
                 }
             }
-        });
-        avoid.setOnClickListener(new View.OnClickListener() {
+        };
+        View.OnClickListener avoidListe = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
-        });
+        };
+        confirm.setOnClickListener(confirListe);
+        avoid.setOnClickListener(avoidListe);
+        confirmaImage.setOnClickListener(confirListe);
+        avoidImage.setOnClickListener(avoidListe);
         dialog.show();
     }
 

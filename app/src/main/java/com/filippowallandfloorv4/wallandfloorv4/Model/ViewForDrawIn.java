@@ -380,6 +380,12 @@ public class ViewForDrawIn extends View {
         return mBitmap;
     }
 
+    //da vedere se tenere solo questo metodo o anche il getmBitmap()
+
+    public Bitmap getmSizedBitmap(){
+        return Bitmap.createScaledBitmap(mBitmap,720,1280,false);
+    }
+
     public void setmBitmap(Bitmap mBitmap) {
         this.mBitmap = mBitmap;
         //onSizeChanged(mBitmap.getWidth(),mBitmap.getHeight(),mBitmap.getWidth(),mBitmap.getHeight());

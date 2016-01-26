@@ -322,13 +322,15 @@ public class EditorActivity extends AppCompatActivity {
         Point size = new Point();
         display.getSize(size);
         Bitmap ultimate = Bitmap.createScaledBitmap(imageBit, size.x, size.y, false);
+        Log.e(LOG_EditorActivity, "decoded bitmap size : h : "+ultimate.getHeight() + " w : "+ultimate.getWidth());
         return ultimate;
     }
     public boolean saveCurrentPhoto(WafImage wafImage){
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ROOT).format(new Date());
         String editedSuffix = timeStamp+"_edit.jpeg";
         boolean isSaved = false;
-        Bitmap edit = fragment.getVfd().getmBitmap();
+        //Bitmap edit = fragment.getVfd().getmBitmap();
+        Bitmap edit = fragment.getVfd().getmSizedBitmap();
         FileOutputStream out = null;
         try{
             out = new FileOutputStream(wafImage.getFilePath().getAbsolutePath()+editedSuffix);
