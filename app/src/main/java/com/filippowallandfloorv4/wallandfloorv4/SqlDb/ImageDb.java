@@ -107,7 +107,7 @@ public class ImageDb extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(IMAGE_FILE_PATH,image.getFilePath().getAbsolutePath());
-        values.put(NAME_PROJECT,image.getNomeProject());
+        values.put(NAME_PROJECT, image.getNomeProject());
         values.put(NAME_ZONE, image.getNomeZona());
         return  db.update(TABLE_WAFIMAGE,values,IMAGE_COL_ID+" = ?",new String[]{String.valueOf(image.get_id())});
     }
@@ -134,10 +134,10 @@ public class ImageDb extends SQLiteOpenHelper {
         cursor.close();
         return wafImageList;
     }
-    public List<String> getAllByProjectString(){ // not work for now
+    public ArrayList<String> getAllByProjectString(){ // not work for now
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT "+NAME_PROJECT+" FROM "+TABLE_WAFIMAGE; //SBAGLIAAAAAAAAAAAAAAAAAAAAATO!!"!!!
-        List<String>projectList = new ArrayList<>();
+        String query = "SELECT "+NAME_PROJECT+" FROM "+TABLE_WAFIMAGE + " GROUP BY "+NAME_PROJECT;
+        ArrayList<String>projectList = new ArrayList<>();
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()){
             do{
@@ -147,6 +147,24 @@ public class ImageDb extends SQLiteOpenHelper {
         cursor.close();
         return projectList;
     }
+    public ArrayList<String>getAllZoneByProject(String projectName){
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<String>zoneList = new ArrayList<>();
+        Cursor cursor = db.query(false, TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, NAME_PROJECT, NAME_ZONE}, NAME_PROJECT + "=?", new String[]{projectName}, null, null, null, null);
+        if (cursor.moveToFirst()){
+            do{
+                zoneList.add(cursor.getString(cursor.getColumnIndex(NAME_ZONE)));
+                Log.e("zone load", cursor.getString(cursor.getColumnIndex(NAME_ZONE)));
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        return zoneList;
+    }
+    public Cursor getAllZoneByProjectCursor(String projectName){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(false, TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, NAME_PROJECT, NAME_ZONE}, NAME_PROJECT + "=?", new String[]{projectName}, null, null, null, null);
+    }
+
     public Cursor getAllByProjectCursor(){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(true, TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID,NAME_PROJECT}, null, null, NAME_PROJECT, null, null, null);

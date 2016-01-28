@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:id="@+id/linearLay_listProject"
     android:layout_gravity="start">
-    <ListView
+    <ExpandableListView
         android:layout_marginTop="@dimen/toobar_height"
         android:layout_width="240dp"
         android:layout_height="wrap_content"

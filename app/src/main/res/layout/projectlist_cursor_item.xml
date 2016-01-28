@@ -8,6 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:gravity="center"
         android:id="@+id/ProjectName_label_onlist"
         android:textSize="@dimen/listProjectTextSize"
         android:layout_weight="1"
@@ -17,6 +18,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/listProjectPhotoCountTextSize"
         android:layout_gravity="center_vertical"
+        android:gravity="end"
         android:id="@+id/ProjectName_imagecount_onlist"
         android:layout_weight="1"
         android:text="56"/>

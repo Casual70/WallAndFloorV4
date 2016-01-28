@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,8 +27,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -55,6 +60,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.R.layout.simple_dropdown_item_1line;
+
 public class MainActivity extends AppCompatActivity {
 
     //save restore
@@ -65,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private WafImage tempWafImage;
     private String tempProjectName;
     private Button photoButton;
-    private ListView projectListView;
+    private ExpandableListView projectListView;
     private DrawerLayout drawerLayout;
     private LinearLayout linearLayout;
     //private ArrayAdapter<String>adapterListProject;
@@ -88,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar_layout);
         setSupportActionBar(toolbar);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawerLay_listProject);
-        projectListView = (ListView)findViewById(R.id.ListView_Project);
+        projectListView = (ExpandableListView)findViewById(R.id.ListView_Project);
         linearLayout = (LinearLayout)findViewById(R.id.linearLay_listProject);
     }
 
@@ -113,20 +120,22 @@ public class MainActivity extends AppCompatActivity {
         app = App.getAppIstance();
         db = app.getImageDb();
         Log.e(LOG_MAINACTIVITY_DEBUG, String.valueOf(db.getAllWafImages().size()));
-        if (cursorProjectAdapter ==null){
-            cursorProjectAdapter = new CursorProjectAdapter(app.getContext(),db.getAllByProjectCursor(),false);
+        if (cursorProjectAdapter == null){
+            cursorProjectAdapter = new CursorProjectAdapter(db.getAllByProjectCursor(),app.getContext(),false);
         }
         projectListView.setAdapter(cursorProjectAdapter);
-        projectListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        projectListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String nameProject = cursorProjectAdapter.getItem(position);
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                String nameProject = cursorProjectAdapter.getItem(groupPosition);
                 ProjectPreviewFragment fragment = new ProjectPreviewFragment();
                 fragment.setProjectPreview(createPreview(app.getContext(), nameProject));
                 FragmentManager fm = getFragmentManager();
                 fm.beginTransaction().replace(R.id.contentFrame, fragment).commit();
                 drawerLayout.closeDrawers();
+                toolbar.setTitle(nameProject);
                 Log.e(LOG_MAINACTIVITY_DEBUG, nameProject);
+                return false;
             }
         });
     }
@@ -287,14 +296,27 @@ public class MainActivity extends AppCompatActivity {
         final Dialog dialog = new Dialog(this);
         View dialogView = LayoutInflater.from(app.getContext()).inflate(R.layout.dialog_project_zone,null);
         dialog.setContentView(dialogView);
-        final EditText projectName = (EditText)dialogView.findViewById(R.id.ProjectName_edit);
-        final EditText zoneName = (EditText)dialogView.findViewById(R.id.ZoneName_edit);
+        final AutoCompleteTextView projectName = (AutoCompleteTextView)dialogView.findViewById(R.id.ProjectName_edit);
+        final AutoCompleteTextView zoneName = (AutoCompleteTextView)dialogView.findViewById(R.id.ZoneName_edit);
         TextView filePath = (TextView)dialogView.findViewById(R.id.FilePath_edit);
         Button confirm = (Button)dialogView.findViewById(R.id.button_confim);
         Button avoid = (Button)dialogView.findViewById(R.id.button_avoid);
         ImageButton confirmaImage = (ImageButton) dialogView.findViewById(R.id.imageButton10);
         ImageButton avoidImage = (ImageButton)dialogView.findViewById(R.id.imageButton11);
         filePath.setText(wafImage.getFilePath().getAbsolutePath());
+        projectName.setAdapter(new ArrayAdapter<String>(this, simple_dropdown_item_1line, app.getImageDb().getAllByProjectString()));
+        projectName.setThreshold(1);
+        projectName.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
+        zoneName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (v.hasFocus() && !TextUtils.isEmpty(projectName.getText())){
+                    String pName = projectName.getText().toString();
+                    zoneName.setAdapter(new ArrayAdapter<String>(v.getContext(), simple_dropdown_item_1line, app.getImageDb().getAllZoneByProject(pName)));
+                    zoneName.setThreshold(1);
+                }
+            }
+        });
         View.OnClickListener confirListe = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -315,12 +337,21 @@ public class MainActivity extends AppCompatActivity {
                         wafImage.setNomeZona(nameZone.toString());
                         db.addWafToDb(wafImage);
                         Log.e(LOG_MAINACTIVITY_DEBUG, "WafImage aggiunto ad DB :" + wafImage.getNomeProject() + " " + wafImage.getNomeZona());
-                        cursorProjectAdapter.swapCursor(db.getAllByProjectCursor());
+                        cursorProjectAdapter = new CursorProjectAdapter(db.getAllByProjectCursor(),app.getContext(),false);
+                        projectListView.setAdapter(cursorProjectAdapter);
+
                         if (gridPreviewCursorAdapter == null){
                             gridPreviewCursorAdapter = new GridPreviewCursorAdapter(app.getContext(),db.getAllWafImageSortByProjectCursor(nameProj.toString()),true);
                         }
-                        gridPreviewCursorAdapter.swapCursor(db.getAllWafImageSortByProjectCursor(nameProj.toString()));
-                        //todo aprire la preview del progetto appena inserito
+                        if(tempProjectName == null || !tempProjectName.equalsIgnoreCase(nameProj.toString())){
+                            ProjectPreviewFragment fragment = new ProjectPreviewFragment();
+                            fragment.setProjectPreview(createPreview(app.getContext(), nameProj.toString()));
+                            FragmentManager fm = getFragmentManager();
+                            fm.beginTransaction().replace(R.id.contentFrame, fragment).commit();
+                            toolbar.setTitle(nameProj);
+                        }else{
+                            gridPreviewCursorAdapter.swapCursor(db.getAllWafImageSortByProjectCursor(nameProj.toString()));
+                        }
                         dialog.dismiss();
                     }
                 }
