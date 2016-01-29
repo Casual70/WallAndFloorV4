@@ -14,6 +14,7 @@
     <string name="title_activity_editor">EditorActivity</string>
     <string name="defaultTexture">Default</string>
     <string name="customTexture">Custom</string>
+    <string name="imageRemoved">Immagine Rimossa</string>
     <!--drawer Text -->
     <string name="button_confirm">Conferma</string>
     <string name="button_add_color">Aggiugi</string>

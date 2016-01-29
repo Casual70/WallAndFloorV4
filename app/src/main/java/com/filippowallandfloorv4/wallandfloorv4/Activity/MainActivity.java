@@ -87,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_PHOTO_EDITOR = 15;
     public static final int REQUEST_PHOTO_LOAD = 20;
 
+    private static final int EXPANDABLE_LIST_PROJECT_GROUP = 8;
+    private static final int EXPANDABLE_LIST_PROJECT_CHILD = 16;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,9 +141,27 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        projectListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                int itemType = ExpandableListView.getPackedPositionType(id);
+                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD){
+                    int childPosition = ExpandableListView.getPackedPositionChild(id);
+                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    //delete zone
+                    return true;
+                }else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP){
+                    int groupPosition = ExpandableListView.getPackedPositionGroup(id);
+                    //delete tutto il project
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        });
     }
 
-    private GridView createPreview(Context context, String nameProject){ //usare un viewHolder anche qui Riciclare
+    private GridView createPreview(Context context, final String nameProject){ //usare un viewHolder anche qui Riciclare
         tempProjectName = nameProject;
         GridView gridView = new GridView(app.getContext());
         gridView.setNumColumns(GridView.AUTO_FIT);
@@ -149,6 +170,25 @@ public class MainActivity extends AppCompatActivity {
         gridPreviewCursorAdapter = new GridPreviewCursorAdapter(this,db.getAllWafImageSortByProjectCursor(nameProject),true); // by Cursor
         gridView.setAdapter(gridPreviewCursorAdapter);
         gridView.setEmptyView(LayoutInflater.from(app.getContext()).inflate(R.layout.empty_grid_view, null));
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                WafImage removeThat = (WafImage) gridPreviewCursorAdapter.getItem(position);
+                db.deleteWafImage(removeThat);
+                if (removeThat.getFilePath().delete()) {
+                    Toast.makeText(view.getContext(), R.string.imageRemoved, Toast.LENGTH_SHORT).show();
+                    gridPreviewCursorAdapter.swapCursor(db.getAllWafImageSortByProjectCursor(nameProject));
+                }
+                return false;
+            }
+        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                WafImage selectedImage = (WafImage)gridPreviewCursorAdapter.getItem(position);
+                startdEditor(selectedImage);
+            }
+        });
         return gridView;
     }
     public void startdEditor(WafImage wafImage){

@@ -66,13 +66,6 @@ public class GridPreviewCursorAdapter extends CursorAdapter {
         opt.inJustDecodeBounds = true;
         Bitmap bitImage = BitmapFactory.decodeFile(wafImage.getFilePath().getAbsolutePath(),opt);
         //imageView.setImageBitmap(Bitmap.createBitmap(Bitmap.createScaledBitmap(bitImage,300,350,false)));
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity mainActivity = (MainActivity) context;
-                mainActivity.startdEditor(wafImage);
-            }
-        });
         Picasso.
                 with(context).
                 load(wafImage.getFilePath()).
@@ -84,4 +77,9 @@ public class GridPreviewCursorAdapter extends CursorAdapter {
         Log.e("Log adapterGrid", "decoded bitmap size : h : " + opt.outHeight + " w : " + opt.outWidth);
     }
 
+    @Override
+    public WafImage getItem(int position) {
+        Cursor cursor = (Cursor)super.getItem(position);
+        return db.getWafByDb(cursor.getInt(cursor.getColumnIndex(ImageDb.IMAGE_COL_ID)));
+    }
 }
