@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="listProjectTextSize">30sp</dimen>
+    <dimen name="listProjectTextSize">25sp</dimen>
     <dimen name="listProjectPhotoCountTextSize">20sp</dimen>
+    <dimen name="list_child_text">15sp</dimen>
 </resources>

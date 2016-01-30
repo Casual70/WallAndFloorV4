@@ -5,9 +5,7 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.CursorTreeAdapter;
-import android.widget.TextView;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.R;
@@ -43,7 +41,7 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
 
     @Override
     protected View newGroupView(Context context, Cursor cursor, boolean isExpanded, ViewGroup parent) {
-        View retView = inflater.inflate(R.layout.projectlist_cursor_item,parent,false);
+        View retView = inflater.inflate(R.layout.projectlist_cursor_item_group,parent,false);
         holder = new ProjectlistCursorItemHolder(retView);
         retView.setTag(holder);
         return retView;
@@ -61,7 +59,7 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
 
     @Override
     protected View newChildView(Context context, Cursor cursor, boolean isLastChild, ViewGroup parent) {
-        View childView = inflater.inflate(R.layout.projectlist_cursor_item,null);
+        View childView = inflater.inflate(R.layout.projectlist_cursor_item_group,null);
         holder = new ProjectlistCursorItemHolder(childView);
         childView.setTag(holder);
         return childView;
@@ -70,11 +68,16 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
     @Override
     protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
         ProjectlistCursorItemHolder holder = (ProjectlistCursorItemHolder) view.getTag();
-        String nameProject = cursor.getString(cursor.getColumnIndex(ImageDb.NAME_ZONE));
+        String nameZone = cursor.getString(cursor.getColumnIndex(ImageDb.NAME_ZONE));
 
-        holder.getProjectNameLabelOnlist().setText(nameProject);
-        Cursor size = App.getAppIstance().getImageDb().getAllWafImageSortByProjectCursor(nameProject);
-        holder.getProjectNameImagecountOnlist().setText(String.valueOf(size.getCount()));
+        holder.getProjectNameLabelOnlist().setText(nameZone);
+        holder.getProjectNameLabelOnlist().setTextSize(20);
+        holder.getProjectNameLabelOnlist().setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+
+        //Cursor size = App.getAppIstance().getImageDb().getAllWafImageSortByProjectCursor(nameZone);
+        //holder.getProjectNameImagecountOnlist().setText(String.valueOf(size.getCount()));
+
+        holder.getProjectNameImagecountOnlist().setVisibility(View.GONE);
     }
     @Override
     public long getGroupId(int groupPosition) {
@@ -85,6 +88,8 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
     public long getChildId(int groupPosition, int childPosition) {
         return childPosition;
     }
+
+
 
 
 

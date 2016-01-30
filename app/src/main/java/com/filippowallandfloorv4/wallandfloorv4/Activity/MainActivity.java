@@ -21,6 +21,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -113,6 +115,12 @@ public class MainActivity extends AppCompatActivity {
         if (cursorProjectAdapter == null){
             cursorProjectAdapter = new CursorProjectAdapter(db.getAllByProjectCursor(),app.getContext(),false);
         }
+        View header = LayoutInflater.from(this).inflate(R.layout.header_projectlist_group,null);
+        TextView headerTextView = (TextView)header.findViewById(R.id.header_textView);
+        RotateAnimation rotateAnimation = (RotateAnimation) AnimationUtils.loadAnimation(this,R.anim.projectlist_header);
+        rotateAnimation.setFillAfter(true);
+        headerTextView.setAnimation(rotateAnimation);
+        projectListView.addHeaderView(header);
         projectListView.setAdapter(cursorProjectAdapter);
         projectListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
@@ -342,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void dialogTakedPhoto(final WafImage wafImage){
         final Dialog dialog = new Dialog(this);
+        final int[] addok = {0};
         View dialogView = LayoutInflater.from(app.getContext()).inflate(R.layout.dialog_project_zone,null);
         dialog.setContentView(dialogView);
         final AutoCompleteTextView projectName = (AutoCompleteTextView)dialogView.findViewById(R.id.ProjectName_edit);
@@ -400,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
                         }else{
                             gridPreviewCursorAdapter.swapCursor(db.getAllWafImageSortByProjectCursor(nameProj.toString()));
                         }
+                        addok[0] = 1;
                         dialog.dismiss();
                     }
                 }
@@ -417,8 +427,8 @@ public class MainActivity extends AppCompatActivity {
         avoidImage.setOnClickListener(avoidListe);
         DialogInterface.OnDismissListener onDismissListener = new DialogInterface.OnDismissListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) { // todo cambiare perchè caneclla sempre i file (non trova riscontro nel db)
-                if (db.getAllWafImages().contains(wafImage)){
+            public void onDismiss(DialogInterface dialog) {
+                if (addok[0] == 1){
                     dialog.dismiss();
                 }else{
                     File pathWaf = wafImage.getFilePath();
