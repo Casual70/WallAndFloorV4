@@ -28,7 +28,7 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
         this.inflater = LayoutInflater.from(context);
     }
 
-    public String getItem(int position) {
+    public String getProjectName(int position) {
         String nameProject = null;
         if (cursor.moveToPosition(position)){
             nameProject = cursor.getString(cursor.getColumnIndex(ImageDb.NAME_PROJECT));
@@ -76,6 +76,16 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
         Cursor size = App.getAppIstance().getImageDb().getAllWafImageSortByProjectCursor(nameProject);
         holder.getProjectNameImagecountOnlist().setText(String.valueOf(size.getCount()));
     }
+    @Override
+    public long getGroupId(int groupPosition) {
+        return groupPosition;
+    }
+
+    @Override
+    public long getChildId(int groupPosition, int childPosition) {
+        return childPosition;
+    }
+
 
 
 }

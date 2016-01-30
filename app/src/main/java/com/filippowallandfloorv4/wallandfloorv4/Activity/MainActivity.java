@@ -1,20 +1,16 @@
 package com.filippowallandfloorv4.wallandfloorv4.Activity;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -25,18 +21,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CursorAdapter;
-import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,13 +41,8 @@ import com.filippowallandfloorv4.wallandfloorv4.R;
 import com.filippowallandfloorv4.wallandfloorv4.SqlDb.ImageDb;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -130,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         projectListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                String nameProject = cursorProjectAdapter.getItem(groupPosition);
+                String nameProject = cursorProjectAdapter.getProjectName(groupPosition);
                 ProjectPreviewFragment fragment = new ProjectPreviewFragment();
                 fragment.setProjectPreview(createPreview(app.getContext(), nameProject));
                 FragmentManager fm = getFragmentManager();
@@ -149,10 +136,31 @@ public class MainActivity extends AppCompatActivity {
                     int childPosition = ExpandableListView.getPackedPositionChild(id);
                     int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                     //delete zone
+                    Cursor cursorZoneName = cursorProjectAdapter.getChild(groupPosition, childPosition);
+                    if (cursorZoneName == null){
+                        Log.e(LOG_MAINACTIVITY_DEBUG,"cursorChild Null");
+                    }else{
+                        String zoneName = cursorZoneName.getString(cursorZoneName.getColumnIndex(ImageDb.NAME_ZONE));
+                        db.deleteAllWafImageByZone(zoneName);
+                        Log.e(LOG_MAINACTIVITY_DEBUG, "Zona eliminata");
+                    }
+                    cursorProjectAdapter = new CursorProjectAdapter(db.getAllByProjectCursor(),app.getContext(),false);
+                    projectListView.setAdapter(cursorProjectAdapter);
+                    projectListView.expandGroup(groupPosition,true);
                     return true;
                 }else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP){
                     int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                     //delete tutto il project
+                    Cursor cursorGroup = cursorProjectAdapter.getGroup(groupPosition);
+                    if (cursorGroup == null){
+                        Log.e(LOG_MAINACTIVITY_DEBUG,"cursorGroup null");
+                    }else{
+                        String groudName = cursorGroup.getString(cursorGroup.getColumnIndex(ImageDb.NAME_PROJECT));
+                        db.deleteAllWafImageByProject(groudName);
+                        Log.e(LOG_MAINACTIVITY_DEBUG, "Project eleimanato "+groudName);
+                        cursorProjectAdapter = new CursorProjectAdapter(db.getAllByProjectCursor(),app.getContext(),false);
+                        projectListView.setAdapter(cursorProjectAdapter);
+                    }
                     return true;
                 }else{
                     return false;
@@ -379,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(LOG_MAINACTIVITY_DEBUG, "WafImage aggiunto ad DB :" + wafImage.getNomeProject() + " " + wafImage.getNomeZona());
                         cursorProjectAdapter = new CursorProjectAdapter(db.getAllByProjectCursor(),app.getContext(),false);
                         projectListView.setAdapter(cursorProjectAdapter);
-
+                        // expand the group
                         if (gridPreviewCursorAdapter == null){
                             gridPreviewCursorAdapter = new GridPreviewCursorAdapter(app.getContext(),db.getAllWafImageSortByProjectCursor(nameProj.toString()),true);
                         }
@@ -407,6 +415,18 @@ public class MainActivity extends AppCompatActivity {
         avoid.setOnClickListener(avoidListe);
         confirmaImage.setOnClickListener(confirListe);
         avoidImage.setOnClickListener(avoidListe);
+        DialogInterface.OnDismissListener onDismissListener = new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) { // todo cambiare perchè caneclla sempre i file (non trova riscontro nel db)
+                if (db.getAllWafImages().contains(wafImage)){
+                    dialog.dismiss();
+                }else{
+                    File pathWaf = wafImage.getFilePath();
+                    pathWaf.delete();
+                }
+            }
+        };
+        dialog.setOnDismissListener(onDismissListener);
         dialog.show();
     }
 

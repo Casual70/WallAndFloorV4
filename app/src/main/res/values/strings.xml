@@ -15,6 +15,7 @@
     <string name="defaultTexture">Default</string>
     <string name="customTexture">Custom</string>
     <string name="imageRemoved">Immagine Rimossa</string>
+    <string name="projectRemoved">Progetto Eliminato</string>
     <!--drawer Text -->
     <string name="button_confirm">Conferma</string>
     <string name="button_add_color">Aggiugi</string>

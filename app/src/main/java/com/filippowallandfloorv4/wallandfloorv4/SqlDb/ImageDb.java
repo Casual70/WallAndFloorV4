@@ -6,8 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.filippowallandfloorv4.wallandfloorv4.Model.WafImage;
+import com.filippowallandfloorv4.wallandfloorv4.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,8 +33,11 @@ public class ImageDb extends SQLiteOpenHelper {
 
     public static final String TEXTURE_CODE = "texture_code";
 
+    private Context context;
+
     public ImageDb(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -111,7 +116,7 @@ public class ImageDb extends SQLiteOpenHelper {
         values.put(NAME_ZONE, image.getNomeZona());
         return  db.update(TABLE_WAFIMAGE,values,IMAGE_COL_ID+" = ?",new String[]{String.valueOf(image.get_id())});
     }
-    public void deleteWafImage(WafImage image){ // not work for now
+    public void deleteWafImage(WafImage image){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_WAFIMAGE, IMAGE_COL_ID + " = ?", new String[]{String.valueOf(image.get_id())});
         db.close();
@@ -120,7 +125,7 @@ public class ImageDb extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<WafImage>wafImageList = new ArrayList<>();
         String allSelectQuery = "SELECT * FROM "+TABLE_WAFIMAGE + " WHERE "+NAME_PROJECT+" =?";
-        Cursor cursor = db.rawQuery(allSelectQuery,new String[]{projectName});
+        Cursor cursor = db.rawQuery(allSelectQuery, new String[]{projectName});
         if (cursor.moveToFirst()){
             do {
                 File path = new File(cursor.getString(cursor.getColumnIndex(IMAGE_FILE_PATH)));
@@ -164,6 +169,24 @@ public class ImageDb extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(false, TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, NAME_PROJECT, NAME_ZONE}, NAME_PROJECT + "=?", new String[]{projectName}, null, null, null, null);
     }
+    public Cursor getAllWafImageByZone(String zoneName){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(false, TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, NAME_PROJECT, NAME_ZONE,IMAGE_FILE_PATH}, NAME_ZONE + "=?", new String[]{zoneName}, null, null, null, null);
+    }
+    public boolean deleteAllWafImageByZone(String zoneName){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = getAllWafImageByZone(zoneName);
+        if (cursor.moveToFirst()){
+            do{
+                File fildPath = new File(cursor.getString(cursor.getColumnIndex(IMAGE_FILE_PATH)));
+                if (fildPath.delete()){
+                    Toast.makeText(context, R.string.imageRemoved,Toast.LENGTH_SHORT).show();
+                }
+            }while (cursor.moveToNext());
+        }
+        db.delete(TABLE_WAFIMAGE,NAME_ZONE+"=?",new String[]{zoneName});
+        return true;
+    }
 
     public Cursor getAllByProjectCursor(){
         SQLiteDatabase db = this.getReadableDatabase();
@@ -172,6 +195,20 @@ public class ImageDb extends SQLiteOpenHelper {
     public Cursor getAllWafImageSortByProjectCursor(String projectName){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(false,TABLE_WAFIMAGE,new String[]{IMAGE_COL_ID,NAME_PROJECT,NAME_ZONE,IMAGE_FILE_PATH},NAME_PROJECT+"=?",new String[]{projectName},null,null,null,null);
+    }
+    public boolean deleteAllWafImageByProject(String projectName){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = getAllWafImageSortByProjectCursor(projectName);
+        if (cursor.moveToFirst()){
+            do{
+                File filePath = new File(cursor.getString(cursor.getColumnIndex(IMAGE_FILE_PATH)));
+                if (filePath.delete()){
+                    Toast.makeText(context,R.string.projectRemoved,Toast.LENGTH_SHORT).show();
+                }
+            }while (cursor.moveToNext());
+        }
+        db.delete(TABLE_WAFIMAGE,NAME_PROJECT+"=?",new String[]{projectName});
+        return true;
     }
     public Cursor getAllWafImageTexture(){ // da collaudare
         SQLiteDatabase db = this.getReadableDatabase();
