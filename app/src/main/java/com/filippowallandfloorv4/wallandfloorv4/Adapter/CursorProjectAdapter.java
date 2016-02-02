@@ -19,6 +19,7 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
     private Cursor cursor;
     private ProjectlistCursorItemHolder holder;
     private LayoutInflater inflater;
+    private String projectName;
 
     public CursorProjectAdapter(Cursor c, Context context, boolean autoRequery) {
         super(c, context, autoRequery);
@@ -69,7 +70,6 @@ public class CursorProjectAdapter extends CursorTreeAdapter {
     protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
         ProjectlistCursorItemHolder holder = (ProjectlistCursorItemHolder) view.getTag();
         String nameZone = cursor.getString(cursor.getColumnIndex(ImageDb.NAME_ZONE));
-
         holder.getProjectNameLabelOnlist().setText(nameZone);
         holder.getProjectNameLabelOnlist().setTextSize(20);
         holder.getProjectNameLabelOnlist().setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);

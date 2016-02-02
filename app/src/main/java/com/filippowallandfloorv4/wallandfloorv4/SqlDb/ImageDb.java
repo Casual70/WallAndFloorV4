@@ -167,7 +167,7 @@ public class ImageDb extends SQLiteOpenHelper {
     }
     public Cursor getAllZoneByProjectCursor(String projectName){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.query(false, TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, NAME_PROJECT, NAME_ZONE}, NAME_PROJECT + "=?", new String[]{projectName}, null, null, null, null);
+        return db.query(false, TABLE_WAFIMAGE, new String[]{IMAGE_COL_ID, NAME_PROJECT, NAME_ZONE}, NAME_PROJECT + "=?", new String[]{projectName}, NAME_ZONE , null, null, null);
     }
     public Cursor getAllWafImageByZone(String zoneName){
         SQLiteDatabase db = this.getReadableDatabase();

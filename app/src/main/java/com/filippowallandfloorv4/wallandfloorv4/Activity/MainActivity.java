@@ -115,12 +115,15 @@ public class MainActivity extends AppCompatActivity {
         if (cursorProjectAdapter == null){
             cursorProjectAdapter = new CursorProjectAdapter(db.getAllByProjectCursor(),app.getContext(),false);
         }
-        View header = LayoutInflater.from(this).inflate(R.layout.header_projectlist_group,null);
+        //todo trovare qualcosa di meglio per l'header
+        /**View header = LayoutInflater.from(this).inflate(R.layout.header_projectlist_group,null);
         TextView headerTextView = (TextView)header.findViewById(R.id.header_textView);
         RotateAnimation rotateAnimation = (RotateAnimation) AnimationUtils.loadAnimation(this,R.anim.projectlist_header);
         rotateAnimation.setFillAfter(true);
         headerTextView.setAnimation(rotateAnimation);
-        projectListView.addHeaderView(header);
+        if (projectListView.getHeaderViewsCount() == 0){
+            projectListView.addHeaderView(header);
+        }*/
         projectListView.setAdapter(cursorProjectAdapter);
         projectListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
