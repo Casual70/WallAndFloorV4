@@ -1,6 +1,5 @@
 package com.filippowallandfloorv4.wallandfloorv4.Model;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,23 +8,13 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
-import android.hardware.display.DisplayManager;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.SeekBar;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
-import com.filippowallandfloorv4.wallandfloorv4.R;
-import com.filippowallandfloorv4.wallandfloorv4.Service.CannyEdgeDetector;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
-
-import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,9 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
-import java.util.Timer;
 
 
 public class ViewForDrawIn extends View {
@@ -51,23 +38,26 @@ public class ViewForDrawIn extends View {
     private Paint backPaint;
     private Path mPath;             // serve a definire il Percorso Path appunto tracciato, è quello che mi serve
     private Paint mBitmapPaint;     //
-    private ArrayList<Path> myPathUndo = new ArrayList<Path>();
-    private ArrayList<Path> myPathRedo = new ArrayList<Path>();
+    private ArrayList<Path> myPathUndo = new ArrayList<>();
+    private ArrayList<Path> myPathRedo = new ArrayList<>();
+    private ArrayList<LinkedList> myPathUndoBack = new ArrayList<>();
+    private ArrayList<LinkedList> myPathRedoBack = new ArrayList<>();
     private Path floodFillPath;
-    private Map<Path,Paint>pathColorMap = new HashMap<Path,Paint>();
+    private Map<Path,Paint>pathColorMap = new HashMap<>();
+    private Map<Path,LinkedList>pathBackMap = new HashMap<>();
     private Bitmap backBitmap;
-    private LinkedList<Bitmap> undoRedo;
-    private LinkedList<Pixel>postElaboration;
-    private LinkedList<Pixel>postFill;
+    private LinkedList<Mypixel>postElaboration;
+    private LinkedList<Mypixel>postFill;
+    private LinkedList<Mypixel>visitedBackPixel;
     private boolean freeHand;
     private float mX,mY;
     private boolean floodFill;
-    private List<Pixel> listPcentr;
+    private List<Mypixel> listPcentr;
     private WafImage wafImage;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if (isInEditMode()){}
+        isInEditMode();
         this.context = App.getAppIstance().getContext();
         init();
     }
@@ -100,12 +90,6 @@ public class ViewForDrawIn extends View {
         Log.e(VFD_LOG, "on Measure");
     }
 
-    public ColorMatrixColorFilter grayscale (){
-        ColorMatrix cm = new ColorMatrix();
-        cm.setSaturation(0);
-        return new ColorMatrixColorFilter(cm);
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -118,14 +102,15 @@ public class ViewForDrawIn extends View {
         canvas.drawPath(mPath, mPaint);
         Log.e(VFD_LOG, "draw");
     }
+
     private void touch_start(float x, float y){
         mPath.reset();
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
         if (listPcentr == null){
-            listPcentr = new ArrayList<Pixel>();
-            listPcentr.add(new Pixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
+            listPcentr = new ArrayList<>();
+            listPcentr.add(new Mypixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
         }
     }
     private void touch_move(float x,float y){
@@ -136,7 +121,7 @@ public class ViewForDrawIn extends View {
             mX = x;
             mY = y;
             if (listPcentr != null){
-                listPcentr.add(new Pixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
+                listPcentr.add(new Mypixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
             }
         }
     }
@@ -144,7 +129,7 @@ public class ViewForDrawIn extends View {
         mPath.lineTo(mX, mY);
         //mCanvas.drawPath(mPath, mPaint);
         if (listPcentr !=null){
-            listPcentr.add(new Pixel((int)x,(int)y,mBitmap.getPixel((int)x,(int)y)));
+            listPcentr.add(new Mypixel((int) x, (int) y, mBitmap.getPixel((int) x, (int) y)));
         }
         if (freeHand) {
             pathColorMap.put(mPath, new Paint(mPaint));
@@ -155,9 +140,17 @@ public class ViewForDrawIn extends View {
     }
     public void onUndoPath(){
         if (myPathUndo.size() > 0) {
-            myPathRedo.add(myPathUndo.get(myPathUndo.size() - 1)); // da verificare
+            myPathRedo.add(myPathUndo.get(myPathUndo.size() - 1));
             myPathUndo.remove(myPathUndo.size() - 1);
             invalidate();
+        }
+        if (myPathUndoBack.size() > 0){
+            LinkedList<Mypixel> list = myPathUndoBack.get(myPathUndoBack.size()-1);
+            for (Mypixel p : list){
+                backBitmap.setPixel(p.x,p.y,Color.BLACK);
+            }
+            myPathRedoBack.add(list);
+            myPathUndoBack.remove(list);
         }
     }
     public void onRedoPath(){
@@ -165,6 +158,14 @@ public class ViewForDrawIn extends View {
             myPathUndo.add(myPathRedo.get(myPathRedo.size()-1));
             myPathRedo.remove(myPathRedo.size()-1);
             invalidate();
+        }
+        if (myPathRedoBack.size()>0){
+            LinkedList<Mypixel> list = myPathRedoBack.get(myPathRedoBack.size()-1);
+            for (Mypixel p : list){
+                backBitmap.setPixel(p.x,p.y,Color.RED);
+            }
+            myPathUndoBack.add(list);
+            myPathRedoBack.remove(list);
         }
     }
 
@@ -205,9 +206,13 @@ public class ViewForDrawIn extends View {
                             float stroke = mPaint.getStrokeWidth();
                             mPaint.setStrokeWidth(1.0f);
                             mPath.reset();
-                            floodFill(backBitmap, new Pixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
+                            visitedBackPixel = new LinkedList<>();
+                            floodFill(backBitmap, new Mypixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
                             pathColorMap.put(floodFillPath, new Paint(mPaint));
-                            myPathUndo.add(floodFillPath); // ridisegnare questa path anche nel backBitmap
+                            myPathUndo.add(floodFillPath);
+                            Log.e("Visited pixel", "Visited Pixel tot : " + visitedBackPixel.size());
+                            myPathUndoBack.add(visitedBackPixel);
+                            visitedBackPixel = new LinkedList<>();
                             floodFillPath = new Path();
                             mPaint.setStrokeWidth(stroke);
                             break;
@@ -243,40 +248,35 @@ public class ViewForDrawIn extends View {
         prepareImage.execute();
 
     }
-    private void UndoRedoFull(Bitmap ActBitmap){
-        if (undoRedo == null){
-            undoRedo = new LinkedList<Bitmap>();
-        }
-        undoRedo.add(mBitmap);
-    }
 
-    public void floodFill(Bitmap bitmap, Pixel nestP){
+    public void floodFill(Bitmap bitmap, Mypixel nestP){
         postElaboration = new LinkedList<>();
         postFill = new LinkedList<>();
         long start = System.currentTimeMillis();
         int x1 = nestP.x;
         while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) { //check get width 11 è sbagliato
-            fillY(bitmap,new Pixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
+            fillY(bitmap,new Mypixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
             x1++;
         }
         int x2 = nestP.x-1;
         while (x2 > 1 && bitmap.getPixel(x2,nestP.y) == Color.BLACK){ //check get width 11 è sbagliato
-            fillY(bitmap, new Pixel(x2, nestP.y, bitmap.getPixel(x2, nestP.y)));
+            fillY(bitmap, new Mypixel(x2, nestP.y, bitmap.getPixel(x2, nestP.y)));
             x2--;
         }
-        for (Pixel post:postElaboration){
+        for (Mypixel post:postElaboration){
             bitmap.setPixel(post.x,post.y,Color.RED);
+            post.setVisited(true);
+            visitedBackPixel.add(post);
         }
         LinkedList<LinkedList> listOfBorder = postFill(bitmap);
         if (!listOfBorder.isEmpty()){
             for (LinkedList list : listOfBorder){
                 if (list.size() >= 10){
-                Pixel newNest = (Pixel) list.get(list.size()/2);
+                Mypixel newNest = (Mypixel) list.get(list.size()/2);
                 floodFill(bitmap,newNest);
                 }
             }
         }
-
         long finish = (System.currentTimeMillis()-start);
         Log.e(VFD_LOG,"tempo impiegato: "+finish);
 
@@ -285,25 +285,26 @@ public class ViewForDrawIn extends View {
         invalidate();
     }
     private LinkedList<LinkedList> postFill(Bitmap bitmap){ // todo rivedere questo metodo e velocizzarlo
-        for (Pixel post:postElaboration){
-            if (bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){
-                postFill.add(new Pixel(post.x-1,post.y,Color.BLACK));
+        for (Mypixel post:postElaboration){
+            if (bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){ //02-03 14:51:53.992 3081-3081/com.filippowallandfloorv4.wallandfloorv4 W/System.err: java.lang.IllegalArgumentException: x must be >= 0
+                postFill.add(new Mypixel(post.x-1,post.y,Color.BLACK));
             }
+
             if (bitmap.getPixel(post.x+1,post.y) == Color.BLACK && bitmap.getPixel(post.x-2,post.y) == Color.RED){
-                postFill.add(new Pixel(post.x+1,post.y,Color.BLACK));
+                postFill.add(new Mypixel(post.x+1,post.y,Color.BLACK));
             }
         }// this is ok
         LinkedList<LinkedList>listOfAllBorder = new LinkedList<>();
-        LinkedList<Pixel>singleBorderLine = new LinkedList<>();
-        ListIterator<Pixel> iterator = postFill.listIterator();
+        LinkedList<Mypixel>singleBorderLine = new LinkedList<>();
+        ListIterator<Mypixel> iterator = postFill.listIterator();
         int previusY = 0;
         while (iterator.hasNext()){
-            Pixel p = iterator.next();
+            Mypixel p = iterator.next();
             Log.e(VFD_LOG, "Y: "+p.y);
             if (previusY == 0 || (previusY+1 != p.y && previusY-1 != p.y)){
                 Log.e(VFD_LOG, "previus is null or different");
                 if (!singleBorderLine.isEmpty()){
-                    LinkedList<Pixel> temp = new LinkedList<>();
+                    LinkedList<Mypixel> temp = new LinkedList<>();
                     temp.addAll(singleBorderLine);
                     listOfAllBorder.add(temp);
                     Log.e(VFD_LOG, "creta nuova lista size: "+temp.size());
@@ -321,37 +322,37 @@ public class ViewForDrawIn extends View {
             previusY = p.y;
         }
         if (!singleBorderLine.isEmpty()){
-            LinkedList<Pixel> temp = new LinkedList<>();
+            LinkedList<Mypixel> temp = new LinkedList<>();
             temp.addAll(singleBorderLine);
             listOfAllBorder.add(temp);
             Log.e(VFD_LOG, "creta nuova lista finale size: "+temp.size());
         }
 
         Log.e(VFD_LOG, "border n: " + listOfAllBorder.size());
-        int[] color = {Color.RED,Color.GREEN,Color.BLUE,Color.WHITE};
+        /**int[] color = {Color.RED,Color.GREEN,Color.BLUE,Color.WHITE};
         for (LinkedList p : listOfAllBorder){
             Random random = new Random();
             int x = random.nextInt(3);
-            for (Pixel pix : (LinkedList<Pixel>)p){
+            for (Mypixel pix : (LinkedList<Mypixel>)p){
                 bitmap.setPixel(pix.x,pix.y,Color.BLACK);
             }
-        }
+        }*/
         return listOfAllBorder;
     }
 
-    private boolean fillY(Bitmap bitmap, Pixel nestP){
+    private boolean fillY(Bitmap bitmap, Mypixel nestP){
         int y1 = nestP.y;
-        LinkedList<Pixel> pixelsY1 = new LinkedList<>();
+        LinkedList<Mypixel> pixelsY1 = new LinkedList<>();
         while (y1 < bitmap.getHeight() - 1 && bitmap.getPixel(nestP.x, y1) == Color.BLACK) {
-            Pixel p = new Pixel(nestP.x, y1, bitmap.getPixel(nestP.x, y1));
+            Mypixel p = new Mypixel(nestP.x, y1, bitmap.getPixel(nestP.x, y1));
             p.setVisited(true);
             pixelsY1.add(p);
             y1++;
         }
         int y2 = nestP.y;
-        LinkedList<Pixel> pixelsY2 = new LinkedList<>();
+        LinkedList<Mypixel> pixelsY2 = new LinkedList<>();
         while (y2 > 1 && bitmap.getPixel(nestP.x, y2) == Color.BLACK) {
-            Pixel p = new Pixel(nestP.x, y2, bitmap.getPixel(nestP.x, y2));
+            Mypixel p = new Mypixel(nestP.x, y2, bitmap.getPixel(nestP.x, y2));
             p.setVisited(true);
             pixelsY2.add(p);
             y2--;
@@ -359,7 +360,6 @@ public class ViewForDrawIn extends View {
         Path path = new Path();
         path.moveTo(pixelsY2.getLast().x, pixelsY2.getLast().y);
         path.lineTo(pixelsY1.getLast().x, pixelsY1.getLast().y);
-        //mCanvas.drawPath(path, mPaint);
         floodFillPath.addPath(path);
 
         postElaboration.addAll(pixelsY1);
@@ -388,8 +388,6 @@ public class ViewForDrawIn extends View {
 
     public void setmBitmap(Bitmap mBitmap) {
         this.mBitmap = mBitmap;
-        //onSizeChanged(mBitmap.getWidth(),mBitmap.getHeight(),mBitmap.getWidth(),mBitmap.getHeight());
-        //Log.e(VFD_LOG,"on size changed recall");
     }
 
     public void setFreeHand(boolean freeHand) {

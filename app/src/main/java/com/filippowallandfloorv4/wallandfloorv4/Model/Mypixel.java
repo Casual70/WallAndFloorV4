@@ -5,13 +5,13 @@ import android.graphics.Color;
 /**
  * Created by Filippo on 17/12/2015.
  */
-public class Pixel {
+public class Mypixel {
     public int x;
     public int y;
     private boolean visited = false;
     private int color;
 
-    public Pixel(int x, int y, int color) {
+    public Mypixel(int x, int y, int color) {
         this.x = x;
         this.y = y;
         this.color = color;
