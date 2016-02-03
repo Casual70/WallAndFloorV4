@@ -85,6 +85,7 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         view.setBackBitmap(bitmap);
+        view.setBackCanvas(new Canvas(bitmap));
         view.setmBitmap(originalBitmap);
         view.invalidate();
         super.onPostExecute(bitmap);

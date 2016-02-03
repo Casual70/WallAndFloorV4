@@ -207,7 +207,7 @@ public class ViewForDrawIn extends View {
                             mPath.reset();
                             floodFill(backBitmap, new Pixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
                             pathColorMap.put(floodFillPath, new Paint(mPaint));
-                            myPathUndo.add(floodFillPath);
+                            myPathUndo.add(floodFillPath); // ridisegnare questa path anche nel backBitmap
                             floodFillPath = new Path();
                             mPaint.setStrokeWidth(stroke);
                             break;
