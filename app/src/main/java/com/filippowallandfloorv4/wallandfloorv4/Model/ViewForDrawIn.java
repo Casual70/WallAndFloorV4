@@ -286,11 +286,11 @@ public class ViewForDrawIn extends View {
     }
     private LinkedList<LinkedList> postFill(Bitmap bitmap){ // todo rivedere questo metodo e velocizzarlo
         for (Mypixel post:postElaboration){
-            if (bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){ //02-03 14:51:53.992 3081-3081/com.filippowallandfloorv4.wallandfloorv4 W/System.err: java.lang.IllegalArgumentException: x must be >= 0
+            if (post.x!=0 && bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){ //02-03 14:51:53.992 3081-3081/com.filippowallandfloorv4.wallandfloorv4 W/System.err: java.lang.IllegalArgumentException: x must be >= 0
                 postFill.add(new Mypixel(post.x-1,post.y,Color.BLACK));
             }
 
-            if (bitmap.getPixel(post.x+1,post.y) == Color.BLACK && bitmap.getPixel(post.x-2,post.y) == Color.RED){
+            if (post.x != bitmap.getHeight() && bitmap.getPixel(post.x+1,post.y) == Color.BLACK && bitmap.getPixel(post.x-2,post.y) == Color.RED){
                 postFill.add(new Mypixel(post.x+1,post.y,Color.BLACK));
             }
         }// this is ok
