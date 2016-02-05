@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
@@ -54,6 +55,7 @@ public class ViewForDrawIn extends View {
     private boolean floodFill;
     private List<Mypixel> listPcentr;
     private WafImage wafImage;
+    private ScaleGestureDetector SGD;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -67,6 +69,7 @@ public class ViewForDrawIn extends View {
         mPaint = new Paint();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         stroke = mPaint.getStrokeWidth();
+        SGD = new ScaleGestureDetector();
         Log.e(VFD_LOG, "Vdf inizialized");
     }
 
