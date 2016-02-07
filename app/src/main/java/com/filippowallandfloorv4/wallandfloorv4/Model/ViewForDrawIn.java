@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -52,10 +53,12 @@ public class ViewForDrawIn extends View {
     private LinkedList<Mypixel>visitedBackPixel;
     private boolean freeHand;
     private float mX,mY;
+    private int mActivePointerId = -1;
     private boolean floodFill;
     private List<Mypixel> listPcentr;
     private WafImage wafImage;
     private ScaleGestureDetector SGD;
+    private float mScaleFactor = 1.0f;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -69,7 +72,7 @@ public class ViewForDrawIn extends View {
         mPaint = new Paint();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         stroke = mPaint.getStrokeWidth();
-        SGD = new ScaleGestureDetector();
+        SGD = new ScaleGestureDetector(context,new ScaleListener());
         Log.e(VFD_LOG, "Vdf inizialized");
     }
 
@@ -96,6 +99,9 @@ public class ViewForDrawIn extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.save();
+        //canvas.translate(mX,mY);
+        canvas.scale(mScaleFactor, mScaleFactor);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         for (Path p : myPathUndo){
             Paint paint = pathColorMap.get(p);
@@ -103,6 +109,7 @@ public class ViewForDrawIn extends View {
             Log.e("ondraw Log", ""+ myPathUndo.size());
         }
         canvas.drawPath(mPath, mPaint);
+        canvas.restore();
         Log.e(VFD_LOG, "draw");
     }
 
@@ -130,7 +137,6 @@ public class ViewForDrawIn extends View {
     }
     private void touch_up(float x, float y){
         mPath.lineTo(mX, mY);
-        //mCanvas.drawPath(mPath, mPaint);
         if (listPcentr !=null){
             listPcentr.add(new Mypixel((int) x, (int) y, mBitmap.getPixel((int) x, (int) y)));
         }
@@ -177,60 +183,69 @@ public class ViewForDrawIn extends View {
     public boolean onTouchEvent(MotionEvent event) throws IllegalArgumentException{
         super.onTouchEvent(event);
         float y;
-        y = event.getY();
+        mY = event.getY();
         float x;
-        x = event.getX();
+        mX = event.getX();
         Log.e("on Touch choise", "freeHand :" + freeHand);
         Log.e("on Touch choise", "floodFill :" + floodFill);
         try {
-            if (freeHand){
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        touch_start(x, y);
-                        invalidate();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        touch_move(x, y);
-                        invalidate();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        touch_up(x, y);
-                        //colorLog(x, y); // sarà da togliere alla fine del debug
-                        invalidate();
-                        break;
-                }
-            }
-            if (floodFill){
-                if (backBitmap != null){
+            if (event.getPointerCount()>1){   // picht zoom
+                Log.e("Puntatori attivi", "Puntatori attivi : " + event.getPointerCount());
+                SGD.onTouchEvent(event);
+
+            }else{
+                if (freeHand){
                     switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+
+                            touch_start(mX, mY);
+                            invalidate();
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            touch_move(mX, mY);
+                            invalidate();
+                            break;
                         case MotionEvent.ACTION_UP:
-                            touch_up(x, y);
-                            colorLog(x, y);
-                            float stroke = mPaint.getStrokeWidth();
-                            mPaint.setStrokeWidth(1.0f);
-                            mPath.reset();
-                            visitedBackPixel = new LinkedList<>();
-                            floodFill(backBitmap, new Mypixel((int) x, (int) y, backBitmap.getPixel((int) x, (int) y)));
-                            pathColorMap.put(floodFillPath, new Paint(mPaint));
-                            myPathUndo.add(floodFillPath);
-                            Log.e("Visited pixel", "Visited Pixel tot : " + visitedBackPixel.size());
-                            myPathUndoBack.add(visitedBackPixel);
-                            visitedBackPixel = new LinkedList<>();
-                            floodFillPath = new Path();
-                            mPaint.setStrokeWidth(stroke);
+                            touch_up(mX, mY);
+                            //colorLog(x, y); // sarà da togliere alla fine del debug
+                            invalidate();
                             break;
                     }
                 }
-            }
-            if (!floodFill && !freeHand){
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_UP:
-                        colorLog(x,y);
+                if (floodFill){
+                    if (backBitmap != null){
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_UP:
+                                touch_up(mX, mY);
+                                colorLog(mX, mY);
+                                float stroke = mPaint.getStrokeWidth();
+                                mPaint.setStrokeWidth(1.0f);
+                                mPath.reset();
+                                visitedBackPixel = new LinkedList<>();
+                                floodFill(backBitmap, new Mypixel((int) mX, (int) mY, backBitmap.getPixel((int) mX, (int) mY)));
+                                pathColorMap.put(floodFillPath, new Paint(mPaint));
+                                myPathUndo.add(floodFillPath);
+                                Log.e("Visited pixel", "Visited Pixel tot : " + visitedBackPixel.size());
+                                myPathUndoBack.add(visitedBackPixel);
+                                visitedBackPixel = new LinkedList<>();
+                                floodFillPath = new Path();
+                                mPaint.setStrokeWidth(stroke);
+                                break;
+                        }
+                    }
+                }
+                if (!floodFill && !freeHand){
+                    switch (event.getAction()){
+                        case MotionEvent.ACTION_UP:
+                            colorLog(mX,mY);
+                    }
                 }
             }
+
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
+
         return true;
     }
 
@@ -369,6 +384,20 @@ public class ViewForDrawIn extends View {
         postElaboration.addAll(pixelsY2);
         Log.e(VFD_LOG,"postElaboration size: "+postElaboration.size());
         return true;
+    }
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            mScaleFactor *= detector.getScaleFactor();
+            mScaleFactor = Math.max(1.0f, Math.min(mScaleFactor, 5.0f));
+
+            float detectorFocusX = detector.getFocusX();
+            float detectorFocusY = detector.getFocusY();
+
+            invalidate();
+            return true;
+        }
+
     }
 
     public Paint getmPaint() {
