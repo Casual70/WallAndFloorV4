@@ -186,66 +186,21 @@ public class ViewForDrawIn extends View {
         super.onTouchEvent(event);
         mY = event.getY();
         mX = event.getX();
+        float zoomX = event.getX();
+        float zoomY = event.getY();
         Log.e("on Touch choise", "freeHand :" + freeHand);
         Log.e("on Touch choise", "floodFill :" + floodFill);
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("freehand", freeHand);
-        bundle.putBoolean("floodfill", floodFill);
         try {
             if (event.getPointerCount()>1){   // picht zoom
                 Log.e("Puntatori attivi", "Puntatori attivi : " + event.getPointerCount());
                 SGD.onTouchEvent(event);
                 freeHand = false;
                 floodFill = false;
-                // todo implementare qui lo swich che prenda i due puntatori
-                switch (event.getAction()&MotionEvent.ACTION_MASK){
-                    case MotionEvent.ACTION_DOWN:{
-                        final float x = event.getX();
-                        final float y = event.getY();
-                        mLastTouchX = x;
-                        mLastTouchY = y;
-                        mActivePointerId = event.getPointerId(0);
-                        break;
-                    }
-                    case MotionEvent.ACTION_MOVE:{
-                        final int pointerIndex = event.findPointerIndex(mActivePointerId);
-                        final float x = event.getX(pointerIndex);
-                        final float y = event.getY(pointerIndex);
-                        if (!SGD.isInProgress()){
-                            final float dx = x - mLastTouchX;
-                            final float dy = y - mLastTouchY;
-                            mX += dx;
-                            mY += dy;
-                            invalidate();
-                        }
-                        mLastTouchX = x;
-                        mLastTouchY = y;
-                        break;
-                    }
-                    case MotionEvent.ACTION_UP: {
-                        mActivePointerId = -1;
-                        break;
-                    }
-
-                    case MotionEvent.ACTION_CANCEL: {
-                        mActivePointerId = -1;
-                        break;
-                    }
-                    case MotionEvent.ACTION_POINTER_UP: {
-                        final int pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK)
-                                >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-                        final int pointerId = event.getPointerId(pointerIndex);
-                        if (pointerId == mActivePointerId) {
-                            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-                            mLastTouchX = event.getX(newPointerIndex);
-                            mLastTouchY = event.getY(newPointerIndex);
-                            mActivePointerId = event.getPointerId(newPointerIndex);
-                        }
-                        break;
-                    }
-                }
-
+                editorFragment.freeHandToggleB.setChecked(freeHand);
+                editorFragment.oneLineToggleB.setChecked(floodFill);
+                // todo implementare qui lo switch che prenda i due puntatori
             }else{
+                Log.e("Puntatori attivi", "Puntatori attivi : " + event.getPointerCount());
                 if (freeHand){
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
@@ -296,13 +251,9 @@ public class ViewForDrawIn extends View {
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
-        freeHand = bundle.getBoolean("freehand");
-        floodFill = bundle.getBoolean("floodfill");
-        editorFragment.freeHandToggleB.setChecked(freeHand);
-        editorFragment.oneLineToggleB.setChecked(floodFill);
-
         return true;
     }
+
 
     public void colorLog(float x, float y){
         this.setDrawingCacheEnabled(true);

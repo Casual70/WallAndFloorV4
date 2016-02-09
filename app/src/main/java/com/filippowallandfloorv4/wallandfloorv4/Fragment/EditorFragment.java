@@ -90,7 +90,12 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        ((RadioGroup)v.getParent()).check(v.getId());
+        boolean check = ((RadioGroup)v.getParent()).getCheckedRadioButtonId() == v.getId();
+        if (check){
+            ((RadioGroup)v.getParent()).clearCheck();
+        }else{
+            ((RadioGroup)v.getParent()).check(v.getId());
+        }
     }
 
     @Override
@@ -167,6 +172,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         toggleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                Log.e("call","listenercall");
                 for (int i = 0; i < group.getChildCount(); i++) {
                     ToggleButton toggleButton = (ToggleButton) group.getChildAt(i);
                     toggleButton.setChecked(toggleButton.getId() == checkedId);
