@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -187,14 +188,15 @@ public class ViewForDrawIn extends View {
         mX = event.getX();
         Log.e("on Touch choise", "freeHand :" + freeHand);
         Log.e("on Touch choise", "floodFill :" + floodFill);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("freehand", freeHand);
+        bundle.putBoolean("floodfill", floodFill);
         try {
             if (event.getPointerCount()>1){   // picht zoom
                 Log.e("Puntatori attivi", "Puntatori attivi : " + event.getPointerCount());
                 SGD.onTouchEvent(event);
                 freeHand = false;
                 floodFill = false;
-                editorFragment.freeHandToggleB.setChecked(false);
-                editorFragment.oneLineToggleB.setChecked(false);
                 // todo implementare qui lo swich che prenda i due puntatori
                 switch (event.getAction()&MotionEvent.ACTION_MASK){
                     case MotionEvent.ACTION_DOWN:{
@@ -241,15 +243,13 @@ public class ViewForDrawIn extends View {
                         }
                         break;
                     }
-
                 }
 
             }else{
                 if (freeHand){
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-
-                            touch_start(mX, mY);
+                            touch_start(event.getX(), event.getY());
                             invalidate();
                             break;
                         case MotionEvent.ACTION_MOVE:
@@ -296,6 +296,10 @@ public class ViewForDrawIn extends View {
         }catch (IllegalArgumentException e){
             e.printStackTrace();
         }
+        freeHand = bundle.getBoolean("freehand");
+        floodFill = bundle.getBoolean("floodfill");
+        editorFragment.freeHandToggleB.setChecked(freeHand);
+        editorFragment.oneLineToggleB.setChecked(floodFill);
 
         return true;
     }
