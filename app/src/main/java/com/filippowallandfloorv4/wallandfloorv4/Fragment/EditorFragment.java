@@ -71,6 +71,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         vfd.setmBitmap(mBitmap);
         vfd.setmPaint(mPaint);
         vfd.setWafImage(wafImage);
+        vfd.setEditorFragment(this);
 
         textureIB = (ImageButton)view.findViewById(R.id.textureImageButton);
         saveIB = (ImageButton)view.findViewById(R.id.saveimageButton);
@@ -171,6 +172,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
                     toggleButton.setChecked(toggleButton.getId() == checkedId);
                     vfd.setFreeHand(freeHandToggleB.isChecked());
                     vfd.setFloodFill(oneLineToggleB.isChecked());
+                    Log.e(LOG_EDITFRAG,"freehand: "+freeHandToggleB.isChecked() + " -- floodfill: "+oneLineToggleB.isChecked());
                 }
             }
         });

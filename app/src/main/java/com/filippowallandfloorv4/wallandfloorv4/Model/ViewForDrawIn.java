@@ -4,9 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -16,6 +13,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
+import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
 
 import java.util.ArrayList;
@@ -24,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Random;
 
 
 public class ViewForDrawIn extends View {
@@ -53,12 +50,17 @@ public class ViewForDrawIn extends View {
     private LinkedList<Mypixel>visitedBackPixel;
     private boolean freeHand;
     private float mX,mY;
+    private float mLastTouchX;
+    private float mLastTouchY;
+    private float scalePointX;
+    private float scalePointY;
     private int mActivePointerId = -1;
     private boolean floodFill;
     private List<Mypixel> listPcentr;
     private WafImage wafImage;
     private ScaleGestureDetector SGD;
     private float mScaleFactor = 1.0f;
+    private EditorFragment editorFragment;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -100,8 +102,7 @@ public class ViewForDrawIn extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.save();
-        //canvas.translate(mX,mY);
-        canvas.scale(mScaleFactor, mScaleFactor);
+        canvas.scale(mScaleFactor, mScaleFactor, scalePointX, scalePointY);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         for (Path p : myPathUndo){
             Paint paint = pathColorMap.get(p);
@@ -182,9 +183,7 @@ public class ViewForDrawIn extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) throws IllegalArgumentException{
         super.onTouchEvent(event);
-        float y;
         mY = event.getY();
-        float x;
         mX = event.getX();
         Log.e("on Touch choise", "freeHand :" + freeHand);
         Log.e("on Touch choise", "floodFill :" + floodFill);
@@ -192,6 +191,58 @@ public class ViewForDrawIn extends View {
             if (event.getPointerCount()>1){   // picht zoom
                 Log.e("Puntatori attivi", "Puntatori attivi : " + event.getPointerCount());
                 SGD.onTouchEvent(event);
+                freeHand = false;
+                floodFill = false;
+                editorFragment.freeHandToggleB.setChecked(false);
+                editorFragment.oneLineToggleB.setChecked(false);
+                // todo implementare qui lo swich che prenda i due puntatori
+                switch (event.getAction()&MotionEvent.ACTION_MASK){
+                    case MotionEvent.ACTION_DOWN:{
+                        final float x = event.getX();
+                        final float y = event.getY();
+                        mLastTouchX = x;
+                        mLastTouchY = y;
+                        mActivePointerId = event.getPointerId(0);
+                        break;
+                    }
+                    case MotionEvent.ACTION_MOVE:{
+                        final int pointerIndex = event.findPointerIndex(mActivePointerId);
+                        final float x = event.getX(pointerIndex);
+                        final float y = event.getY(pointerIndex);
+                        if (!SGD.isInProgress()){
+                            final float dx = x - mLastTouchX;
+                            final float dy = y - mLastTouchY;
+                            mX += dx;
+                            mY += dy;
+                            invalidate();
+                        }
+                        mLastTouchX = x;
+                        mLastTouchY = y;
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        mActivePointerId = -1;
+                        break;
+                    }
+
+                    case MotionEvent.ACTION_CANCEL: {
+                        mActivePointerId = -1;
+                        break;
+                    }
+                    case MotionEvent.ACTION_POINTER_UP: {
+                        final int pointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                                >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                        final int pointerId = event.getPointerId(pointerIndex);
+                        if (pointerId == mActivePointerId) {
+                            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+                            mLastTouchX = event.getX(newPointerIndex);
+                            mLastTouchY = event.getY(newPointerIndex);
+                            mActivePointerId = event.getPointerId(newPointerIndex);
+                        }
+                        break;
+                    }
+
+                }
 
             }else{
                 if (freeHand){
@@ -260,6 +311,7 @@ public class ViewForDrawIn extends View {
         G = Color.green(pxl);
         B = Color.blue(pxl);
         Log.e(VFD_LOG, "Alpha: " + A + " Red: " + R + " Green: " + G + " Blue: " + B);
+        Log.e(VFD_LOG, "X: " + x + " Y: " + y);
     }
     public void findBord(){
         PrepareImage prepareImage = new PrepareImage(mBitmap,this);
@@ -391,8 +443,10 @@ public class ViewForDrawIn extends View {
             mScaleFactor *= detector.getScaleFactor();
             mScaleFactor = Math.max(1.0f, Math.min(mScaleFactor, 5.0f));
 
-            float detectorFocusX = detector.getFocusX();
-            float detectorFocusY = detector.getFocusY();
+            scalePointX = detector.getFocusX();
+            scalePointY = detector.getFocusY();
+
+            Log.e("detector","Detector x : "+scalePointX + " y : "+scalePointY);
 
             invalidate();
             return true;
@@ -464,6 +518,10 @@ public class ViewForDrawIn extends View {
 
     public void setWafImage(WafImage wafImage) {
         this.wafImage = wafImage;
+    }
+
+    public void setEditorFragment(EditorFragment editorFragment) {
+        this.editorFragment = editorFragment;
     }
 
     public void finallyDraw() {
