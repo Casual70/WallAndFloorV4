@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Bundle;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -53,6 +53,8 @@ public class ViewForDrawIn extends View {
     private float mX,mY;
     private float mLastTouchX;
     private float mLastTouchY;
+    private int canvasBoundX;
+    private int canvasBoundY;
     private float scalePointX;
     private float scalePointY;
     private int mActivePointerId = -1;
@@ -104,6 +106,9 @@ public class ViewForDrawIn extends View {
         super.onDraw(canvas);
         canvas.save();
         canvas.scale(mScaleFactor, mScaleFactor, scalePointX, scalePointY);
+        Rect canvasBound = canvas.getClipBounds();
+        canvasBoundX = canvasBound.left;
+        canvasBoundY = canvasBound.top;
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         for (Path p : myPathUndo){
             Paint paint = pathColorMap.get(p);
@@ -184,8 +189,8 @@ public class ViewForDrawIn extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) throws IllegalArgumentException{
         super.onTouchEvent(event);
-        mY = event.getY();
-        mX = event.getX();
+        mY = event.getY()/mScaleFactor+canvasBoundY;
+        mX = event.getX()/mScaleFactor+canvasBoundX;
         float zoomX = event.getX();
         float zoomY = event.getY();
         Log.e("on Touch choise", "freeHand :" + freeHand);
@@ -198,13 +203,12 @@ public class ViewForDrawIn extends View {
                 floodFill = false;
                 editorFragment.freeHandToggleB.setChecked(freeHand);
                 editorFragment.oneLineToggleB.setChecked(floodFill);
-                // todo implementare qui lo switch che prenda i due puntatori
             }else{
                 Log.e("Puntatori attivi", "Puntatori attivi : " + event.getPointerCount());
                 if (freeHand){
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            touch_start(event.getX(), event.getY());
+                            touch_start(mX, mY);
                             invalidate();
                             break;
                         case MotionEvent.ACTION_MOVE:
@@ -309,9 +313,9 @@ public class ViewForDrawIn extends View {
 
         invalidate();
     }
-    private LinkedList<LinkedList> postFill(Bitmap bitmap){ // todo rivedere questo metodo e velocizzarlo
+    private LinkedList<LinkedList> postFill(Bitmap bitmap){
         for (Mypixel post:postElaboration){
-            if (post.x!=0 && bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){ //02-03 14:51:53.992 3081-3081/com.filippowallandfloorv4.wallandfloorv4 W/System.err: java.lang.IllegalArgumentException: x must be >= 0
+            if (post.x!=0 && bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){
                 postFill.add(new Mypixel(post.x-1,post.y,Color.BLACK));
             }
 
