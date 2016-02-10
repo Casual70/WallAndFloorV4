@@ -12,10 +12,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Toast;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
+
+import org.opencv.core.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +67,7 @@ public class ViewForDrawIn extends View {
     private ScaleGestureDetector SGD;
     private float mScaleFactor = 1.0f;
     private EditorFragment editorFragment;
+    private ArrayList<Point>corners;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -78,6 +82,7 @@ public class ViewForDrawIn extends View {
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         stroke = mPaint.getStrokeWidth();
         SGD = new ScaleGestureDetector(context,new ScaleListener());
+        corners = new ArrayList<>();
         Log.e(VFD_LOG, "Vdf inizialized");
     }
 
@@ -223,7 +228,7 @@ public class ViewForDrawIn extends View {
                     }
                 }
                 if (floodFill){
-                    if (backBitmap != null){
+                    if (backBitmap != null && corners.size() == 4){
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_UP:
                                 touch_up(mX, mY);
@@ -240,6 +245,14 @@ public class ViewForDrawIn extends View {
                                 visitedBackPixel = new LinkedList<>();
                                 floodFillPath = new Path();
                                 mPaint.setStrokeWidth(stroke);
+                                corners.clear();
+                                break;
+                        }
+                    }else if(backBitmap!= null && corners.size()<4){
+                        // implementare metodo accumulo corner
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+                                addCheck4Corners(mX,mY);
                                 break;
                         }
                     }
@@ -256,6 +269,18 @@ public class ViewForDrawIn extends View {
             e.printStackTrace();
         }
         return true;
+    }
+
+    private void addCheck4Corners(float x, float y){
+        if (corners.size()<4){
+            Point corner = new Point((double)x,(double)y);
+            corners.add(corner);
+            mCanvas.drawCircle(x,y,5,mPaint);
+            invalidate();
+            Toast.makeText(context,"Aggiunto Corner: X: "+corner.x+" Y: "+corner.y,Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context,"Numero Corner "+corners.size(),Toast.LENGTH_SHORT).show();
+        }
     }
 
 
