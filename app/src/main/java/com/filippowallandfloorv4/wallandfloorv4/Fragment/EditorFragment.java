@@ -264,12 +264,8 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Integer item = (Integer) parent.getItemAtPosition(position);
-                Paint paintTexture = vfd.getmPaint();
                 Bitmap textureBit = BitmapFactory.decodeResource(getResources(),item);
-                BitmapShader bitmapShader = new BitmapShader(textureBit, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-                paintTexture.setShader(bitmapShader);
-                paintTexture.setAlpha(230); // arbitrary parameter for preserve edge
-                vfd.setmPaint(paintTexture);
+                vfd.setmTextureBitmap(textureBit);
                 dialog.dismiss();
             }
         });

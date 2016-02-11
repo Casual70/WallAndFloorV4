@@ -2,17 +2,11 @@ package com.filippowallandfloorv4.wallandfloorv4;
 
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Camera;
-import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
 
 import com.filippowallandfloorv4.wallandfloorv4.SqlDb.ImageDb;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -2,11 +2,13 @@ package com.filippowallandfloorv4.wallandfloorv4.Model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -17,8 +19,13 @@ import android.widget.Toast;
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
+import com.filippowallandfloorv4.wallandfloorv4.Service.ProspectTexture;
 
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +75,7 @@ public class ViewForDrawIn extends View {
     private float mScaleFactor = 1.0f;
     private EditorFragment editorFragment;
     private ArrayList<Point>corners;
+    private Bitmap mTextureBitmap;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -236,6 +244,11 @@ public class ViewForDrawIn extends View {
                                 float stroke = mPaint.getStrokeWidth();
                                 mPaint.setStrokeWidth(1.0f);
                                 mPath.reset();
+                                if (mTextureBitmap != null){
+                                    // sto utilizzando un texture settato in EditorFragment e dichiarato null alla chiusura del drawableLayout in Editor Activity
+                                    ProspectTexture prospectTexture = new ProspectTexture(mTextureBitmap,this,corners);
+                                    prospectTexture.execute();
+                                }
                                 visitedBackPixel = new LinkedList<>();
                                 floodFill(backBitmap, new Mypixel((int) mX, (int) mY, backBitmap.getPixel((int) mX, (int) mY)));
                                 pathColorMap.put(floodFillPath, new Paint(mPaint));
@@ -506,6 +519,14 @@ public class ViewForDrawIn extends View {
 
     public void setEditorFragment(EditorFragment editorFragment) {
         this.editorFragment = editorFragment;
+    }
+
+    public Bitmap getmTextureBitmap() {
+        return mTextureBitmap;
+    }
+
+    public void setmTextureBitmap(Bitmap mTextureBitmap) {
+        this.mTextureBitmap = mTextureBitmap;
     }
 
     public void finallyDraw() {

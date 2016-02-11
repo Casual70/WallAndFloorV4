@@ -241,6 +241,7 @@ public class EditorActivity extends AppCompatActivity {
                         vfdPaint.setColor(color);
                         if (vfdPaint.getShader() != null) {
                             vfdPaint.setShader(null);
+                            fragment.getVfd().setmTextureBitmap(null);
                         }
                         fragment.getVfd().setmPaint(vfdPaint);
                     }
