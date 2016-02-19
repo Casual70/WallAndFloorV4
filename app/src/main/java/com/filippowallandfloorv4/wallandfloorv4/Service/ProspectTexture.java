@@ -36,9 +36,9 @@ public class ProspectTexture extends AsyncTask<Bitmap,Void,Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Bitmap... params) {
-        Bitmap returnBit = Bitmap.createBitmap(params[0]);
+        Bitmap returnBit = Bitmap.createBitmap(plateBitmap);
         Mat originalTexture = new Mat();
-        Utils.bitmapToMat(params[0],originalTexture);
+        Utils.bitmapToMat(plateBitmap,originalTexture);
         Mat correctTexture = new Mat(originalTexture.rows(),originalTexture.cols(),originalTexture.type());
         ArrayList<Point> originalCorner = new ArrayList<>();
         Point one = new Point(0,0);
@@ -48,7 +48,7 @@ public class ProspectTexture extends AsyncTask<Bitmap,Void,Bitmap> {
         originalCorner.add(one);originalCorner.add(two);originalCorner.add(tree);originalCorner.add(four);
         Mat originalCornersMat = Converters.vector_Point2f_to_Mat(originalCorner);
         Mat correctCornerMat = Converters.vector_Point2f_to_Mat(corners);
-        Mat trasformation = Imgproc.getPerspectiveTransform(correctCornerMat,originalCornersMat); // vedere se invertire
+        Mat trasformation = Imgproc.getPerspectiveTransform(originalCornersMat,correctCornerMat); // vedere se invertire
         Imgproc.warpPerspective(originalTexture, correctTexture, trasformation, correctTexture.size());
         Utils.matToBitmap(correctTexture, returnBit);
         return returnBit;

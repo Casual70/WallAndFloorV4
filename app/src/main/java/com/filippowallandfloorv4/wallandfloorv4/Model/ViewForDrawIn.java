@@ -60,6 +60,7 @@ public class ViewForDrawIn extends View {
     private LinkedList<Mypixel>postFill;
     private LinkedList<Mypixel>visitedBackPixel;
     private boolean freeHand;
+    private List<Point>prospectPoitList;
     private float mX,mY;
     private float mLastTouchX;
     private float mLastTouchY;
@@ -74,7 +75,6 @@ public class ViewForDrawIn extends View {
     private ScaleGestureDetector SGD;
     private float mScaleFactor = 1.0f;
     private EditorFragment editorFragment;
-    private ArrayList<Point>corners;
     private Bitmap mTextureBitmap;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
@@ -90,7 +90,6 @@ public class ViewForDrawIn extends View {
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         stroke = mPaint.getStrokeWidth();
         SGD = new ScaleGestureDetector(context,new ScaleListener());
-        corners = new ArrayList<>();
         Log.e(VFD_LOG, "Vdf inizialized");
     }
 
@@ -167,6 +166,17 @@ public class ViewForDrawIn extends View {
             mPath = new Path();
         }
     }
+    public List<Point> load4Point(float x, float y){
+        Point point = new Point(x,y);
+        if (prospectPoitList == null){
+            prospectPoitList = new ArrayList<>();
+        }
+        if (prospectPoitList.size()<4){
+            prospectPoitList.add(point);
+            mCanvas.drawCircle((float) point.x, (float) point.y, 5, mPaint);
+        }
+        return prospectPoitList;
+    }
     public void onUndoPath(){
         if (myPathUndo.size() > 0) {
             myPathRedo.add(myPathUndo.get(myPathUndo.size() - 1));
@@ -197,6 +207,7 @@ public class ViewForDrawIn extends View {
             myPathRedoBack.remove(list);
         }
     }
+
 
 
     @Override
@@ -236,7 +247,7 @@ public class ViewForDrawIn extends View {
                     }
                 }
                 if (floodFill){
-                    if (backBitmap != null && corners.size() == 4){
+                    if (backBitmap != null ){
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_UP:
                                 touch_up(mX, mY);
@@ -244,10 +255,25 @@ public class ViewForDrawIn extends View {
                                 float stroke = mPaint.getStrokeWidth();
                                 mPaint.setStrokeWidth(1.0f);
                                 mPath.reset();
-                                if (mTextureBitmap != null){
-                                    // sto utilizzando un texture settato in EditorFragment e dichiarato null alla chiusura del drawableLayout in Editor Activity
-                                    ProspectTexture prospectTexture = new ProspectTexture(mTextureBitmap,this,corners);
-                                    prospectTexture.execute();
+                                if (prospectPoitList == null || prospectPoitList.size()<4){
+                                    prospectPoitList = load4Point(mX,mY);
+                                    String listPoint = "";
+                                    for(int index = 0;index<prospectPoitList.size();index++){
+                                        listPoint += ("Punto "+index+" X: "+prospectPoitList.get(index).x + " Y: "+prospectPoitList.get(index).y+"\n");
+                                    }
+                                    Log.e("ProspectListSize"," "+prospectPoitList.size());
+                                    Toast.makeText(context,listPoint,Toast.LENGTH_SHORT).show();
+                                    return true;
+                                }
+                                //todo il punto è
+                                //todo prosctPointList è caricata con 4 punti
+                                //todo prospettivizzare il Texture e applicarlo come shader
+                                //todo nel Wrap ricordarsi di ottenere un bitmap leggermente più grande
+                                //todo in modo che questo rimanga quadrato
+                                //todo altrimenti cercare di scalare il bitmap in modo che non avvenga il REPEAT nello shader
+                                if (mPaint.getShader() == null){
+                                    Toast.makeText(context,"Shader == Null",Toast.LENGTH_SHORT).show();
+                                    return true;
                                 }
                                 visitedBackPixel = new LinkedList<>();
                                 floodFill(backBitmap, new Mypixel((int) mX, (int) mY, backBitmap.getPixel((int) mX, (int) mY)));
@@ -258,14 +284,6 @@ public class ViewForDrawIn extends View {
                                 visitedBackPixel = new LinkedList<>();
                                 floodFillPath = new Path();
                                 mPaint.setStrokeWidth(stroke);
-                                corners.clear();
-                                break;
-                        }
-                    }else if(backBitmap!= null && corners.size()<4){
-                        // implementare metodo accumulo corner
-                        switch (event.getAction()) {
-                            case MotionEvent.ACTION_DOWN:
-                                addCheck4Corners(mX,mY);
                                 break;
                         }
                     }
@@ -283,19 +301,6 @@ public class ViewForDrawIn extends View {
         }
         return true;
     }
-
-    private void addCheck4Corners(float x, float y){
-        if (corners.size()<4){
-            Point corner = new Point((double)x,(double)y);
-            corners.add(corner);
-            mCanvas.drawCircle(x,y,5,mPaint);
-            invalidate();
-            Toast.makeText(context,"Aggiunto Corner: X: "+corner.x+" Y: "+corner.y,Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(context,"Numero Corner "+corners.size(),Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
     public void colorLog(float x, float y){
         this.setDrawingCacheEnabled(true);
@@ -322,7 +327,7 @@ public class ViewForDrawIn extends View {
         long start = System.currentTimeMillis();
         int x1 = nestP.x;
         while (x1< bitmap.getWidth()-1 && bitmap.getPixel(x1, nestP.y) == Color.BLACK) { //check get width 11 è sbagliato
-            fillY(bitmap,new Mypixel(x1,nestP.y,bitmap.getPixel(x1, nestP.y)));
+            fillY(bitmap, new Mypixel(x1, nestP.y, bitmap.getPixel(x1, nestP.y)));
             x1++;
         }
         int x2 = nestP.x-1;
@@ -345,7 +350,7 @@ public class ViewForDrawIn extends View {
             }
         }
         long finish = (System.currentTimeMillis()-start);
-        Log.e(VFD_LOG,"tempo impiegato: "+finish);
+        Log.e(VFD_LOG, "tempo impiegato: " + finish);
 
         //mBitmap = bitmap;
 

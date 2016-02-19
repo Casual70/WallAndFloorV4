@@ -37,6 +37,10 @@ import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
 import com.filippowallandfloorv4.wallandfloorv4.Model.WafImage;
 import com.filippowallandfloorv4.wallandfloorv4.R;
 
+import org.opencv.core.Point;
+
+import java.util.List;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -227,7 +231,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         }
     }
     private void dialogTexture(){
-        Context context = getActivity();
+        final Context context = getActivity();
         final Dialog dialog = new Dialog(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_texture,null);
         final GridView gridView = (GridView) view.findViewById(R.id.gridView);
@@ -263,9 +267,16 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Integer item = (Integer) parent.getItemAtPosition(position);
+                Integer item = adapterDef.getItem(position);
                 Bitmap textureBit = BitmapFactory.decodeResource(getResources(),item);
-                vfd.setmTextureBitmap(textureBit);
+                if (textureBit == null){
+                    Toast.makeText(context,"decode Resorce Fail",Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    return;
+                }
+                BitmapShader shader = new BitmapShader(textureBit, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+                vfd.getmPaint().setShader(shader);
+                vfd.getmPaint().setAlpha(250);
                 dialog.dismiss();
             }
         });
