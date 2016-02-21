@@ -255,6 +255,16 @@ public class ViewForDrawIn extends View {
                                 float stroke = mPaint.getStrokeWidth();
                                 mPaint.setStrokeWidth(1.0f);
                                 mPath.reset();
+                                //todo il punto è
+                                //todo prosctPointList è caricata con 4 punti
+                                //todo prospettivizzare il Texture e applicarlo come shader
+                                //todo nel Wrap ricordarsi di ottenere un bitmap leggermente più grande
+                                //todo in modo che questo rimanga quadrato
+                                //todo altrimenti cercare di scalare il bitmap in modo che non avvenga il REPEAT nello shader
+                                if (mPaint.getShader() == null){
+                                    Toast.makeText(context,"Shader == Null",Toast.LENGTH_SHORT).show();
+                                    return true;
+                                }
                                 if (prospectPoitList == null || prospectPoitList.size()<4){
                                     prospectPoitList = load4Point(mX,mY);
                                     String listPoint = "";
@@ -265,15 +275,10 @@ public class ViewForDrawIn extends View {
                                     Toast.makeText(context,listPoint,Toast.LENGTH_SHORT).show();
                                     return true;
                                 }
-                                //todo il punto è
-                                //todo prosctPointList è caricata con 4 punti
-                                //todo prospettivizzare il Texture e applicarlo come shader
-                                //todo nel Wrap ricordarsi di ottenere un bitmap leggermente più grande
-                                //todo in modo che questo rimanga quadrato
-                                //todo altrimenti cercare di scalare il bitmap in modo che non avvenga il REPEAT nello shader
-                                if (mPaint.getShader() == null){
-                                    Toast.makeText(context,"Shader == Null",Toast.LENGTH_SHORT).show();
-                                    return true;
+                                if (prospectPoitList.size() == 4){
+                                    Toast.makeText(context,"i 4 punti di prospettivizzazione sono stati caricati",Toast.LENGTH_SHORT).show();
+                                    return true; // questo return sarà da togliere in seguito
+
                                 }
                                 visitedBackPixel = new LinkedList<>();
                                 floodFill(backBitmap, new Mypixel((int) mX, (int) mY, backBitmap.getPixel((int) mX, (int) mY)));
