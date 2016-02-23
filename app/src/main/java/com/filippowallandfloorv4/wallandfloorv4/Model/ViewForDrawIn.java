@@ -173,7 +173,8 @@ public class ViewForDrawIn extends View {
             prospectPoitList = new ArrayList<>();
         }
         if (prospectPoitList.size()<4){
-            prospectPoitList.add(new Point(point.x,point.y));
+            prospectPoitList.add(new Point(point.x*((double)mTextureBitmapVFD.getWidth()/(double)mBitmap.getWidth()),
+                                           point.y*((double)mTextureBitmapVFD.getHeight()/(double)mBitmap.getHeight())));
             Paint paint = new Paint();
             paint.setColor(Color.RED);
             paint.setStrokeWidth(10);
