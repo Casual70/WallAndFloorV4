@@ -2,6 +2,7 @@ package com.filippowallandfloorv4.wallandfloorv4.Model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -75,7 +76,7 @@ public class ViewForDrawIn extends View {
     private ScaleGestureDetector SGD;
     private float mScaleFactor = 1.0f;
     private EditorFragment editorFragment;
-    private Bitmap mTextureBitmap;
+    private Bitmap mTextureBitmapVFD;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -172,8 +173,12 @@ public class ViewForDrawIn extends View {
             prospectPoitList = new ArrayList<>();
         }
         if (prospectPoitList.size()<4){
-            prospectPoitList.add(point);
-            mCanvas.drawCircle((float) point.x, (float) point.y, 5, mPaint);
+            prospectPoitList.add(new Point(point.x,point.y));
+            Paint paint = new Paint();
+            paint.setColor(Color.RED);
+            paint.setStrokeWidth(10);
+            mCanvas.drawCircle((float) point.x, (float) point.y, 15, paint);
+            invalidate();
         }
         return prospectPoitList;
     }
@@ -266,6 +271,7 @@ public class ViewForDrawIn extends View {
                                     return true;
                                 }
                                 if (prospectPoitList == null || prospectPoitList.size()<4){
+                                    mTextureBitmapVFD = editorFragment.mTextureBitmap;
                                     prospectPoitList = load4Point(mX,mY);
                                     String listPoint = "";
                                     for(int index = 0;index<prospectPoitList.size();index++){
@@ -275,10 +281,15 @@ public class ViewForDrawIn extends View {
                                     Toast.makeText(context,listPoint,Toast.LENGTH_SHORT).show();
                                     return true;
                                 }
-                                if (prospectPoitList.size() == 4){
-                                    Toast.makeText(context,"i 4 punti di prospettivizzazione sono stati caricati",Toast.LENGTH_SHORT).show();
-                                    return true; // questo return sarà da togliere in seguito
 
+                                if (prospectPoitList.size() == 4){
+                                    Bitmap newTexture = prospectTexture(prospectPoitList);
+                                    if (newTexture == null){
+                                        Log.e(VIEW_LOG_TAG,"texture null");
+                                    }
+                                    BitmapShader shader = new BitmapShader(newTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+                                    mPaint.setShader(shader);
+                                    Toast.makeText(context,"i 4 punti di prospettivizzazione sono stati caricati",Toast.LENGTH_SHORT).show();
                                 }
                                 visitedBackPixel = new LinkedList<>();
                                 floodFill(backBitmap, new Mypixel((int) mX, (int) mY, backBitmap.getPixel((int) mX, (int) mY)));
@@ -305,6 +316,46 @@ public class ViewForDrawIn extends View {
             e.printStackTrace();
         }
         return true;
+    }
+
+    private Bitmap prospectTexture(List<Point>prospectPoitList){
+        Mat textureImage  = new Mat();
+        Utils.bitmapToMat(mTextureBitmapVFD,textureImage);
+        Mat outputimage = new Mat(textureImage.rows(),textureImage.cols(),textureImage.type());
+        Point one,two,tree,four;
+        one = new Point(0,0);
+        two = new Point(0,textureImage.cols());
+        tree = new Point(textureImage.rows(),textureImage.cols());
+        four = new Point(textureImage.rows(),0);
+        List<Point>source = new ArrayList<>();
+        source.add(one);source.add(two);source.add(tree);source.add(four);
+        Mat startM = Converters.vector_Point2f_to_Mat(source);
+
+        org.opencv.core.Point outOne,outTwo,outTree,outFour;
+        outOne = new org.opencv.core.Point(one.x,one.y);
+        outTwo = new org.opencv.core.Point(two.x,two.y);
+        outTree = new org.opencv.core.Point(tree.x,tree.y);
+        outFour = new org.opencv.core.Point(four.x,four.y);
+        List<org.opencv.core.Point>sourceOut = new ArrayList<>();
+        sourceOut.add(outOne);sourceOut.add(outTwo);sourceOut.add(outTree);sourceOut.add(outFour);
+        Mat endM = Converters.vector_Point2f_to_Mat(sourceOut);
+
+        Mat trasform = Imgproc.getPerspectiveTransform(startM,endM);
+        Imgproc.warpPerspective(textureImage, outputimage, trasform, textureImage.size(), Imgproc.INTER_CUBIC);
+        Bitmap outputBitmap = Bitmap.createBitmap(mTextureBitmapVFD.getWidth(),mTextureBitmapVFD.getHeight(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(outputimage,outputBitmap);
+        Log.e("dimens","bitmap Width :"+mBitmap.getWidth() + " bimat Height: "+ mBitmap.getHeight());
+        Log.e("dimens","texture Width :"+mTextureBitmapVFD.getWidth() + " texture Height: "+ mTextureBitmapVFD.getHeight());
+        return outputBitmap;
+    }
+
+    private double scalePointProspX(int WTextureBitmap,int WBitmap,double point){
+        double rapporto = WTextureBitmap/WBitmap;
+        return point*rapporto;
+    }
+    private double scalePointProspY(int HTextureBitmap,int HBitmap,double point){
+        double rapporto = HTextureBitmap/HBitmap;
+        return point*rapporto;
     }
 
     public void colorLog(float x, float y){
@@ -531,12 +582,12 @@ public class ViewForDrawIn extends View {
         this.editorFragment = editorFragment;
     }
 
-    public Bitmap getmTextureBitmap() {
-        return mTextureBitmap;
+    public Bitmap getmTextureBitmapVFD() {
+        return mTextureBitmapVFD;
     }
 
-    public void setmTextureBitmap(Bitmap mTextureBitmap) {
-        this.mTextureBitmap = mTextureBitmap;
+    public void setmTextureBitmapVFD(Bitmap mTextureBitmapVFD) {
+        this.mTextureBitmapVFD = mTextureBitmapVFD;
     }
 
     public void finallyDraw() {

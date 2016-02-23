@@ -56,6 +56,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     public ListPopupWindow listPopupStyle, listPopupLine;
     public RadioGroup toggleGroup;
     public Bitmap mBitmap;
+    public Bitmap mTextureBitmap;
     public Paint mPaint;
     public View[]listButton;
     private WafImage wafImage;
@@ -268,13 +269,13 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Integer item = adapterDef.getItem(position);
-                Bitmap textureBit = BitmapFactory.decodeResource(getResources(),item);
-                if (textureBit == null){
+                mTextureBitmap = BitmapFactory.decodeResource(getResources(),item);
+                if (mTextureBitmap == null){
                     Toast.makeText(context,"decode Resorce Fail",Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                     return;
                 }
-                BitmapShader shader = new BitmapShader(textureBit, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+                BitmapShader shader = new BitmapShader(mTextureBitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
                 vfd.getmPaint().setShader(shader);
                 vfd.getmPaint().setAlpha(250);
                 dialog.dismiss();
