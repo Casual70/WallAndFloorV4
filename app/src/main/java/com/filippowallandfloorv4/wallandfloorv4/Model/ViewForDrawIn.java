@@ -28,6 +28,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -278,7 +279,8 @@ public class ViewForDrawIn extends View {
                                 }
 
                                 if (prospectPoitList.size() == 4){
-                                    Bitmap newTexture = prospectTexture(sourcePoitList,prospectPoitList, prepareTexture());
+                                    Bitmap prepare = prepareTexture();
+                                    Bitmap newTexture = prospectTexture(sourcePoitList,prospectPoitList, prepare);
                                     if (newTexture == null){
                                         Log.e(VIEW_LOG_TAG,"texture null");
                                     }
@@ -319,17 +321,17 @@ public class ViewForDrawIn extends View {
         Bitmap fullBitmapTexture = Bitmap.createBitmap(mBitmap.getWidth(),mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas can = new Canvas(fullBitmapTexture);
         can.drawARGB(0, 0, 0, 0);
-        int oneX = (mBitmap.getWidth() / 2) - (mTextureBitmapVFD.getWidth() / 2);
-        int oneY = (mBitmap.getHeight() / 2) - (mTextureBitmapVFD.getHeight() / 2);
-        can.drawBitmap(mTextureBitmapVFD,(float)oneX,(float)oneY, null);
+
+        can.drawBitmap(mTextureBitmapVFD, 0, 0, null);
         Point one,two,tree,four;
-        one = new Point(oneX, oneY);
+        one = new Point((float)0,(float)0);
         two = new Point(one.x,one.y+mTextureBitmapVFD.getHeight());
         tree = new Point(one.x+mTextureBitmapVFD.getWidth(),one.y+mTextureBitmapVFD.getHeight());
         four = new Point(one.x + mTextureBitmapVFD.getWidth(),one.y);
-        sourcePoitList = new ArrayList<>();
+        sourcePoitList = new ArrayList<Point>();
         sourcePoitList.add(one);sourcePoitList.add(two);sourcePoitList.add(tree);sourcePoitList.add(four);
-        Log.e("PointSource One", " One x: " + oneX + " One y: " + oneY);
+
+        Log.e("PointSource One", " One x: " + one.x + " One y: " + one.y);
         Log.e("PointSource Two", " Two x: " + two.x + " Two y: " + two.y);
         Log.e("PointSource Tree", " Tree x: " + tree.x + " Tree y: " + tree.y);
         Log.e("PointSource Four"," Four x: "+four.x + " Four y: "+four.y);
@@ -341,14 +343,21 @@ public class ViewForDrawIn extends View {
         Utils.bitmapToMat(paddingTexture, textureImage);
         Mat outputimage = new Mat(textureImage.rows(),textureImage.cols(),textureImage.type());
 
-        Mat startM = Converters.vector_Point2f_to_Mat(sourcePointList);
+        Mat startM = Converters.vector_Point2f_to_Mat(Arrays.asList(
+                new Point(sourcePointList.get(0).x,sourcePointList.get(0).y),
+                new Point(sourcePointList.get(1).x,sourcePointList.get(1).y),
+                new Point(sourcePointList.get(2).x,sourcePointList.get(2).y),
+                new Point(sourcePointList.get(3).x,sourcePointList.get(3).y)));
+
         Mat endM = Converters.vector_Point2f_to_Mat(prospectPointList);
 
         //OpenCV Error: Assertion failed (src.checkVector(2, CV_32F) == 4 && dst.checkVector(2, CV_32F) == 4)
-        //fare endM.checkVector()
+        Log.e("Assertion", "valori end: " + endM.checkVector(2, CvType.CV_32F));
+        Log.e("Assertion", "valori start: " + startM.checkVector(2, CvType.CV_32F));
 
 
         Mat trasform = Imgproc.getPerspectiveTransform(startM, endM);
+
         Imgproc.warpPerspective(textureImage, outputimage, trasform, textureImage.size(), Imgproc.INTER_CUBIC);
         Bitmap outputBitmap = Bitmap.createBitmap(outputimage.cols(),outputimage.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(outputimage,outputBitmap);
