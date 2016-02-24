@@ -2,11 +2,9 @@ package com.filippowallandfloorv4.wallandfloorv4.Fragment;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.os.Bundle;
@@ -26,9 +24,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity;
-import com.filippowallandfloorv4.wallandfloorv4.Activity.MainActivity;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureCustomGridAdapter;
-import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureElementHolder;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.DialogTextureGridAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeFillTypeListAdapter;
 import com.filippowallandfloorv4.wallandfloorv4.Adapter.StrokeWidthListAdapter;
@@ -36,10 +32,6 @@ import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Model.ViewForDrawIn;
 import com.filippowallandfloorv4.wallandfloorv4.Model.WafImage;
 import com.filippowallandfloorv4.wallandfloorv4.R;
-
-import org.opencv.core.Point;
-
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -295,7 +287,6 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
     public void setmBitmapAndPaint(Bitmap mBitmap,Paint mPaint){
         this.mBitmap = mBitmap;
         this.mPaint = mPaint;
-        //
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.filippowallandfloorv4.wallandfloorv4.Model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,9 +19,9 @@ import android.widget.Toast;
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
-import com.filippowallandfloorv4.wallandfloorv4.Service.ProspectTexture;
 
 import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
@@ -62,6 +61,7 @@ public class ViewForDrawIn extends View {
     private LinkedList<Mypixel>visitedBackPixel;
     private boolean freeHand;
     private List<Point>prospectPoitList;
+    private List<Point>sourcePoitList;
     private float mX,mY;
     private float mLastTouchX;
     private float mLastTouchY;
@@ -173,8 +173,8 @@ public class ViewForDrawIn extends View {
             prospectPoitList = new ArrayList<>();
         }
         if (prospectPoitList.size()<4){
-            prospectPoitList.add(new Point(point.x*((double)mTextureBitmapVFD.getWidth()/(double)mBitmap.getWidth()),
-                                           point.y*((double)mTextureBitmapVFD.getHeight()/(double)mBitmap.getHeight())));
+            prospectPoitList.add(new Point(point.x, point.y));
+
             Paint paint = new Paint();
             paint.setColor(Color.RED);
             paint.setStrokeWidth(10);
@@ -261,12 +261,6 @@ public class ViewForDrawIn extends View {
                                 float stroke = mPaint.getStrokeWidth();
                                 mPaint.setStrokeWidth(1.0f);
                                 mPath.reset();
-                                //todo il punto è
-                                //todo prosctPointList è caricata con 4 punti
-                                //todo prospettivizzare il Texture e applicarlo come shader
-                                //todo nel Wrap ricordarsi di ottenere un bitmap leggermente più grande
-                                //todo in modo che questo rimanga quadrato
-                                //todo altrimenti cercare di scalare il bitmap in modo che non avvenga il REPEAT nello shader
                                 if (mPaint.getShader() == null){
                                     Toast.makeText(context,"Shader == Null",Toast.LENGTH_SHORT).show();
                                     return true;
@@ -284,7 +278,7 @@ public class ViewForDrawIn extends View {
                                 }
 
                                 if (prospectPoitList.size() == 4){
-                                    Bitmap newTexture = prospectTexture(prospectPoitList);
+                                    Bitmap newTexture = prospectTexture(sourcePoitList,prospectPoitList, prepareTexture());
                                     if (newTexture == null){
                                         Log.e(VIEW_LOG_TAG,"texture null");
                                     }
@@ -319,34 +313,48 @@ public class ViewForDrawIn extends View {
         return true;
     }
 
-    private Bitmap prospectTexture(List<Point>prospectPoitList){
-        Mat textureImage  = new Mat();
-        Utils.bitmapToMat(mTextureBitmapVFD,textureImage);
-        Mat outputimage = new Mat(textureImage.rows(),textureImage.cols(),textureImage.type());
+    public Bitmap prepareTexture(){
+        Mat mBitmapMat = new Mat();
+        Utils.bitmapToMat(mBitmap, mBitmapMat);
+        Bitmap fullBitmapTexture = Bitmap.createBitmap(mBitmap.getWidth(),mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas can = new Canvas(fullBitmapTexture);
+        can.drawARGB(0, 0, 0, 0);
+        int oneX = (mBitmap.getWidth() / 2) - (mTextureBitmapVFD.getWidth() / 2);
+        int oneY = (mBitmap.getHeight() / 2) - (mTextureBitmapVFD.getHeight() / 2);
+        can.drawBitmap(mTextureBitmapVFD,(float)oneX,(float)oneY, null);
         Point one,two,tree,four;
-        one = new Point(0,0);
-        two = new Point(0,textureImage.cols());
-        tree = new Point(textureImage.rows(),textureImage.cols());
-        four = new Point(textureImage.rows(),0);
-        List<Point>source = new ArrayList<>();
-        source.add(one);source.add(two);source.add(tree);source.add(four);
-        Mat startM = Converters.vector_Point2f_to_Mat(source);
+        one = new Point(oneX, oneY);
+        two = new Point(one.x,one.y+mTextureBitmapVFD.getHeight());
+        tree = new Point(one.x+mTextureBitmapVFD.getWidth(),one.y+mTextureBitmapVFD.getHeight());
+        four = new Point(one.x + mTextureBitmapVFD.getWidth(),one.y);
+        sourcePoitList = new ArrayList<>();
+        sourcePoitList.add(one);sourcePoitList.add(two);sourcePoitList.add(tree);sourcePoitList.add(four);
+        Log.e("PointSource One", " One x: " + oneX + " One y: " + oneY);
+        Log.e("PointSource Two", " Two x: " + two.x + " Two y: " + two.y);
+        Log.e("PointSource Tree", " Tree x: " + tree.x + " Tree y: " + tree.y);
+        Log.e("PointSource Four"," Four x: "+four.x + " Four y: "+four.y);
+        return fullBitmapTexture;
+    }
 
-        org.opencv.core.Point outOne,outTwo,outTree,outFour;
-        outOne = new org.opencv.core.Point(one.x,one.y);
-        outTwo = new org.opencv.core.Point(two.x,two.y);
-        outTree = new org.opencv.core.Point(tree.x,tree.y);
-        outFour = new org.opencv.core.Point(four.x,four.y);
-        List<org.opencv.core.Point>sourceOut = new ArrayList<>();
-        sourceOut.add(outOne);sourceOut.add(outTwo);sourceOut.add(outTree);sourceOut.add(outFour);
-        Mat endM = Converters.vector_Point2f_to_Mat(sourceOut);
+    private Bitmap prospectTexture(List<Point>sourcePointList, List<Point>prospectPointList ,Bitmap paddingTexture){
+        Mat textureImage = new Mat();
+        Utils.bitmapToMat(paddingTexture, textureImage);
+        Mat outputimage = new Mat(textureImage.rows(),textureImage.cols(),textureImage.type());
 
-        Mat trasform = Imgproc.getPerspectiveTransform(startM,endM);
+        Mat startM = Converters.vector_Point2f_to_Mat(sourcePointList);
+        Mat endM = Converters.vector_Point2f_to_Mat(prospectPointList);
+
+        //OpenCV Error: Assertion failed (src.checkVector(2, CV_32F) == 4 && dst.checkVector(2, CV_32F) == 4)
+        //fare endM.checkVector()
+
+
+        Mat trasform = Imgproc.getPerspectiveTransform(startM, endM);
         Imgproc.warpPerspective(textureImage, outputimage, trasform, textureImage.size(), Imgproc.INTER_CUBIC);
-        Bitmap outputBitmap = Bitmap.createBitmap(mTextureBitmapVFD.getWidth(),mTextureBitmapVFD.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap outputBitmap = Bitmap.createBitmap(outputimage.cols(),outputimage.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(outputimage,outputBitmap);
+        invalidate();
         Log.e("dimens","bitmap Width :"+mBitmap.getWidth() + " bimat Height: "+ mBitmap.getHeight());
-        Log.e("dimens","texture Width :"+mTextureBitmapVFD.getWidth() + " texture Height: "+ mTextureBitmapVFD.getHeight());
+        Log.e("dimens","texture Width :"+paddingTexture.getWidth() + " texture Height: "+ paddingTexture.getHeight());
         return outputBitmap;
     }
 

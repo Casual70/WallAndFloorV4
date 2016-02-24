@@ -76,7 +76,7 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
         Mat imageCanny  = new Mat();
         Mat imageGray = new Mat();
         Imgproc.cvtColor(imageOriginalMat,imageGray,Imgproc.COLOR_BGR2GRAY);
-        Imgproc.blur(imageGray, imageCanny, new Size(3,3));
+        Imgproc.medianBlur(imageGray, imageCanny, 5);
         Imgproc.Canny(imageCanny, imageCanny, threshold_min, threshold_min * 15, 5, true);
         Utils.matToBitmap(imageCanny, edgeImage);
         return edgeImage;
