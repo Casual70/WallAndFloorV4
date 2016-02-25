@@ -129,6 +129,15 @@ public class ViewForDrawIn extends View {
             canvas.drawPath(p, paint);
             Log.e("ondraw Log", ""+ myPathUndo.size());
         }
+        if (prospectPoitList != null){
+            Paint paint = new Paint(); // vedere se è necessaria farle come varibili globali
+            paint.setColor(Color.RED);
+            Path pointPath = new Path();
+            for (Point p : prospectPoitList){
+                pointPath.addCircle((float)p.x,(float)p.y,15, Path.Direction.CCW);
+                canvas.drawPath(pointPath,paint);
+            }
+        }
         canvas.drawPath(mPath, mPaint);
         canvas.restore();
         Log.e(VFD_LOG, "draw");
@@ -179,8 +188,12 @@ public class ViewForDrawIn extends View {
             Paint paint = new Paint();
             paint.setColor(Color.RED);
             paint.setStrokeWidth(10);
-            mCanvas.drawCircle((float) point.x, (float) point.y, 15, paint);
+            //mCanvas.drawCircle((float) point.x, (float) point.y, 15, paint);
+            mPath.addCircle((float) point.x, (float) point.y, 15, Path.Direction.CCW);
+            pathColorMap.put(mPath, new Paint(paint));
+            myPathUndo.add(mPath);
             invalidate();
+            mPath = new Path();
         }
         return prospectPoitList;
     }
@@ -222,8 +235,6 @@ public class ViewForDrawIn extends View {
         super.onTouchEvent(event);
         mY = event.getY()/mScaleFactor+canvasBoundY;
         mX = event.getX()/mScaleFactor+canvasBoundX;
-        float zoomX = event.getX();
-        float zoomY = event.getY();
         Log.e("on Touch choise", "freeHand :" + freeHand);
         Log.e("on Touch choise", "floodFill :" + floodFill);
         try {
@@ -262,7 +273,7 @@ public class ViewForDrawIn extends View {
                                 float stroke = mPaint.getStrokeWidth();
                                 mPaint.setStrokeWidth(1.0f);
                                 mPath.reset();
-                                if (mPaint.getShader() == null){
+                                if (mPaint.getShader() == null){                                            //nel caso si stiano stabiledondo i punti di prospetto aprire
                                     Toast.makeText(context,"Shader == Null",Toast.LENGTH_SHORT).show();
                                     return true;
                                 }
@@ -283,6 +294,7 @@ public class ViewForDrawIn extends View {
                                     Bitmap newTexture = prospectTexture(sourcePoitList,prospectPoitList, prepare);
                                     if (newTexture == null){
                                         Log.e(VIEW_LOG_TAG,"texture null");
+                                        return true;
                                     }
                                     BitmapShader shader = new BitmapShader(newTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
                                     mPaint.setShader(shader);
@@ -319,18 +331,19 @@ public class ViewForDrawIn extends View {
         Mat mBitmapMat = new Mat();
         Utils.bitmapToMat(mBitmap, mBitmapMat);
         Bitmap fullBitmapTexture = Bitmap.createBitmap(mBitmap.getWidth(),mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        BitmapShader shader = new BitmapShader(mTextureBitmapVFD, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
         Canvas can = new Canvas(fullBitmapTexture);
-        can.drawARGB(0, 0, 0, 0);
-
-        can.drawBitmap(mTextureBitmapVFD, 0, 0, null);
+        Paint paint = new Paint();
+        paint.setShader(shader);
+        paint.setAlpha(255);
+        can.drawPaint(paint);
         Point one,two,tree,four;
-        one = new Point((float)0,(float)0);
+        one = new Point((mBitmap.getWidth()/2)-(mTextureBitmapVFD.getWidth()/2),(mBitmap.getHeight()/2)-(mTextureBitmapVFD.getHeight()/2));
         two = new Point(one.x,one.y+mTextureBitmapVFD.getHeight());
         tree = new Point(one.x+mTextureBitmapVFD.getWidth(),one.y+mTextureBitmapVFD.getHeight());
         four = new Point(one.x + mTextureBitmapVFD.getWidth(),one.y);
         sourcePoitList = new ArrayList<Point>();
         sourcePoitList.add(one);sourcePoitList.add(two);sourcePoitList.add(tree);sourcePoitList.add(four);
-
         Log.e("PointSource One", " One x: " + one.x + " One y: " + one.y);
         Log.e("PointSource Two", " Two x: " + two.x + " Two y: " + two.y);
         Log.e("PointSource Tree", " Tree x: " + tree.x + " Tree y: " + tree.y);
@@ -606,6 +619,14 @@ public class ViewForDrawIn extends View {
 
     public void setmTextureBitmapVFD(Bitmap mTextureBitmapVFD) {
         this.mTextureBitmapVFD = mTextureBitmapVFD;
+    }
+
+    public List<Point> getProspectPoitList() {
+        return prospectPoitList;
+    }
+
+    public void setProspectPoitList(List<Point> prospectPoitList) {
+        this.prospectPoitList = prospectPoitList;
     }
 
     public void finallyDraw() {

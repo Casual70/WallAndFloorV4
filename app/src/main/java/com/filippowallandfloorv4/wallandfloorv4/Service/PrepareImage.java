@@ -46,7 +46,6 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     private Bitmap originalBitmap;
     private Bitmap backBitmap;
     private ViewForDrawIn view;
-    private WafImage wafImage;
 
     private int mCurrentY;
     private int mCurrentX;
@@ -57,8 +56,6 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     public PrepareImage(Bitmap originalBitmap, ViewForDrawIn view) {
         this.originalBitmap = originalBitmap;
         this.view = view;
-        this.wafImage = view.getWafImage();
-
     }
 
     @Override
