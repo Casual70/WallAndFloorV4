@@ -7,14 +7,31 @@
         android:id="@+id/Undo"
         android:icon="@drawable/ic_action_goleft"
         android:title="Undo"
+        android:orderInCategory="2"
         app:showAsAction="always"/>
     <item
         android:id="@+id/Redo"
         android:icon="@drawable/ic_action_goright"
         android:title="Redo"
+        android:orderInCategory="3"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_filter"
+        android:title="@string/filter_menu"
+        android:orderInCategory="1"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/canny_filter"
+                android:title="@string/canny_action_nemu"/>
+            <item
+                android:id="@+id/hougeLine_filter"
+                android:title="@string/hougeLine_action_menu"/>
+        </menu>
+    </item>
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
+        android:orderInCategory="50"
         app:showAsAction="never" />
 </menu>

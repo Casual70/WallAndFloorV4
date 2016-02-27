@@ -24,4 +24,7 @@
     <string name="save_menu">Salva</string>
     <string name="save_success">Immagine Salvata</string>
     <string name="setting_bitmap">Photo Setting</string>
+    <string name="filter_menu">Filter</string>
+    <string name="canny_action_nemu">Canny</string>
+    <string name="hougeLine_action_menu">Houge Line</string>
 </resources>

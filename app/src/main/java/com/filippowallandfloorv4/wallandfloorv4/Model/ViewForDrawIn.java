@@ -18,7 +18,8 @@ import android.widget.Toast;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
-import com.filippowallandfloorv4.wallandfloorv4.Service.PrepareImage;
+import com.filippowallandfloorv4.wallandfloorv4.Service.CannyImage;
+import com.filippowallandfloorv4.wallandfloorv4.Service.HougeImage;
 
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -373,7 +374,7 @@ public class ViewForDrawIn extends View {
 
         Imgproc.warpPerspective(textureImage, outputimage, trasform, textureImage.size(), Imgproc.INTER_CUBIC);
         Bitmap outputBitmap = Bitmap.createBitmap(outputimage.cols(),outputimage.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(outputimage,outputBitmap);
+        Utils.matToBitmap(outputimage, outputBitmap);
         invalidate();
         Log.e("dimens","bitmap Width :"+mBitmap.getWidth() + " bimat Height: "+ mBitmap.getHeight());
         Log.e("dimens","texture Width :"+paddingTexture.getWidth() + " texture Height: "+ paddingTexture.getHeight());
@@ -402,10 +403,14 @@ public class ViewForDrawIn extends View {
         Log.e(VFD_LOG, "Alpha: " + A + " Red: " + R + " Green: " + G + " Blue: " + B);
         Log.e(VFD_LOG, "X: " + x + " Y: " + y);
     }
-    public void findBord(){
-        PrepareImage prepareImage = new PrepareImage(mBitmap,this);
-        prepareImage.execute();
+    public void CannyBord(){
+        CannyImage cannyImage = new CannyImage(mBitmap,this);
+        cannyImage.execute();
 
+    }
+    public void HougeBord(){
+        HougeImage hougeImage = new HougeImage(mBitmap,this);
+        hougeImage.execute();
     }
 
     public void floodFill(Bitmap bitmap, Mypixel nestP){

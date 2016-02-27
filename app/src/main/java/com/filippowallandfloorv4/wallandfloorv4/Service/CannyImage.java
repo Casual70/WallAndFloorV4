@@ -39,7 +39,7 @@ import java.io.File;
 /**
  * Created by Filippo on 16/12/2015.
  */
-public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
+public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
 
     private final static String PrepareImage_Log = "PrepareImage_log";
 
@@ -53,7 +53,7 @@ public class PrepareImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     private double threshold_min = 20;
 
 
-    public PrepareImage(Bitmap originalBitmap, ViewForDrawIn view) {
+    public CannyImage(Bitmap originalBitmap, ViewForDrawIn view) {
         this.originalBitmap = originalBitmap;
         this.view = view;
     }

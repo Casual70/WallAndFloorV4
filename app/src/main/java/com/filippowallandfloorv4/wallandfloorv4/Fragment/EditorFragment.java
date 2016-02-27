@@ -184,7 +184,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
             public void onClick(View v) {
                 //ColorMatrixColorFilter colorMatrixColorFilter = vfd.grayscale();
                 //vfd.getmBitmapPaint().setColorFilter(colorMatrixColorFilter);
-                vfd.findBord();
+                vfd.CannyBord();
             }
         });
         openIB.setOnClickListener(new View.OnClickListener() {

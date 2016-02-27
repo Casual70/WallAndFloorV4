@@ -1,6 +1,5 @@
 package com.filippowallandfloorv4.wallandfloorv4.Activity;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
@@ -23,7 +22,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
@@ -178,7 +176,7 @@ public class EditorActivity extends AppCompatActivity {
         onlyBorderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fragment.getVfd().findBord();
+                fragment.getVfd().CannyBord();
                 drawerLayout_color.closeDrawers();
             }
         });
@@ -287,6 +285,9 @@ public class EditorActivity extends AppCompatActivity {
         }
         if (id == R.id.Undo){
             fragment.getVfd().onUndoPath();
+        }
+        if (id == R.id.canny_filter){
+            fragment.getVfd().CannyBord();
         }
 
         return super.onOptionsItemSelected(item);
