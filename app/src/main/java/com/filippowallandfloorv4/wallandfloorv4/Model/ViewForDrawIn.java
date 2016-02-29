@@ -58,6 +58,7 @@ public class ViewForDrawIn extends View {
     private Map<Path,Paint>pathColorMap = new HashMap<>();
     private Map<Path,LinkedList>pathBackMap = new HashMap<>();
     private Bitmap backBitmap;
+    private Mat cannyMat;
     private LinkedList<Mypixel>postElaboration;
     private LinkedList<Mypixel>postFill;
     private LinkedList<Mypixel>visitedBackPixel;
@@ -406,10 +407,12 @@ public class ViewForDrawIn extends View {
     public void CannyBord(){
         CannyImage cannyImage = new CannyImage(mBitmap,this);
         cannyImage.execute();
-
     }
     public void HougeBord(){
-        HougeImage hougeImage = new HougeImage(mBitmap,this);
+        if (cannyMat == null){
+            return;
+        }
+        HougeImage hougeImage = new HougeImage(cannyMat,this,mBitmap);
         hougeImage.execute();
     }
 
@@ -634,6 +637,10 @@ public class ViewForDrawIn extends View {
         this.prospectPoitList = prospectPoitList;
     }
 
+    public void setCannyMat(Mat cannyMat) {
+        this.cannyMat = cannyMat;
+    }
+
     public void finallyDraw() {
         for (Path p : myPathUndo) {
             Paint paint = pathColorMap.get(p);
@@ -641,5 +648,6 @@ public class ViewForDrawIn extends View {
         }
         mCanvas.drawPath(mPath,mPaint);
     }
+
 }
 

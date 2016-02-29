@@ -289,6 +289,9 @@ public class EditorActivity extends AppCompatActivity {
         if (id == R.id.canny_filter){
             fragment.getVfd().CannyBord();
         }
+        if (id == R.id.hougeLine_filter){
+            fragment.getVfd().HougeBord();
+        }
 
         return super.onOptionsItemSelected(item);
     }

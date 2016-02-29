@@ -46,6 +46,7 @@ public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     private Bitmap originalBitmap;
     private Bitmap backBitmap;
     private ViewForDrawIn view;
+    private Mat cannyMat;
 
     private int mCurrentY;
     private int mCurrentX;
@@ -75,6 +76,7 @@ public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
         Imgproc.cvtColor(imageOriginalMat,imageGray,Imgproc.COLOR_BGR2GRAY);
         Imgproc.medianBlur(imageGray, imageCanny, 5);
         Imgproc.Canny(imageCanny, imageCanny, threshold_min, threshold_min * 15, 5, true);
+        cannyMat = imageCanny;
         Utils.matToBitmap(imageCanny, edgeImage);
         return edgeImage;
     }
@@ -83,6 +85,7 @@ public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     protected void onPostExecute(Bitmap bitmap) {
         view.setBackBitmap(bitmap);
         view.setBackCanvas(new Canvas(bitmap));
+        view.setCannyMat(cannyMat);
         view.setmBitmap(originalBitmap);
         view.invalidate();
         super.onPostExecute(bitmap);
