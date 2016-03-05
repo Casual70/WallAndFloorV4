@@ -27,4 +27,5 @@
     <string name="filter_menu">Filter</string>
     <string name="canny_action_nemu">Canny</string>
     <string name="hougeLine_action_menu">Houge Line</string>
+    <string name="corner_dtector_menu">Corner</string>
 </resources>

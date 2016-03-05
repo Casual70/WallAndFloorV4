@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyImage;
+import com.filippowallandfloorv4.wallandfloorv4.Service.HarrysCorner;
 import com.filippowallandfloorv4.wallandfloorv4.Service.HougeImage;
 
 import org.opencv.android.Utils;
@@ -275,32 +276,32 @@ public class ViewForDrawIn extends View {
                                 float stroke = mPaint.getStrokeWidth();
                                 mPaint.setStrokeWidth(1.0f);
                                 mPath.reset();
-                                if (mPaint.getShader() == null){                                            //nel caso si stiano stabiledondo i punti di prospetto aprire
-                                    Toast.makeText(context,"Shader == Null",Toast.LENGTH_SHORT).show();
-                                    return true;
-                                }
-                                if (prospectPoitList == null || prospectPoitList.size()<4){
-                                    mTextureBitmapVFD = editorFragment.mTextureBitmap;
-                                    prospectPoitList = load4Point(mX,mY);
-                                    String listPoint = "";
-                                    for(int index = 0;index<prospectPoitList.size();index++){
-                                        listPoint += ("Punto "+index+" X: "+prospectPoitList.get(index).x + " Y: "+prospectPoitList.get(index).y+"\n");
-                                    }
-                                    Log.e("ProspectListSize"," "+prospectPoitList.size());
-                                    Toast.makeText(context,listPoint,Toast.LENGTH_SHORT).show();
-                                    return true;
-                                }
-
-                                if (prospectPoitList.size() == 4){
-                                    Bitmap prepare = prepareTexture();
-                                    Bitmap newTexture = prospectTexture(sourcePoitList,prospectPoitList, prepare);
-                                    if (newTexture == null){
-                                        Log.e(VIEW_LOG_TAG,"texture null");
+                                if (mPaint.getShader() != null){                                            //nel caso si stiano stabiledondo i punti di prospetto aprire
+                                    if (prospectPoitList == null || prospectPoitList.size()<4){
+                                        mTextureBitmapVFD = editorFragment.mTextureBitmap;
+                                        prospectPoitList = load4Point(mX,mY);
+                                        String listPoint = "";
+                                        for(int index = 0;index<prospectPoitList.size();index++){
+                                            listPoint += ("Punto "+index+" X: "+prospectPoitList.get(index).x + " Y: "+prospectPoitList.get(index).y+"\n");
+                                        }
+                                        Log.e("ProspectListSize"," "+prospectPoitList.size());
+                                        Toast.makeText(context,listPoint,Toast.LENGTH_SHORT).show();
                                         return true;
                                     }
-                                    BitmapShader shader = new BitmapShader(newTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-                                    mPaint.setShader(shader);
-                                    Toast.makeText(context,"i 4 punti di prospettivizzazione sono stati caricati",Toast.LENGTH_SHORT).show();
+
+                                    if (prospectPoitList.size() == 4){
+                                        Bitmap prepare = prepareTexture();
+                                        Bitmap newTexture = prospectTexture(sourcePoitList,prospectPoitList, prepare);
+                                        if (newTexture == null){
+                                            Log.e(VIEW_LOG_TAG,"texture null");
+                                            return true;
+                                        }
+                                        BitmapShader shader = new BitmapShader(newTexture, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+                                        mPaint.setShader(shader);
+                                        Toast.makeText(context,"i 4 punti di prospettivizzazione sono stati caricati",Toast.LENGTH_SHORT).show();
+                                    }
+                                }else{
+                                    Toast.makeText(context,"Shader == Null",Toast.LENGTH_SHORT).show();
                                 }
                                 visitedBackPixel = new LinkedList<>();
                                 floodFill(backBitmap, new Mypixel((int) mX, (int) mY, backBitmap.getPixel((int) mX, (int) mY)));
@@ -414,6 +415,13 @@ public class ViewForDrawIn extends View {
         }
         HougeImage hougeImage = new HougeImage(cannyMat,this,mBitmap);
         hougeImage.execute();
+    }
+    public void CornerDetector(){
+        if (cannyMat == null){
+            return;
+        }
+        HarrysCorner corner = new HarrysCorner(cannyMat,this,mBitmap);
+        corner.execute();
     }
 
     public void floodFill(Bitmap bitmap, Mypixel nestP){

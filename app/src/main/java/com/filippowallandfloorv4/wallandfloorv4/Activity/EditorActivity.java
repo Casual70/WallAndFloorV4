@@ -292,6 +292,9 @@ public class EditorActivity extends AppCompatActivity {
         if (id == R.id.hougeLine_filter){
             fragment.getVfd().HougeBord();
         }
+        if (id ==R.id.cornerDetector){
+            fragment.getVfd().CornerDetector();
+        }
 
         return super.onOptionsItemSelected(item);
     }
