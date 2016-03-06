@@ -21,6 +21,13 @@ import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyImage;
 import com.filippowallandfloorv4.wallandfloorv4.Service.HarrysCorner;
 import com.filippowallandfloorv4.wallandfloorv4.Service.HougeImage;
+import com.google.common.base.Function;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
+import com.google.common.primitives.Chars;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Primitives;
 
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -31,6 +38,8 @@ import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -309,6 +318,7 @@ public class ViewForDrawIn extends View {
                                 myPathUndo.add(floodFillPath);
                                 Log.e("Visited pixel", "Visited Pixel tot : " + visitedBackPixel.size());
                                 myPathUndoBack.add(visitedBackPixel);
+                                findCorner(visitedBackPixel);
                                 visitedBackPixel = new LinkedList<>();
                                 floodFillPath = new Path();
                                 mPaint.setStrokeWidth(stroke);
@@ -329,6 +339,69 @@ public class ViewForDrawIn extends View {
         }
         return true;
     }
+    private LinkedList<Mypixel> findCorner (LinkedList<Mypixel> visitedBackPixel){
+
+        LinkedList<Mypixel> allPointOrderXmintoMax = new LinkedList<>(visitedBackPixel);
+        LinkedList<Mypixel> allPointOrderYmintoMax = new LinkedList<>(visitedBackPixel);
+
+        LinkedList<Mypixel>corner = new LinkedList<Mypixel>();
+        //1:alto sinistra blu
+        //2:basso sinistra rosso
+        //3:basso destra green
+        //4:alto destra giallo
+        Ordering<Mypixel> orderingMinX = new Ordering<Mypixel>() {
+            @Override
+            public int compare(Mypixel left, Mypixel right) {
+                return Ints.compare(left.x,right.x);
+            }
+        };
+        Ordering<Mypixel>orderingMinY = new Ordering<Mypixel>() {
+            @Override
+            public int compare(Mypixel left, Mypixel right) {
+                return Ints.compare(left.y,right.y);
+            }
+        };
+        Collections.sort(allPointOrderXmintoMax, orderingMinX);
+        LinkedList<Mypixel>listOfYforMinX = new LinkedList<>();
+        for (Mypixel p : allPointOrderXmintoMax){
+            if (p.x == allPointOrderXmintoMax.getFirst().x){
+                listOfYforMinX.add(p);
+            }
+        }
+        Mypixel minXforMinY = Collections.min(listOfYforMinX,orderingMinY); // primo punto //alto sinistra // blu
+        Log.e("final", "" + minXforMinY.x + " " + minXforMinY.y);
+        Paint paint = new Paint();
+        paint.setColor(Color.BLUE);
+        mCanvas.drawCircle((float) minXforMinY.x, (float) minXforMinY.y, 5, paint);
+        corner.add(minXforMinY);
+
+        Collections.sort(allPointOrderYmintoMax, orderingMinY);
+        LinkedList<Mypixel>listOfXforMinY = new LinkedList<>();
+        for (Mypixel p : allPointOrderYmintoMax){
+            if (p.y == allPointOrderYmintoMax.getLast().y){
+                listOfXforMinY.add(p);
+            }
+        }
+        Mypixel minXforMaxY = Collections.min(listOfXforMinY,orderingMinX); //secondo punto // basso sinistra // red
+        paint.setColor(Color.RED);
+        mCanvas.drawCircle((float) minXforMaxY.x, (float) minXforMaxY.y, 5, paint);
+        corner.add(minXforMaxY);
+
+        Collections.sort(allPointOrderXmintoMax, orderingMinX);
+        LinkedList<Mypixel>listOfYforMaxX = new LinkedList<>();
+        for (Mypixel p : allPointOrderXmintoMax){
+            if (p.x == allPointOrderXmintoMax.getLast().x){
+                listOfYforMaxX.add(p);
+            }
+        }
+        Mypixel maxXforMaxY = Collections.max(listOfYforMaxX,orderingMinY);
+        paint.setColor(Color.GREEN);
+        mCanvas.drawCircle((float)maxXforMaxY.x,(float)maxXforMaxY.y,5,paint);
+        corner.add(maxXforMaxY);
+
+        return corner;
+    }
+
 
     public Bitmap prepareTexture(){
         Mat mBitmapMat = new Mat();

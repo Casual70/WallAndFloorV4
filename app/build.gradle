@@ -26,4 +26,5 @@ dependencies {
     compile 'me.villani.lorenzo.android:android-cropimage:1.1.+'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile project(':libraries:opencv')
+    compile 'com.google.guava:guava:19.0'
 }
