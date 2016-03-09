@@ -394,10 +394,22 @@ public class ViewForDrawIn extends View {
                 listOfYforMaxX.add(p);
             }
         }
-        Mypixel maxXforMaxY = Collections.max(listOfYforMaxX,orderingMinY);
+        Mypixel maxXforMaxY = Collections.max(listOfYforMaxX,orderingMinY); //terzo punto // basso destra // green
         paint.setColor(Color.GREEN);
-        mCanvas.drawCircle((float)maxXforMaxY.x,(float)maxXforMaxY.y,5,paint);
+        mCanvas.drawCircle((float) maxXforMaxY.x, (float) maxXforMaxY.y, 5, paint);
         corner.add(maxXforMaxY);
+
+        Collections.sort(allPointOrderYmintoMax, orderingMinY);
+        LinkedList<Mypixel>listofXforMaxY = new LinkedList<>();
+        for (Mypixel p : allPointOrderYmintoMax){
+            if (p.y == allPointOrderYmintoMax.getFirst().y){
+                listofXforMaxY.add(p);
+            }
+        }
+        Mypixel maxXforMinY = Collections.max(listofXforMaxY,orderingMinY); //quarto punto // alto destra // giallo
+        paint.setColor(Color.YELLOW);
+        mCanvas.drawCircle((float) maxXforMinY.x, (float) maxXforMinY.y, 5, paint);
+        corner.add(maxXforMinY);
 
         return corner;
     }
