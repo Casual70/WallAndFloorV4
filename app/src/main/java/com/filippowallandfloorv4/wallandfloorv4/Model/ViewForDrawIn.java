@@ -361,6 +361,38 @@ public class ViewForDrawIn extends View {
                 return Ints.compare(left.y,right.y);
             }
         };
+
+        Collections.sort(allPointOrderXmintoMax,orderingMinX);
+        /**for (Mypixel p: allPointOrderXmintoMax){
+            Log.e("List of MyPixe", " " +p.x+"  "+p.y );
+        }*/
+        LinkedList<LinkedList<Mypixel>> allPointForListofMyPixelx = new LinkedList<>();
+        LinkedList<Mypixel>myPixelforX = new LinkedList<>();
+        ListIterator<Mypixel>iterator = allPointOrderXmintoMax.listIterator();
+        int previusX = 0;
+        while (iterator.hasNext()){
+            Mypixel p = iterator.next();
+            if (previusX == 0){
+                previusX = p.x;
+            }
+            if (p.x == previusX){
+                myPixelforX.add(p);
+            }else {
+                LinkedList<Mypixel>temp = new LinkedList<>();
+                temp.addAll(myPixelforX);
+                allPointForListofMyPixelx.add(temp);
+                myPixelforX.clear();
+                previusX = p.x;
+                myPixelforX.add(p);
+            }
+        }
+        Log.e("size", " "+allPointForListofMyPixelx.size());
+        Log.e("size of index 10"," "+allPointForListofMyPixelx.get(10).size());
+
+
+
+
+        /** prima ipotesi
         Collections.sort(allPointOrderXmintoMax, orderingMinX);
         LinkedList<Mypixel>listOfYforMinX = new LinkedList<>();
         for (Mypixel p : allPointOrderXmintoMax){
@@ -410,7 +442,7 @@ public class ViewForDrawIn extends View {
         paint.setColor(Color.YELLOW);
         mCanvas.drawCircle((float) maxXforMinY.x, (float) maxXforMinY.y, 5, paint);
         corner.add(maxXforMinY);
-
+        */
         return corner;
     }
 
@@ -463,7 +495,7 @@ public class ViewForDrawIn extends View {
         Bitmap outputBitmap = Bitmap.createBitmap(outputimage.cols(),outputimage.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(outputimage, outputBitmap);
         invalidate();
-        Log.e("dimens","bitmap Width :"+mBitmap.getWidth() + " bimat Height: "+ mBitmap.getHeight());
+        Log.e("dimens", "bitmap Width :" + mBitmap.getWidth() + " bimat Height: " + mBitmap.getHeight());
         Log.e("dimens","texture Width :"+paddingTexture.getWidth() + " texture Height: "+ paddingTexture.getHeight());
         return outputBitmap;
     }
