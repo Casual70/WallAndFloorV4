@@ -387,7 +387,24 @@ public class ViewForDrawIn extends View {
             }
         }
         Log.e("size", " "+allPointForListofMyPixelx.size());
-        Log.e("size of index 10"," "+allPointForListofMyPixelx.get(10).size());
+        //Log.e("size of index 10"," "+allPointForListofMyPixelx.get(10).size());
+
+        LinkedList<Mypixel>listMinorYforEveryX = new LinkedList<>();
+        LinkedList<Mypixel>listMaxYforEveryX = new LinkedList<>();
+        for (LinkedList<Mypixel> listEveryX : allPointForListofMyPixelx) {
+            Collections.sort(listEveryX, orderingMinY);
+            listMinorYforEveryX.add(listEveryX.getFirst());
+            listMaxYforEveryX.add(listEveryX.getLast());
+        }
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        for (Mypixel p : listMinorYforEveryX){
+            mCanvas.drawCircle(p.x, p.y, 5, paint);
+        }
+        paint.setColor(Color.GREEN);
+        for (Mypixel p : listMaxYforEveryX){
+            mCanvas.drawCircle(p.x,p.y,5,paint);
+        }
 
 
 
@@ -580,8 +597,9 @@ public class ViewForDrawIn extends View {
         for (Mypixel post:postElaboration){
             if (post.x!=0 && bitmap.getPixel(post.x-1,post.y) == Color.BLACK && bitmap.getPixel(post.x+2,post.y) == Color.RED){
                 postFill.add(new Mypixel(post.x-1,post.y,Color.BLACK));
+            }else if (post.x <2){
+                post.x = 2;
             }
-
             if (post.x != bitmap.getHeight() && bitmap.getPixel(post.x+1,post.y) == Color.BLACK && bitmap.getPixel(post.x-2,post.y) == Color.RED){
                 postFill.add(new Mypixel(post.x+1,post.y,Color.BLACK));
             }

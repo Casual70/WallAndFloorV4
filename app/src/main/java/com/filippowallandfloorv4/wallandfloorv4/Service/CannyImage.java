@@ -51,7 +51,8 @@ public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
     private int mCurrentY;
     private int mCurrentX;
 
-    private double threshold_min = 20;
+    private double threshold_min = 1;
+    private double thereshold_max = 2;
 
 
     public CannyImage(Bitmap originalBitmap, ViewForDrawIn view) {
@@ -73,9 +74,10 @@ public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
         Utils.bitmapToMat(originalBitmap,imageOriginalMat);
         Mat imageCanny  = new Mat();
         Mat imageGray = new Mat();
-        Imgproc.cvtColor(imageOriginalMat,imageGray,Imgproc.COLOR_BGR2GRAY);
+        Imgproc.cvtColor(imageOriginalMat, imageGray, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.equalizeHist(imageGray,imageGray);
         Imgproc.medianBlur(imageGray, imageCanny, 5);
-        Imgproc.Canny(imageCanny, imageCanny, threshold_min, threshold_min * 15, 5, true);
+        Imgproc.Canny(imageCanny, imageCanny, threshold_min, thereshold_max * 15, 5, true);
         cannyMat = imageCanny;
         Utils.matToBitmap(imageCanny, edgeImage);
         return edgeImage;
@@ -103,11 +105,11 @@ public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
         final View view = LayoutInflater.from(this.view.getContext()).inflate(R.layout.edge_detector_accuracy,null);
         final PopupWindow pop = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
         SeekBar contrast = (SeekBar)view.findViewById(R.id.seekEdgeDetector);
-        threshold_min = contrast.getProgress();
+        thereshold_max = contrast.getProgress();
         contrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                threshold_min = progress;
+                thereshold_max = progress;
                 onProgressUpdate(doInBackground(bitmap));
             }
 
