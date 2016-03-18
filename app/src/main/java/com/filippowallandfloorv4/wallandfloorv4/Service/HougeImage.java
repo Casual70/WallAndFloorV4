@@ -45,9 +45,9 @@ public class HougeImage extends AsyncTask <Bitmap,Bitmap,Bitmap>{
     private int mCurrentY;
     private int mCurrentX;
 
-    private int threshold = 30;
-    private int min_line_lenght = 35;
-    private int max_line_gap = 7;
+    private int threshold = 300;
+    private int min_line_lenght = 40;
+    private int max_line_gap = 5;
 
     public HougeImage(Mat cannyMat, ViewForDrawIn view, Bitmap originalBitmap) {
         this.cannyMat = cannyMat;
@@ -65,6 +65,8 @@ public class HougeImage extends AsyncTask <Bitmap,Bitmap,Bitmap>{
         Bitmap hougtImage = Bitmap.createBitmap(cannyMat.width(),cannyMat.height(), Bitmap.Config.ARGB_8888);
         Mat cannyImageColor = new Mat();
         Mat lines = new Mat();
+        // probalistic
+        /**
         Imgproc.HoughLinesP(cannyMat, lines, 1, Math.PI / 180, threshold, min_line_lenght, max_line_gap);
         Imgproc.cvtColor(cannyMat, cannyImageColor, Imgproc.COLOR_GRAY2RGB);
         for (int i = 0; i < lines.rows();i++){
@@ -76,6 +78,25 @@ public class HougeImage extends AsyncTask <Bitmap,Bitmap,Bitmap>{
             org.opencv.core.Point lineStart = new org.opencv.core.Point(xStart,yStart);
             org.opencv.core.Point lineEnd = new org.opencv.core.Point(xEnd,yEnd);
             Imgproc.line(cannyImageColor,lineStart,lineEnd,new Scalar(0,0,255),3);
+        }*/
+        // not probabilistic
+        Imgproc.HoughLines(cannyMat,lines,3,Math.PI/180,threshold);
+        Imgproc.cvtColor(cannyMat, cannyImageColor, Imgproc.COLOR_GRAY2RGB);
+        for (int i = 0 ; i<lines.rows();i++){
+            double rho = lines.get(i,0)[0];
+            double theta = lines.get(i,0)[1];
+            Point pt1 = new Point();
+            Point pt2 = new Point();
+            double a = Math.cos(theta);
+            double b = Math.sin(theta);
+            double x0 = a+rho;
+            double y0 = b+rho;
+            pt1.x = Math.round(x0 + 1000*(-b));
+            pt1.y = Math.round(y0 + 1000*(a));
+            pt2.x = Math.round(x0 - 1000*(-b));
+            pt2.y = Math.round(y0 - 1000*(a));
+
+            Imgproc.line(cannyImageColor,pt1,pt2,new Scalar(0,0,255),3);
         }
         /**ArrayList<Point>corners = new ArrayList<Point>();
         for (int i=0; i<lines.rows();i++){
