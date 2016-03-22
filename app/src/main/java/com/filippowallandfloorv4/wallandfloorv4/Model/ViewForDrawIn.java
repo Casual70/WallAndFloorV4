@@ -95,6 +95,7 @@ public class ViewForDrawIn extends View {
     private float mScaleFactor = 1.0f;
     private EditorFragment editorFragment;
     private Bitmap mTextureBitmapVFD;
+    public LinkedList<ImageViewPointer> imageViewPointersList;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -108,6 +109,7 @@ public class ViewForDrawIn extends View {
         mPaint = new Paint();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         stroke = mPaint.getStrokeWidth();
+        imageViewPointersList = new LinkedList<ImageViewPointer>();
         SGD = new ScaleGestureDetector(context,new ScaleListener());
         Log.e(VFD_LOG, "Vdf inizialized");
     }
@@ -196,18 +198,23 @@ public class ViewForDrawIn extends View {
     }
     public List<Point> load4Point(float x, float y , Bitmap mTextureBitmapVFD){
 
-        ImageViewPointer point = new ImageViewPointer(context,x,y);
+
+        ImageViewPointer point1 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
+        ImageViewPointer point2 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2+mTextureBitmapVFD.getHeight()/2);
+        ImageViewPointer point3 = new ImageViewPointer(context,this.getWidth()/2+mTextureBitmapVFD.getWidth()/2,this.getHeight()/2+mTextureBitmapVFD.getHeight()/2);
+        ImageViewPointer point4 = new ImageViewPointer(context,this.getWidth()/2+mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
+        imageViewPointersList.add(point1);imageViewPointersList.add(point2);imageViewPointersList.add(point3);imageViewPointersList.add(point4);
+
         if (prospectPoitList == null){
             prospectPoitList = new ArrayList<>();
         }
         if (prospectPoitList.size()<4){
-            prospectPoitList.add(new Point(point.getX(), point.getY()));
-            point.setImageDrawable(getResources().getDrawable(R.drawable.destra));
+            prospectPoitList.add(new Point(point1.getX(), point1.getY()));
+            point1.setImageDrawable(getResources().getDrawable(R.drawable.destra));
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(15,15);
-            params.leftMargin = (int)point.getX();
-            params.topMargin = (int)point.getY();
-            editorFragment.relativeLayout_editor.addView(point, params);
-
+            params.leftMargin = (int)point1.getX();
+            params.topMargin = (int)point1.getY();
+            editorFragment.relativeLayout_editor.addView(point1, params);
         }
 
         /**Load4point()
