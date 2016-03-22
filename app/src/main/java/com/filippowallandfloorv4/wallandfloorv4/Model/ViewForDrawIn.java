@@ -14,10 +14,14 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.filippowallandfloorv4.wallandfloorv4.Activity.EditorActivity;
 import com.filippowallandfloorv4.wallandfloorv4.App;
 import com.filippowallandfloorv4.wallandfloorv4.Fragment.EditorFragment;
+import com.filippowallandfloorv4.wallandfloorv4.R;
 import com.filippowallandfloorv4.wallandfloorv4.Service.CannyImage;
 import com.filippowallandfloorv4.wallandfloorv4.Service.HarrysCorner;
 import com.filippowallandfloorv4.wallandfloorv4.Service.HougeImage;
@@ -30,6 +34,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Primitives;
 
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -141,7 +146,7 @@ public class ViewForDrawIn extends View {
             canvas.drawPath(p, paint);
             Log.e("ondraw Log", ""+ myPathUndo.size());
         }
-        if (prospectPoitList != null){
+        /**if (prospectPoitList != null){
             Paint paint = new Paint(); // vedere se è necessaria farle come varibili globali
             paint.setColor(Color.RED);
             Path pointPath = new Path();
@@ -149,7 +154,7 @@ public class ViewForDrawIn extends View {
                 pointPath.addCircle((float)p.x,(float)p.y,15, Path.Direction.CCW);
                 canvas.drawPath(pointPath,paint);
             }
-        }
+        }*/
         canvas.drawPath(mPath, mPaint);
         canvas.restore();
         Log.e(VFD_LOG, "draw");
@@ -189,24 +194,22 @@ public class ViewForDrawIn extends View {
             mPath = new Path();
         }
     }
-    public List<Point> load4Point(float x, float y){
-        Point point = new Point(x,y);
+    public List<Point> load4Point(float x, float y , Bitmap mTextureBitmapVFD){
+
+        ImageViewPointer point = new ImageViewPointer(context,x,y);
         if (prospectPoitList == null){
             prospectPoitList = new ArrayList<>();
         }
         if (prospectPoitList.size()<4){
-            prospectPoitList.add(new Point(point.x, point.y));
+            prospectPoitList.add(new Point(point.getX(), point.getY()));
+            point.setImageDrawable(getResources().getDrawable(R.drawable.destra));
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(15,15);
+            params.leftMargin = (int)point.getX();
+            params.topMargin = (int)point.getY();
+            editorFragment.relativeLayout_editor.addView(point, params);
 
-            Paint paint = new Paint();
-            paint.setColor(Color.RED);
-            paint.setStrokeWidth(10);
-            //mCanvas.drawCircle((float) point.x, (float) point.y, 15, paint);
-            mPath.addCircle((float) point.x, (float) point.y, 15, Path.Direction.CCW);
-            pathColorMap.put(mPath, new Paint(paint));
-            myPathUndo.add(mPath);
-            invalidate();
-            mPath = new Path();
         }
+
         return prospectPoitList;
     }
     public void onUndoPath(){
@@ -288,13 +291,13 @@ public class ViewForDrawIn extends View {
                                 if (mPaint.getShader() != null){                                            //nel caso si stiano stabiledondo i punti di prospetto aprire
                                     if (prospectPoitList == null || prospectPoitList.size()<4){
                                         mTextureBitmapVFD = editorFragment.mTextureBitmap;
-                                        prospectPoitList = load4Point(mX,mY);
+                                        prospectPoitList = load4Point(mX,mY, mTextureBitmapVFD);
                                         String listPoint = "";
-                                        for(int index = 0;index<prospectPoitList.size();index++){
+                                        /**for(int index = 0;index<prospectPoitList.size();index++){
                                             listPoint += ("Punto "+index+" X: "+prospectPoitList.get(index).x + " Y: "+prospectPoitList.get(index).y+"\n");
                                         }
                                         Log.e("ProspectListSize"," "+prospectPoitList.size());
-                                        Toast.makeText(context,listPoint,Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context,listPoint,Toast.LENGTH_SHORT).show();*/
                                         return true;
                                     }
 
@@ -318,7 +321,7 @@ public class ViewForDrawIn extends View {
                                 myPathUndo.add(floodFillPath);
                                 Log.e("Visited pixel", "Visited Pixel tot : " + visitedBackPixel.size());
                                 myPathUndoBack.add(visitedBackPixel);
-                                findCorner(visitedBackPixel);
+                                //findCorner(visitedBackPixel);
                                 visitedBackPixel = new LinkedList<>();
                                 floodFillPath = new Path();
                                 mPaint.setStrokeWidth(stroke);

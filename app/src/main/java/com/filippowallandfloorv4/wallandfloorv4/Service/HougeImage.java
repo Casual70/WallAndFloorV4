@@ -45,8 +45,8 @@ public class HougeImage extends AsyncTask <Bitmap,Bitmap,Bitmap>{
     private int mCurrentY;
     private int mCurrentX;
 
-    private int threshold = 300;
-    private int min_line_lenght = 40;
+    private int threshold = 20;
+    private int min_line_lenght = 50;
     private int max_line_gap = 5;
 
     public HougeImage(Mat cannyMat, ViewForDrawIn view, Bitmap originalBitmap) {
@@ -66,21 +66,32 @@ public class HougeImage extends AsyncTask <Bitmap,Bitmap,Bitmap>{
         Mat cannyImageColor = new Mat();
         Mat lines = new Mat();
         // probalistic
-        /**
+
         Imgproc.HoughLinesP(cannyMat, lines, 1, Math.PI / 180, threshold, min_line_lenght, max_line_gap);
         Imgproc.cvtColor(cannyMat, cannyImageColor, Imgproc.COLOR_GRAY2RGB);
         for (int i = 0; i < lines.rows();i++){
+
+            double rho = lines.get(i,0)[0];
+            double theta = lines.get(i,0)[1];
+            double a = Math.cos(theta);
+            double b = Math.sin(theta);
+            double x0 = a+rho;
+            double y0 = b+rho;
+
+
             double line[] = lines.get(i,0);
-            double xStart = line[0],
-                    yStart = line[1],
-                    xEnd = line[2],
-                    yEnd = line[3];
+            double  xStart = line[0],//Math.round(x0 + 1000*(-b)), //line[0],
+                    yStart = line[1],// Math.round(y0 + 1000*(a)), //line[1],
+                    xEnd =  line[2],//Math.round(x0 - 1000*(-b)),//line[2],
+                    yEnd = line[3];// Math.round(y0 - 1000*(a)); //line[3];
+
             org.opencv.core.Point lineStart = new org.opencv.core.Point(xStart,yStart);
             org.opencv.core.Point lineEnd = new org.opencv.core.Point(xEnd,yEnd);
             Imgproc.line(cannyImageColor,lineStart,lineEnd,new Scalar(0,0,255),3);
-        }*/
+        }
         // not probabilistic
-        Imgproc.HoughLines(cannyMat,lines,3,Math.PI/180,threshold);
+        /**
+        Imgproc.HoughLines(cannyMat,lines,2,Math.PI/180,threshold);
         Imgproc.cvtColor(cannyMat, cannyImageColor, Imgproc.COLOR_GRAY2RGB);
         for (int i = 0 ; i<lines.rows();i++){
             double rho = lines.get(i,0)[0];
@@ -97,7 +108,7 @@ public class HougeImage extends AsyncTask <Bitmap,Bitmap,Bitmap>{
             pt2.y = Math.round(y0 - 1000*(a));
 
             Imgproc.line(cannyImageColor,pt1,pt2,new Scalar(0,0,255),3);
-        }
+        }*/
         /**ArrayList<Point>corners = new ArrayList<Point>();
         for (int i=0; i<lines.rows();i++){
             for (int j= i+1;j<lines.rows();j++ ){

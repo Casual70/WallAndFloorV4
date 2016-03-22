@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.filippowallandfloorv4.wallandfloorv4.App;
@@ -53,6 +54,7 @@ public class EditorActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout_color;
     private App app;
     private EditorFragment fragment;
+    public RelativeLayout relativeLayout_editorActivity;
 
     private SharedPreferences colorPref;
     private static final String keycolor2 = "col2";

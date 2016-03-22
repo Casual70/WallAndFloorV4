@@ -77,8 +77,8 @@ public class CannyImage extends AsyncTask<Bitmap,Bitmap,Bitmap> {
         Imgproc.cvtColor(imageOriginalMat, imageGray, Imgproc.COLOR_BGR2GRAY);
         //Imgproc.equalizeHist(imageGray,imageGray);
         Imgproc.medianBlur(imageGray, imageCanny, 5);
-        //Imgproc.GaussianBlur(imageGray,imageCanny,new Size(7,7),100);
-        Imgproc.Canny(imageCanny, imageCanny, threshold_min, thereshold_max * 10, 5, true);
+        //Imgproc.GaussianBlur(imageGray,imageCanny,new Size(9,9),100);
+        Imgproc.Canny(imageCanny, imageCanny, threshold_min, thereshold_max * 150, 7, true);
         cannyMat = imageCanny;
         Utils.matToBitmap(imageCanny, edgeImage);
         return edgeImage;

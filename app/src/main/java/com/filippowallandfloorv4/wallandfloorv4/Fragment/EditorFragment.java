@@ -43,6 +43,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
 
     public ViewForDrawIn vfd;
     public RelativeLayout bottomActionBar;
+    public RelativeLayout relativeLayout_editor;
     public ImageButton openIB, strokeWidthIB, strokeStyleIB, grayScaleIB,textureIB,saveIB;
     public ToggleButton freeHandToggleB, oneLineToggleB;
     public ListPopupWindow listPopupStyle, listPopupLine;
@@ -81,6 +82,7 @@ public class EditorFragment extends android.app.Fragment implements View.OnClick
         openIB = (ImageButton)view.findViewById(R.id.openImageButton);
         grayScaleIB = (ImageButton)view.findViewById(R.id.grayScaleImageButton);
         listButton = new View[]{strokeStyleIB,strokeWidthIB,toggleGroup,grayScaleIB,textureIB,saveIB};
+        relativeLayout_editor = (RelativeLayout)view.findViewById(R.id.fragment_layout_editor);
 
         return view;
     }
