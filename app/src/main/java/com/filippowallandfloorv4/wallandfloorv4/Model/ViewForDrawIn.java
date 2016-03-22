@@ -210,6 +210,15 @@ public class ViewForDrawIn extends View {
 
         }
 
+        /**Load4point()
+        - achiviare le ImageVPointer per poi rimuoverle alla fine (magari al posto del prospectPoitList)
+                - implementare il Drag sulle image view dove ogni volta che vengono spostate si deve ridisegnare le linee di selezione
+        - per le linee di selezione usare un Path a parte da eliminare alla fine con le image view
+                - implementare un tasto o un gesto di conferma alla fine del posizionamento
+                - nel drag aggiungere anche il metodo per prospettivizzare l'immagine del bitmap che
+                -le linee di selezione e i 4 punti devono assere presenti da subito con il bitmap disegmato il fill piatto
+                - al drag si avrà la prospettiva secondo gli attuali parametri*/
+
         return prospectPoitList;
     }
     public void onUndoPath(){
