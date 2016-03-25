@@ -199,22 +199,25 @@ public class ViewForDrawIn extends View {
     public List<Point> load4Point(float x, float y , Bitmap mTextureBitmapVFD){
 
 
-        ImageViewPointer point1 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
+        //ImageViewPointer point1 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
+        ImageViewPointer point1 = new ImageViewPointer(context,this.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
         ImageViewPointer point2 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2+mTextureBitmapVFD.getHeight()/2);
         ImageViewPointer point3 = new ImageViewPointer(context,this.getWidth()/2+mTextureBitmapVFD.getWidth()/2,this.getHeight()/2+mTextureBitmapVFD.getHeight()/2);
         ImageViewPointer point4 = new ImageViewPointer(context,this.getWidth()/2+mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
         imageViewPointersList.add(point1);imageViewPointersList.add(point2);imageViewPointersList.add(point3);imageViewPointersList.add(point4);
 
-        if (prospectPoitList == null){
-            prospectPoitList = new ArrayList<>();
-        }
-        if (prospectPoitList.size()<4){
-            prospectPoitList.add(new Point(point1.getX(), point1.getY()));
-            point1.setImageDrawable(getResources().getDrawable(R.drawable.destra));
+        for (ImageViewPointer ivp : imageViewPointersList){
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(15,15);
-            params.leftMargin = (int)point1.getX();
-            params.topMargin = (int)point1.getY();
-            editorFragment.relativeLayout_editor.addView(point1, params);
+            params.leftMargin = (int)(ivp.getX());
+            params.topMargin = (int)(ivp.getY());
+            ivp.setImageDrawable(getResources().getDrawable(R.drawable.destra));
+            editorFragment.relativeLayout_editor.addView(ivp);
+            if (prospectPoitList == null){
+                prospectPoitList = new ArrayList<>();
+            }
+            if (prospectPoitList.size()<4){
+                prospectPoitList.add(new Point(ivp.getX(),ivp.getY()));
+            }
         }
 
         /**Load4point()
