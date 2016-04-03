@@ -70,6 +70,7 @@ public class ViewForDrawIn extends View {
     private ArrayList<LinkedList> myPathUndoBack = new ArrayList<>();
     private ArrayList<LinkedList> myPathRedoBack = new ArrayList<>();
     private Path floodFillPath;
+    private Path pathProspectOverview;
     private Map<Path,Paint>pathColorMap = new HashMap<>();
     private Map<Path,LinkedList>pathBackMap = new HashMap<>();
     private Bitmap backBitmap;
@@ -96,6 +97,8 @@ public class ViewForDrawIn extends View {
     private EditorFragment editorFragment;
     private Bitmap mTextureBitmapVFD;
     public LinkedList<ImageViewPointer> imageViewPointersList;
+    private int xDelta;
+    private int yDelta;
 
     public ViewForDrawIn(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -148,6 +151,7 @@ public class ViewForDrawIn extends View {
             canvas.drawPath(p, paint);
             Log.e("ondraw Log", ""+ myPathUndo.size());
         }
+
         /**if (prospectPoitList != null){
             Paint paint = new Paint(); // vedere se è necessaria farle come varibili globali
             paint.setColor(Color.RED);
@@ -196,28 +200,52 @@ public class ViewForDrawIn extends View {
             mPath = new Path();
         }
     }
+    OnTouchListener dragPointer = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            final int X = (int)event.getRawX();
+            final int Y = (int)event.getRawY();
+            switch (event.getAction() & MotionEvent.ACTION_MASK){
+                case MotionEvent.ACTION_DOWN:
+                    RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)v.getLayoutParams();
+                    xDelta = X - layoutParams.leftMargin;
+                    yDelta = Y - layoutParams.topMargin;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    RelativeLayout.LayoutParams layoutParamsMove = (RelativeLayout.LayoutParams)v.getLayoutParams();
+                    layoutParamsMove.leftMargin = X-xDelta;
+                    layoutParamsMove.topMargin = Y-yDelta;
+                    v.setLayoutParams(layoutParamsMove);
+                    ImageViewPointer pointer = (ImageViewPointer)v;
+                    pointer.setX(X-xDelta);
+                    pointer.setY(Y - yDelta);
+                    drawPathProspectOverview();
+                    break;
+            }
+            editorFragment.relativeLayout_editor.invalidate();
+            //drawPathProspectOverview();
+            logListImageViewPointer();
+            return true;
+        }
+    };
     public List<Point> load4Point(float x, float y , Bitmap mTextureBitmapVFD){
 
 
-        //ImageViewPointer point1 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
-        ImageViewPointer point1 = new ImageViewPointer(context,this.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
+        ImageViewPointer point1 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
         ImageViewPointer point2 = new ImageViewPointer(context,this.getWidth()/2-mTextureBitmapVFD.getWidth()/2,this.getHeight()/2+mTextureBitmapVFD.getHeight()/2);
         ImageViewPointer point3 = new ImageViewPointer(context,this.getWidth()/2+mTextureBitmapVFD.getWidth()/2,this.getHeight()/2+mTextureBitmapVFD.getHeight()/2);
         ImageViewPointer point4 = new ImageViewPointer(context,this.getWidth()/2+mTextureBitmapVFD.getWidth()/2,this.getHeight()/2-mTextureBitmapVFD.getHeight()/2);
         imageViewPointersList.add(point1);imageViewPointersList.add(point2);imageViewPointersList.add(point3);imageViewPointersList.add(point4);
+        prospectPoitList = new ArrayList<>();
 
         for (ImageViewPointer ivp : imageViewPointersList){
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(15,15);
             params.leftMargin = (int)(ivp.getX());
             params.topMargin = (int)(ivp.getY());
-            ivp.setImageDrawable(getResources().getDrawable(R.drawable.destra));
-            editorFragment.relativeLayout_editor.addView(ivp);
-            if (prospectPoitList == null){
-                prospectPoitList = new ArrayList<>();
-            }
-            if (prospectPoitList.size()<4){
-                prospectPoitList.add(new Point(ivp.getX(),ivp.getY()));
-            }
+            ivp.setImageDrawable(getResources().getDrawable(R.drawable.circle_icon));
+            ivp.setOnTouchListener(dragPointer);
+            editorFragment.relativeLayout_editor.addView(ivp,params);
+            prospectPoitList.add(new Point(ivp.getX(),ivp.getY()));
         }
 
         /**Load4point()
@@ -231,6 +259,31 @@ public class ViewForDrawIn extends View {
 
         return prospectPoitList;
     }
+
+    private void logListImageViewPointer (){
+        Path pathRelative = new Path();
+        for (int i = 0 ; i < imageViewPointersList.size() ; i++){
+            Log.e("point","X: "+imageViewPointersList.get(i).getX() + " Y:"+ imageViewPointersList.get(i).getY());
+
+        }//terminare il path di collegamento
+    }
+    private void drawPathProspectOverview(){
+        if (pathProspectOverview == null){
+            pathProspectOverview = new Path();
+        }
+        for (int i = 0 ; i < imageViewPointersList.size() ; i++){
+            if (i == 0){
+                pathProspectOverview.moveTo(imageViewPointersList.get(i).getX()+7,imageViewPointersList.get(i).getY()+7); // todo assegnare i 7 come variabili e i layout params pure in base al display
+            }else{
+                pathProspectOverview.lineTo(imageViewPointersList.get(i).getX()+7,imageViewPointersList.get(i).getY()+7);
+            }
+        }
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        mCanvas.drawPath(pathProspectOverview,paint);
+    }
+
+
     public void onUndoPath(){
         if (myPathUndo.size() > 0) {
             myPathRedo.add(myPathUndo.get(myPathUndo.size() - 1));
